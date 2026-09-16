@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/plus-jakarta-sans';
+
+/*
+ * Design tokens. App UI values were sampled from the phone screens in design/
+ * (see DECISIONS.md → "Colour tokens"); brand values come from design/00-brand.jpeg.
+ */
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Inter Variable', ui-sans-serif, sans-serif;
+
+  /* Brand */
+  --color-navy: #0b1f44;
+  --color-brand-blue: #006cff;
+  --color-charcoal: #2e3a46;
+  --color-board: #f4f7fb;
+
+  /* App surfaces */
+  --color-app: #011020;
+  --color-card: #04182b;
+  --color-card-2: #051c2e;
+  --color-input: #0a2439;
+  --color-selected: #002349;
+  --color-line: #1a2d3e;
+  --color-line-input: #2a3f50;
+  --color-line-active: #006cff;
+
+  /* Actions */
+  --color-primary: #006cff;
+  --color-primary-hover: #0a5ce0;
+
+  /* Text */
+  --color-fg: #ffffff;
+  --color-muted: #aeb9c9;
+  --color-subtle: #7f8a9b;
+
+  /* Status */
+  --color-success: #22c55e;
+  --color-warning: #f5a524;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-app font-sans text-fg antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}

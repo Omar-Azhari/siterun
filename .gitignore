@@ -1,0 +1,14 @@
+node_modules
+dist
+*.local
+.env
+.env.*
+!.env.example
+coverage
+playwright-report
+test-results
+node_modules/.tmp
+.DS_Store
+# design source archive (images live in design/)
+siterun.zip
+siterun/
