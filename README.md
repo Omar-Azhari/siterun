@@ -3,7 +3,7 @@
 Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
 *Machines. People. Progress.*
 
-Status: **Phase 0 (setup) complete.** See `DECISIONS.md` for design decisions.
+Status: **Phase 1 (design system) complete.** See `DECISIONS.md` for design decisions.
 
 ## Stack
 
@@ -47,7 +47,10 @@ design/            Source-of-truth design boards (00-brand … 10-supplier-admin
 public/brand/      Logo SVGs and app icon
 public/            Favicons, PWA icons, web manifest
 scripts/           Brand asset generation and comparison tools
-src/components/    UI components (brand/Logo uses the generated mark paths)
+src/components/ui/          Design-system components (barrel: `@/components/ui`)
+src/components/layout/      Screen shell (header, sticky footer, bottom nav)
+src/components/navigation/  Per-role bottom nav config
+src/components/brand/       Logo (uses the generated mark paths)
 src/lib/           Pure logic (e.g. ABN validation)
 src/pages/dev/     Dev-only pages (/dev/brand; later /dev/components, /dev/screens)
 e2e/               Playwright tests
@@ -57,6 +60,7 @@ docs/checkpoints/  Checkpoint screenshots
 ## Dev pages
 
 - `/dev/brand`: logos, colour tokens and type samples (checkpoint 0)
+- `/dev/components`: every UI component in every state (checkpoint 1)
 
 ## Demo logins
 
