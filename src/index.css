@@ -53,3 +53,42 @@
     @apply outline-2 outline-offset-2 outline-primary;
   }
 }
+
+/* Leaflet overrides to match the dark UI */
+.leaflet-container {
+  font-family: var(--font-sans);
+}
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(1, 16, 32, 0.65);
+  color: #9aa6b8;
+  font-size: 9px;
+}
+.leaflet-container .leaflet-control-attribution a {
+  color: #c3ccd8;
+}
+.leaflet-tooltip.site-pin-label {
+  background: rgba(1, 16, 32, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 6px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.leaflet-tooltip.site-pin-label::before {
+  border-top-color: rgba(1, 16, 32, 0.9);
+}
+.leaflet-tooltip.map-chip {
+  background: rgba(1, 16, 32, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  box-shadow: none;
+}
+.leaflet-tooltip.map-chip::before {
+  display: none;
+}
