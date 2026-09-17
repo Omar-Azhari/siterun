@@ -71,6 +71,51 @@ const CompanyPage = page(() => import('@/pages/account/AccountSubPages'), 'Compa
 const PaymentSettingsPage = page(() => import('@/pages/account/AccountSubPages'), 'PaymentSettingsPage')
 const AccountPrivacyPage = page(() => import('@/pages/account/AccountSubPages'), 'PrivacyPage')
 
+// Boards 07-10 (supplier)
+const SupplierMachinesPage = page(() => import('@/pages/supplier/MachinesPage'), 'MachinesPage')
+const MachineManagePage = page(() => import('@/pages/supplier/MachinesPage'), 'MachineManagePage')
+const CategoryStep = page(() => import('@/pages/supplier/listing/CategoryStep'), 'CategoryStep')
+const DetailsStep = page(() => import('@/pages/supplier/listing/DetailsStep'), 'DetailsStep')
+const PhotosStep = page(() => import('@/pages/supplier/listing/PhotosStep'), 'PhotosStep')
+const SpecsStep = page(() => import('@/pages/supplier/listing/SpecsStep'), 'SpecsStep')
+const RatesStep = page(() => import('@/pages/supplier/listing/RatesStep'), 'RatesStep')
+const ServiceAreaStep = page(() => import('@/pages/supplier/listing/ServiceAreaStep'), 'ServiceAreaStep')
+const PreviewListingPage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'PreviewListingPage')
+const ReviewSubmitPage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'ReviewSubmitPage')
+const ListingLivePage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'ListingLivePage')
+const ComplianceChecklistPage = page(() => import('@/pages/supplier/compliance/ComplianceChecklistPage'), 'ComplianceChecklistPage')
+const RequirementsPage = page(() => import('@/pages/supplier/compliance/RequirementsPage'), 'RequirementsPage')
+const UploadDocumentPage = page(() => import('@/pages/supplier/compliance/UploadDocumentPage'), 'UploadDocumentPage')
+const ComplianceStatusPage = page(() => import('@/pages/supplier/compliance/ComplianceStatusPage'), 'ComplianceStatusPage')
+const ComplianceAlertsPage = page(() => import('@/pages/supplier/compliance/ComplianceAlertsPage'), 'ComplianceAlertsPage')
+const BookingRequestsPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'BookingRequestsPage')
+const DispatchPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'DispatchPage')
+const SupplierBookingsListPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'SupplierBookingsListPage')
+const SupplierBookingDetailPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'SupplierBookingDetailPage')
+const PayoutsPage = page(() => import('@/pages/supplier/PayoutsPage'), 'PayoutsPage')
+const PerformancePage = page(() => import('@/pages/supplier/PerformancePage'), 'PerformancePage')
+
+// Support
+const SupportPage = page(() => import('@/pages/support/SupportPages'), 'SupportPage')
+const TicketsPage = page(() => import('@/pages/support/SupportPages'), 'TicketsPage')
+const HelpArticlesPage = page(() => import('@/pages/support/SupportPages'), 'HelpArticlesPage')
+const NewTicketPage = page(() => import('@/pages/support/SupportPages'), 'NewTicketPage')
+
+// Platform admin
+const AdminDashboardPage = page(() => import('@/pages/admin/AdminPages'), 'AdminDashboardPage')
+const AdminApprovalsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminApprovalsPage')
+const AdminMachineReviewPage = page(() => import('@/pages/admin/AdminPages'), 'AdminMachineReviewPage')
+const AdminDocumentReviewPage = page(() => import('@/pages/admin/AdminPages'), 'AdminDocumentReviewPage')
+const AdminSuppliersPage = page(() => import('@/pages/admin/AdminPages'), 'AdminSuppliersPage')
+const AdminBookingsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminBookingsPage')
+const AdminMorePage = page(() => import('@/pages/admin/AdminPages'), 'AdminMorePage')
+
+// Operator
+const OperatorHomePage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorHomePage')
+const OperatorBookingsPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorBookingsPage')
+const OperatorBookingDetailPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorBookingDetailPage')
+const OperatorDocumentsPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorDocumentsPage')
+
 // Dev
 const BrandPage = page(() => import('@/pages/dev/BrandPage'), 'BrandPage')
 const ComponentsPage = page(() => import('@/pages/dev/ComponentsPage'), 'ComponentsPage')
@@ -117,6 +162,57 @@ export function AppRoutes() {
         <Route path="/account/company" element={<CompanyPage />} />
         <Route path="/account/payment-settings" element={<PaymentSettingsPage />} />
         <Route path="/account/privacy" element={<AccountPrivacyPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/support/requests" element={<TicketsPage />} />
+        <Route path="/support/articles" element={<HelpArticlesPage />} />
+        <Route path="/support/new" element={<NewTicketPage />} />
+
+        <Route element={<RequireArea area={['supplier', 'operator']} />}>
+          <Route path="/supplier/compliance/upload" element={<UploadDocumentPage />} />
+        </Route>
+
+        <Route element={<RequireArea area="supplier" />}>
+          <Route path="/supplier" element={<PerformancePage />} />
+          <Route path="/supplier/performance" element={<PerformancePage />} />
+          <Route path="/supplier/machines" element={<SupplierMachinesPage />} />
+          <Route path="/supplier/machines/new/category" element={<CategoryStep />} />
+          <Route path="/supplier/machines/:id" element={<MachineManagePage />} />
+          <Route path="/supplier/machines/:id/edit/category" element={<CategoryStep />} />
+          <Route path="/supplier/machines/:id/edit/details" element={<DetailsStep />} />
+          <Route path="/supplier/machines/:id/edit/photos" element={<PhotosStep />} />
+          <Route path="/supplier/machines/:id/edit/specs" element={<SpecsStep />} />
+          <Route path="/supplier/machines/:id/edit/rates" element={<RatesStep />} />
+          <Route path="/supplier/machines/:id/edit/service-area" element={<ServiceAreaStep />} />
+          <Route path="/supplier/machines/:id/compliance" element={<ComplianceStatusPage />} />
+          <Route path="/supplier/machines/:id/preview" element={<PreviewListingPage />} />
+          <Route path="/supplier/machines/:id/review" element={<ReviewSubmitPage />} />
+          <Route path="/supplier/machines/:id/live" element={<ListingLivePage />} />
+          <Route path="/supplier/compliance" element={<ComplianceChecklistPage />} />
+          <Route path="/supplier/compliance/requirements/:group" element={<RequirementsPage />} />
+          <Route path="/supplier/compliance/alerts" element={<ComplianceAlertsPage />} />
+          <Route path="/supplier/requests" element={<BookingRequestsPage />} />
+          <Route path="/supplier/dispatch" element={<DispatchPage />} />
+          <Route path="/supplier/bookings" element={<SupplierBookingsListPage />} />
+          <Route path="/supplier/bookings/:id" element={<SupplierBookingDetailPage />} />
+          <Route path="/supplier/payouts" element={<PayoutsPage />} />
+        </Route>
+
+        <Route element={<RequireArea area="operator" />}>
+          <Route path="/operator" element={<OperatorHomePage />} />
+          <Route path="/operator/bookings" element={<OperatorBookingsPage />} />
+          <Route path="/operator/bookings/:id" element={<OperatorBookingDetailPage />} />
+          <Route path="/operator/documents" element={<OperatorDocumentsPage />} />
+        </Route>
+
+        <Route element={<RequireArea area="admin" />}>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/approvals" element={<AdminApprovalsPage />} />
+          <Route path="/admin/approvals/machines/:id" element={<AdminMachineReviewPage />} />
+          <Route path="/admin/approvals/documents/:id" element={<AdminDocumentReviewPage />} />
+          <Route path="/admin/suppliers" element={<AdminSuppliersPage />} />
+          <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+          <Route path="/admin/more" element={<AdminMorePage />} />
+        </Route>
 
         <Route element={<RequireArea area={['contractor']} />}>
           <Route path="/home" element={<BrowsePage />} />

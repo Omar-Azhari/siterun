@@ -60,7 +60,7 @@ export interface DemoDb {
   activity: AdminActivity[]
 }
 
-export const DB_VERSION = 3
+export const DB_VERSION = 4
 export const DEMO_PASSWORD = 'SiteRun!2026'
 
 export const DEMO_ACCOUNTS = [
@@ -1714,20 +1714,29 @@ export function buildSeed(now: Date = new Date()): DemoDb {
       )
     }
   }
-  // Older completed work (60–90 days ago) for trend comparisons.
-  for (let i = 0; i < 16; i++) {
-    const start = -40 - i * 3
-    bookings.push(
-      booking({
-        id: `b-old-${i}`,
-        machineId: i % 2 ? 'm-3t-cat303' : 'm-5t-komatsu',
-        contractorOrgId: customers[i % customers.length] ?? 'org-buildco',
-        startDate: day(start),
-        endDate: day(start + 1),
-        status: 'completed',
-        createdAt: subDays(today, -start + 7).toISOString(),
-      }),
-    )
+  // The previous 30-day window (31–60 days ago) so trends compare like with like.
+  const previous: [string, number, number][] = [
+    ['m-3t-cat303', 10, 2],
+    ['m-60t-crane', 6, 3],
+    ['m-gen-40kva', 4, 2],
+  ]
+  for (const [machineId, count, len] of previous) {
+    for (let i = 0; i < count; i++) {
+      const end = -33 - i * (len + 0) - (machineId === 'm-gen-40kva' ? 12 : 0)
+      const start = end - len + 1
+      bookings.push(
+        booking({
+          id: `b-prev-${++h}`,
+          machineId,
+          contractorOrgId: customers[h % customers.length] ?? 'org-buildco',
+          startDate: day(start),
+          endDate: day(end),
+          status: 'completed',
+          hireType: machineId === 'm-60t-crane' ? 'wet' : 'dry',
+          createdAt: subDays(today, -start + 7).toISOString(),
+        }),
+      )
+    }
   }
   // Acme's past hires behind INV-1041…1045
   const invoiceHires: [string, string, number, number, number][] = [

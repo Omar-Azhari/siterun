@@ -39,7 +39,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           id={selectId}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(selectId, { hint, error })}
-          className="h-full min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pr-8 text-base text-fg outline-none invalid:text-subtle disabled:cursor-not-allowed [&>option]:bg-card [&>option]:text-fg"
+          className="h-full min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pr-8 text-base text-fg outline-none disabled:cursor-not-allowed [&:has(option[value='']:checked)]:text-subtle [&>option]:bg-card [&>option]:text-fg"
           required={placeholder ? true : rest.required}
           {...rest}
         >

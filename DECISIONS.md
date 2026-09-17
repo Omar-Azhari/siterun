@@ -69,3 +69,33 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **Operator bottom nav** (not in the mockups): Home · Bookings · Documents · Messages · Account.
 - **Supplier "Bookings"** opens Bookings & Dispatch (`/supplier/dispatch`). Booking Requests and Booking Detail highlight the same tab.
 - **Contractor "Account"** stays highlighted on sub-pages reached from Account (Payments, Invoices, Sites, Team, Plans, Support, Notifications). Board 05 shows those as separate tabs, but the brief sets a five-item contractor nav.
+
+## Phase 2
+
+### Architecture
+- **One `Api` interface, two backends.** Screens call `src/data/api.ts` through React Query hooks. `DemoApi` (in-browser, persisted to localStorage, reseeded daily) is used when Supabase env vars are missing. It also powers `/dev/screens` and the board screenshot suite. Its permission checks mirror the RLS policies, so behaviour matches production.
+- **Demo mode is a feature, not a stub.** Every flow works without a backend: sign-up, OTP (code `123456`, shown on screen), bookings, supplier accept/decline, dispatch/delivery/collection, invoices, payouts, admin approval.
+- **Supplier lifecycle actions were added** (not on the boards): *Mark Dispatched → Mark Delivered/Picked Up → Mark Collected & Invoice*, available from Plan Dispatch and Booking Detail. Completing a hire raises the tax invoice. Without these, hires could never move between the designed states.
+
+### Content and data
+- **Photos** come from Unsplash (Unsplash License) via the website search, because the API needs a key. Sources and photographers are in `CREDITS.md`. Pexels wasn't needed.
+- **Demo emails use `.test` domains** (e.g. `alex@acme.test` instead of `alex@acme.com`), so no real address can ever receive mail.
+- **Dates are relative to today.** The seed reproduces the mockups' shape (5 active hires, 4 requests, INV-1041…1045, $12,480 available payout) rather than their literal May–June 2025 dates.
+- **Invoice rows show totals including GST.** The mockup amounts ($3,200, $1,680…) are used as the ex-GST hire value. Invoices add 10%, so rows read $3,520.00 etc. **Account Balance** = unpaid invoices including GST ($4,620.00 in the seed, not $12,480).
+- **Admin dashboard numbers are live counts** from the database (e.g. Users 7), not the mockup's platform-scale figures (1,248). Trends compare the selected period with the previous one.
+- **Site names:** board 04 uses "Riverside Estate" while board 02 uses "Riverside Apartments". The seed uses Riverside Apartments everywhere. Board 04's other sites (Warehouse Project A, Airport Upgrade, Retail Fitout, Civic Centre) exist as additional Acme sites.
+- **Board 05 calendar** shows the *supplier* name under each booking (the mockup shows customer names, which doesn't make sense for a contractor).
+- **Booking references** use `SR-YYYY-NNNN` everywhere, including the supplier booking detail (mockup: `#BK-7842`). Support tickets keep the mockup's `#SR-4582` style.
+- **Compliance Status (board 08 #6)** shows the requirements configured for the machine's category. The mockup lists crane and operator documents on an excavator; ours shows general-plant documents (and crane documents only for cranes). Operator documents live on the operator's profile.
+- **Board 10 booking detail** shows the real status ("New Request" with Decline/Accept). The mockup shows "Confirmed" with Decline/Accept at the same time.
+- **Browse Equipment** shows all 8 categories (the six on the board plus Loaders and Other Plant, which appear on board 07).
+- **"Booking Confirmed!" vs "Booking Requested!"** New bookings wait for supplier acceptance, so the confirmation screen says *Requested* until the supplier accepts, then *Confirmed*.
+
+### UI details
+- **Type scale is about 15% larger than the brief** (titles 26px, body and inputs 16px). The mockups' text is larger relative to screen width than the brief's sizes, and 16px inputs prevent iOS zoom-on-focus.
+- **Map tiles:** CARTO basemaps now return "API key required", so the dark tracking map uses **Esri Dark Gray Canvas** and the street toggle uses **Esri World Street Map**. Address search and reverse geocoding use **Photon** (OSM, no key) with an offline suburb list as fallback.
+- **Rates step tabs** (Hourly/Daily/Weekly) choose the *main pricing unit* (that rate becomes required). All three rate fields stay visible as in the mockup. A daily rate is always required because search and booking price per day.
+- **Hire type on the listing wizard** is multi-select (a machine can be offered dry *and* wet), with a wet-hire daily rate field when Wet is ticked.
+- **Operator documents** are uploaded per person (HRWL, VOC, tickets, inductions). Operators manage their own from `/operator/documents`.
+- **Login** has a collapsed "Demo accounts" panel in demo mode only.
+- **Live listings must be paused before editing**, so changes can't bypass review.

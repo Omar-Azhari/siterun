@@ -183,6 +183,8 @@ export interface Api {
   // Supplier: bookings & money
   listSupplierBookings(): Promise<BookingView[]>
   respondToBooking(id: string, accept: boolean, reason?: string): Promise<BookingView>
+  /** Supplier lifecycle: confirmed → in_transit → on_site → completed (completion raises the invoice). */
+  advanceBooking(id: string, to: 'in_transit' | 'on_site' | 'completed'): Promise<BookingView>
   getPayoutSummary(): Promise<PayoutSummary>
   listPayouts(): Promise<Payout[]>
   requestPayout(): Promise<Payout>
