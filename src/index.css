@@ -58,10 +58,11 @@
 .leaflet-container {
   font-family: var(--font-sans);
 }
-.leaflet-container .leaflet-control-attribution {
+.leaflet-container .leaflet-control-attribution.leaflet-control {
   background: rgba(1, 16, 32, 0.65);
   color: #9aa6b8;
   font-size: 9px;
+  border-top-right-radius: 6px;
 }
 .leaflet-container .leaflet-control-attribution a {
   color: #c3ccd8;

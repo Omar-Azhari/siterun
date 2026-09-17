@@ -49,6 +49,28 @@ const BookPage = page(() => import('@/pages/browse/BookPage'), 'BookPage')
 const BookingConfirmedPage = page(() => import('@/pages/bookings/BookingConfirmedPage'), 'BookingConfirmedPage')
 const BookingDetailPage = page(() => import('@/pages/bookings/BookingDetailPage'), 'BookingDetailPage')
 
+// Board 04
+const ActiveHiresPage = page(() => import('@/pages/hires/ActiveHiresPage'), 'ActiveHiresPage')
+const HireDetailPage = page(() => import('@/pages/hires/HireDetailPage'), 'HireDetailPage')
+const TrackingPage = page(() => import('@/pages/hires/TrackingPage'), 'TrackingPage')
+const ExtendHirePage = page(() => import('@/pages/hires/ExtendHirePage'), 'ExtendHirePage')
+const ReturnPage = page(() => import('@/pages/hires/ReturnPage'), 'ReturnPage')
+const SmartSwapPage = page(() => import('@/pages/hires/SmartSwapPage'), 'SmartSwapPage')
+
+// Board 05
+const BookingsCalendarPage = page(() => import('@/pages/bookings/BookingsCalendarPage'), 'BookingsCalendarPage')
+const ConversationsPage = page(() => import('@/pages/messages/ConversationsPage'), 'ConversationsPage')
+const ChatPage = page(() => import('@/pages/messages/ChatPage'), 'ChatPage')
+const PaymentsPage = page(() => import('@/pages/payments/PaymentsPage'), 'PaymentsPage')
+const AddCardPage = page(() => import('@/pages/payments/AddCardPage'), 'AddCardPage')
+const InvoicesPage = page(() => import('@/pages/payments/InvoicesPage'), 'InvoicesPage')
+const NotificationsPage = page(() => import('@/pages/notifications/NotificationsPage'), 'NotificationsPage')
+const AccountPage = page(() => import('@/pages/account/AccountPage'), 'AccountPage')
+const ProfilePage = page(() => import('@/pages/account/AccountSubPages'), 'ProfilePage')
+const CompanyPage = page(() => import('@/pages/account/AccountSubPages'), 'CompanyPage')
+const PaymentSettingsPage = page(() => import('@/pages/account/AccountSubPages'), 'PaymentSettingsPage')
+const AccountPrivacyPage = page(() => import('@/pages/account/AccountSubPages'), 'PrivacyPage')
+
 // Dev
 const BrandPage = page(() => import('@/pages/dev/BrandPage'), 'BrandPage')
 const ComponentsPage = page(() => import('@/pages/dev/ComponentsPage'), 'ComponentsPage')
@@ -87,6 +109,14 @@ export function AppRoutes() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/* Shared by signed-in roles */}
         <Route path="/machines/:id" element={<MachineDetailPage />} />
+        <Route path="/messages" element={<ConversationsPage />} />
+        <Route path="/messages/:id" element={<ChatPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/account/profile" element={<ProfilePage />} />
+        <Route path="/account/company" element={<CompanyPage />} />
+        <Route path="/account/payment-settings" element={<PaymentSettingsPage />} />
+        <Route path="/account/privacy" element={<AccountPrivacyPage />} />
 
         <Route element={<RequireArea area={['contractor']} />}>
           <Route path="/home" element={<BrowsePage />} />
@@ -105,6 +135,16 @@ export function AppRoutes() {
           <Route path="/team" element={<TeamPage />} />
           <Route path="/team/invite" element={<InviteTeamPage />} />
           <Route path="/plans" element={<PlansPage />} />
+          <Route path="/hires" element={<ActiveHiresPage />} />
+          <Route path="/hires/:id" element={<HireDetailPage />} />
+          <Route path="/hires/:id/tracking" element={<TrackingPage />} />
+          <Route path="/hires/:id/extend" element={<ExtendHirePage />} />
+          <Route path="/hires/:id/return" element={<ReturnPage />} />
+          <Route path="/hires/:id/swap" element={<SmartSwapPage />} />
+          <Route path="/bookings" element={<BookingsCalendarPage />} />
+          <Route path="/payments" element={<PaymentsPage />} />
+          <Route path="/payments/cards/new" element={<AddCardPage />} />
+          <Route path="/invoices" element={<InvoicesPage />} />
         </Route>
       </Route>
 

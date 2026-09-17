@@ -49,7 +49,7 @@ ${rows}
 
 - Icons: [Lucide](https://lucide.dev) (ISC License)
 - Fonts: [Inter](https://rsms.me/inter/) and [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) (SIL Open Font License), self-hosted through Fontsource
-- Maps: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, © [CARTO](https://carto.com/attributions); imagery © Esri, Maxar, Earthstar Geographics and the GIS User Community
+- Maps: Esri World Imagery, World Street Map and Dark Gray Canvas (© Esri, Maxar, Earthstar Geographics, HERE, Garmin, © OpenStreetMap contributors); geocoding by [Photon](https://photon.komoot.io) on OpenStreetMap data
 - Logo: traced from the SiteRun brand sheet (\`design/00-brand.jpeg\`)
 `,
 )

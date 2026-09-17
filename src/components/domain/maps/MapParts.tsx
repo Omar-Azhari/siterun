@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import L from 'leaflet'
-import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+import { AttributionControl, MapContainer, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { cn } from '@/lib/cn'
 import { TILES, type TileKind } from './mapUtils'
@@ -28,7 +28,7 @@ export function BaseMap({
         center={center}
         zoom={zoom}
         zoomControl={false}
-        attributionControl
+        attributionControl={false}
         scrollWheelZoom={interactive}
         dragging={interactive}
         doubleClickZoom={interactive}
@@ -36,8 +36,10 @@ export function BaseMap({
         keyboard={interactive}
         className="size-full bg-[#0b1a2a]"
       >
+        <AttributionControl prefix={false} position="bottomleft" />
         <TileLayer {...TILES[tiles]} />
         {tiles === 'satellite' && <TileLayer {...TILES.labels} />}
+        {tiles === 'dark' && <TileLayer {...TILES.darkLabels} />}
         {children}
       </MapContainer>
     </div>

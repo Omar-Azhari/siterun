@@ -6,6 +6,8 @@ import {
   formatMoneyCompact,
   formatTime,
   initials,
+  shortTime,
+  timeAgo,
 } from './format'
 
 describe('formatMoney', () => {
@@ -34,5 +36,18 @@ describe('dates and names', () => {
   it('builds initials', () => {
     expect(initials('Alex Turner')).toBe('AT')
     expect(initials('john')).toBe('J')
+  })
+})
+
+describe('relative times', () => {
+  const now = new Date(2026, 8, 16, 12, 0)
+  it('formats time ago', () => {
+    expect(timeAgo(new Date(2026, 8, 16, 10, 0).toISOString(), now)).toBe('2h ago')
+    expect(timeAgo(new Date(2026, 8, 15, 11, 0).toISOString(), now)).toBe('1d ago')
+    expect(timeAgo(new Date(2026, 8, 16, 11, 59, 50).toISOString(), now)).toBe('just now')
+  })
+  it('shows clock time for today in conversation lists', () => {
+    expect(shortTime(new Date(2026, 8, 16, 10, 24).toISOString(), now)).toBe('10:24 AM')
+    expect(shortTime(new Date(2026, 8, 14, 10, 24).toISOString(), now)).toBe('2d')
   })
 })
