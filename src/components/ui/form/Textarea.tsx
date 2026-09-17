@@ -52,7 +52,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
           defaultValue={defaultValue}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(inputId, { hint, error })}
-          className="block w-full resize-none bg-transparent text-[15px] leading-snug text-fg outline-none placeholder:text-subtle"
+          className="block w-full resize-none bg-transparent text-base leading-snug text-fg outline-none placeholder:text-subtle"
           {...rest}
         />
         {maxLength !== undefined && (

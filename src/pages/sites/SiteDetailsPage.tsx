@@ -50,7 +50,7 @@ export function SiteDetailsPage() {
       <form id="site-details" onSubmit={onSubmit} noValidate>
         <Input label="Site name" placeholder="Riverside Apartments" error={errors.name?.message} {...register('name')} />
         <div className="mb-3.5">
-          <p className="mb-1.5 text-[13px] text-[#dae4ef]">Address</p>
+          <p className="mb-1.5 text-sm text-[#dae4ef]">Address</p>
           <Link to="/sites/new/location" className={cn(cardClass, 'flex items-center gap-3 rounded-[10px] border-line-input bg-input bg-none px-3.5 py-3 hover:border-primary')}>
             <span className="flex-1 text-[15px] leading-snug">
               {draft.address}

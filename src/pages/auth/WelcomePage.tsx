@@ -11,7 +11,7 @@ export function WelcomePage() {
         src={img('splash-excavator-frame')}
         alt=""
         className="absolute inset-0 -z-10 size-full object-cover object-[70%_center]"
-        fetchPriority="high"
+        {...{ fetchpriority: 'high' }}
       />
       <div
         aria-hidden
@@ -21,10 +21,10 @@ export function WelcomePage() {
         <Logo variant="mark" className="h-14" title="SiteRun" />
         <p className="mt-2 font-display text-[28px] font-extrabold tracking-tight">SiteRun</p>
       </div>
-      <h1 className="mt-10 font-display text-[40px] leading-[1.05] font-extrabold tracking-tight">
+      <h1 className="mt-10 max-w-[18rem] font-display text-[46px] leading-[1.02] font-extrabold tracking-tight">
         Built for the people who build.
       </h1>
-      <p className="mt-4 max-w-[17rem] text-[15px] leading-snug text-[#dae4ef]">
+      <p className="mt-4 max-w-[16rem] text-[17px] leading-snug text-[#dae4ef]">
         Manage equipment, suppliers and compliance in one place.
       </p>
       <div className="mt-auto pt-10">

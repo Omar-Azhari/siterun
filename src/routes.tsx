@@ -29,6 +29,26 @@ const PrivacyPage = lazy(async () => {
   return { default: () => <LegalPage kind="privacy" /> }
 })
 
+// Board 02
+const CreateSiteLocationPage = page(() => import('@/pages/sites/CreateSiteLocationPage'), 'CreateSiteLocationPage')
+const SiteDetailsPage = page(() => import('@/pages/sites/SiteDetailsPage'), 'SiteDetailsPage')
+const SiteAccessPage = page(() => import('@/pages/sites/SiteAccessPage'), 'SiteAccessPage')
+const SitesPage = page(() => import('@/pages/sites/SitesPage'), 'SitesPage')
+const SiteDetailPage = page(() => import('@/pages/sites/SiteDetailPage'), 'SiteDetailPage')
+const SiteEditPage = page(() => import('@/pages/sites/SiteDetailPage'), 'SiteEditPage')
+const InviteTeamPage = page(() => import('@/pages/team/InviteTeamPage'), 'InviteTeamPage')
+const TeamPage = page(() => import('@/pages/team/TeamPage'), 'TeamPage')
+const PlansPage = page(() => import('@/pages/plans/PlansPage'), 'PlansPage')
+
+// Board 03
+const BrowsePage = page(() => import('@/pages/browse/BrowsePage'), 'BrowsePage')
+const SearchPage = page(() => import('@/pages/browse/SearchPage'), 'SearchPage')
+const SearchResultsPage = page(() => import('@/pages/browse/SearchResultsPage'), 'SearchResultsPage')
+const MachineDetailPage = page(() => import('@/pages/browse/MachineDetailPage'), 'MachineDetailPage')
+const BookPage = page(() => import('@/pages/browse/BookPage'), 'BookPage')
+const BookingConfirmedPage = page(() => import('@/pages/bookings/BookingConfirmedPage'), 'BookingConfirmedPage')
+const BookingDetailPage = page(() => import('@/pages/bookings/BookingDetailPage'), 'BookingDetailPage')
+
 // Dev
 const BrandPage = page(() => import('@/pages/dev/BrandPage'), 'BrandPage')
 const ComponentsPage = page(() => import('@/pages/dev/ComponentsPage'), 'ComponentsPage')
@@ -65,8 +85,26 @@ export function AppRoutes() {
       <Route element={<RequireAuth />}>
         <Route path="/onboarding/business" element={<BusinessProfilePage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        {/* Shared by signed-in roles */}
+        <Route path="/machines/:id" element={<MachineDetailPage />} />
+
         <Route element={<RequireArea area={['contractor']} />}>
-          <Route path="/home" element={<Navigate to="/browse" replace />} />
+          <Route path="/home" element={<BrowsePage />} />
+          <Route path="/browse" element={<BrowsePage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/search/results" element={<SearchResultsPage />} />
+          <Route path="/machines/:id/book" element={<BookPage />} />
+          <Route path="/bookings/:id/confirmed" element={<BookingConfirmedPage />} />
+          <Route path="/bookings/:id" element={<BookingDetailPage />} />
+          <Route path="/sites" element={<SitesPage />} />
+          <Route path="/sites/new/location" element={<CreateSiteLocationPage />} />
+          <Route path="/sites/new/details" element={<SiteDetailsPage />} />
+          <Route path="/sites/new/access" element={<SiteAccessPage />} />
+          <Route path="/sites/:id" element={<SiteDetailPage />} />
+          <Route path="/sites/:id/edit" element={<SiteEditPage />} />
+          <Route path="/team" element={<TeamPage />} />
+          <Route path="/team/invite" element={<InviteTeamPage />} />
+          <Route path="/plans" element={<PlansPage />} />
         </Route>
       </Route>
 

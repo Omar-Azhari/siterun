@@ -41,7 +41,7 @@ export const PhoneField = forwardRef<HTMLInputElement, PhoneFieldProps>(function
       <div className="flex gap-1.5">
         <div className={cn(controlClass(), 'relative w-[108px] shrink-0 gap-2 px-3')}>
           <Flag className="h-4 w-7 shrink-0 rounded-[2px]" />
-          <span className="text-[15px]">{current.dial}</span>
+          <span className="text-base">{current.dial}</span>
           <ChevronDown aria-hidden className="ml-auto size-4 text-[#dae4ef]" />
           <select
             aria-label="Country code"

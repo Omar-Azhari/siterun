@@ -20,11 +20,11 @@ export function describedBy(id: string, { hint, error }: Pick<FieldProps, 'hint'
 /** Shared chrome for text-like controls. */
 export const controlClass = (error?: string) =>
   cn(
-    'flex h-12 w-full items-center gap-2.5 rounded-[10px] border bg-input px-3.5 text-[15px] text-fg transition-colors',
+    'flex h-[50px] w-full items-center gap-2.5 rounded-[10px] border bg-input px-3.5 text-base text-fg transition-colors',
     'focus-within:border-primary focus-within:ring-1 focus-within:ring-primary',
     'has-[:disabled]:opacity-50',
     error ? 'border-danger' : 'border-line-input',
   )
 
 export const bareInputClass =
-  'h-full min-w-0 flex-1 bg-transparent text-[15px] text-fg outline-none placeholder:text-subtle disabled:cursor-not-allowed'
+  'h-full min-w-0 flex-1 bg-transparent text-base text-fg outline-none placeholder:text-subtle disabled:cursor-not-allowed'

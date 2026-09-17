@@ -40,8 +40,8 @@ export function ListRow({
     <>
       {leading && <div className="shrink-0">{leading}</div>}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[15px] font-semibold text-fg">{title}</div>
-        {subtitle && <div className="mt-0.5 text-[13px] leading-snug text-muted">{subtitle}</div>}
+        <div className="truncate text-base font-semibold text-fg">{title}</div>
+        {subtitle && <div className="mt-0.5 text-sm leading-snug text-muted">{subtitle}</div>}
         {meta && <div className="mt-1 text-xs leading-snug text-muted">{meta}</div>}
       </div>
       {trailing && <div className="shrink-0 self-start">{trailing}</div>}
@@ -129,7 +129,7 @@ export function InfoNote({
     <div
       className={cn(
         cardClass,
-        'flex items-start gap-3 p-3 text-[13px] leading-snug text-muted',
+        'flex items-start gap-3 p-3 text-sm leading-snug text-muted',
         className,
       )}
     >

@@ -19,18 +19,18 @@ export function ScreenTitle({
 }: ScreenTitleProps) {
   return (
     <div className={cn('mb-4', align === 'center' && 'text-center', className)}>
-      <h1 className="font-display text-[22px] leading-tight font-bold tracking-[-0.01em] text-fg">
+      <h1 className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.01em] text-fg">
         {title}
       </h1>
       {step && <StepIndicator current={step.current} total={step.total} />}
-      {subtitle && <p className="mt-1 text-sm leading-snug text-muted">{subtitle}</p>}
+      {subtitle && <p className="mt-1 text-[15px] leading-snug text-muted">{subtitle}</p>}
     </div>
   )
 }
 
 export function StepIndicator({ current, total }: { current: number; total: number }) {
   return (
-    <p className="mt-0.5 text-sm font-medium text-primary">
+    <p className="mt-0.5 text-[15px] font-medium text-primary">
       Step {current} of {total}
     </p>
   )
@@ -48,7 +48,7 @@ export function SectionLabel({
 }) {
   return (
     <div className={cn('mt-5 mb-2 flex items-center justify-between', className)}>
-      <h2 className="text-sm font-semibold text-fg">{children}</h2>
+      <h2 className="text-[15px] font-semibold text-fg">{children}</h2>
       {action && <div className="text-[13px] text-primary">{action}</div>}
     </div>
   )

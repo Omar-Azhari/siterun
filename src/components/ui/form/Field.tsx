@@ -24,7 +24,7 @@ export function Field({
     <div className={cn('mb-3.5', className)}>
       {label && (
         <div className={cn('mb-1.5 flex items-center justify-between', hideLabel && 'sr-only')}>
-          <label htmlFor={id} className="text-[13px] text-[#dae4ef]">
+          <label htmlFor={id} className="text-sm text-[#dae4ef]">
             {label}
           </label>
           {labelAside}

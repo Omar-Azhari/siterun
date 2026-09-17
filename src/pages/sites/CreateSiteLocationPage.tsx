@@ -64,7 +64,6 @@ export function CreateSiteLocationPage() {
         if (m) void moveTo(m.getLatLng().lat, m.getLatLng().lng)
       },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 

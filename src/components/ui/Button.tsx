@@ -20,9 +20,9 @@ const variants: Record<ButtonVariant, string> = {
 }
 
 const sizes: Record<ButtonSize, string> = {
-  lg: 'h-[52px] px-5 text-[15px]',
-  md: 'h-11 px-4 text-sm',
-  sm: 'h-9 px-3 text-[13px]',
+  lg: 'h-[54px] px-5 text-base',
+  md: 'h-12 px-4 text-[15px]',
+  sm: 'h-10 px-3 text-sm',
 }
 
 interface CommonProps {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { Screen } from '@/components/layout/Screen'
 import {
@@ -27,6 +27,7 @@ type Values = z.infer<typeof schema>
 
 /** Board 01 · Log In. Redirect after login is handled by the PublicOnly guard. */
 export function LoginPage() {
+  const navigate = useNavigate()
   const [keep, setKeep] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const {
@@ -46,7 +47,7 @@ export function LoginPage() {
   })
 
   return (
-    <Screen header={{ bell: false, leading: 'none' }}>
+    <Screen header={{ bell: false, onBack: () => navigate('/welcome') }}>
       <ScreenTitle title="Welcome back" subtitle="Log in to your account." />
       <form onSubmit={onSubmit} noValidate>
         <Input
