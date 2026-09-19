@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { Check } from 'lucide-react'
 
 // Confetti dashes around the tick: [x, y, rotation, colour] relative to centre.
@@ -30,7 +30,7 @@ export function SuccessState({ title, description, children }: SuccessStateProps
     <div className="flex flex-col items-center text-center" role="status">
       <div className="relative flex h-32 w-56 items-center justify-center">
         {DASHES.map(([x, y, r, c], i) => (
-          <motion.span
+          <m.span
             key={i}
             aria-hidden
             className="absolute h-1 w-2.5 rounded-full"
@@ -40,20 +40,20 @@ export function SuccessState({ title, description, children }: SuccessStateProps
             transition={{ delay: 0.25 + i * 0.02, duration: 0.5, ease: 'easeOut' }}
           />
         ))}
-        <motion.div
+        <m.div
           className="flex size-[88px] items-center justify-center rounded-full border-[3px] border-success bg-success/10 shadow-[0_0_24px_rgba(34,197,94,0.35)]"
           initial={reduce ? false : { scale: 0.4, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 260, damping: 18 }}
         >
-          <motion.span
+          <m.span
             initial={reduce ? false : { scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 15 }}
           >
             <Check aria-hidden className="size-12 text-success" strokeWidth={3} />
-          </motion.span>
-        </motion.div>
+          </m.span>
+        </m.div>
       </div>
       <h1 className="mt-1 font-display text-2xl font-bold text-fg">{title}</h1>
       {description && <p className="mt-2 max-w-[18rem] text-sm text-muted">{description}</p>}

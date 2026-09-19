@@ -1,67 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Bell,
-  BriefcaseBusiness,
-  Building2,
-  CalendarDays,
-  ChartColumn,
-  CircleHelp,
-  CreditCard,
-  FileText,
-  LogOut,
-  MapPinned,
-  MessageSquareText,
-  ShieldCheck,
-  Users,
-  Wallet,
-  X,
-  type LucideIcon,
-} from 'lucide-react'
+import { AnimatePresence, m } from 'framer-motion'
+import { LogOut, X } from 'lucide-react'
 import { Logo } from '@/components/brand/Logo'
 import { Avatar, IconButton } from '@/components/ui'
 import { getApi } from '@/data/client'
 import { useMe } from '@/data/hooks'
-import { ACCOUNT_LABELS, areaFor, type AppArea } from '@/auth/roles'
-
-const LINKS: Record<AppArea, { label: string; to: string; icon: LucideIcon }[]> = {
-  contractor: [
-    { label: 'Your Sites', to: '/sites', icon: MapPinned },
-    { label: 'Bookings Calendar', to: '/bookings', icon: CalendarDays },
-    { label: 'Active Hires', to: '/hires', icon: BriefcaseBusiness },
-    { label: 'Messages', to: '/messages', icon: MessageSquareText },
-    { label: 'Payments', to: '/payments', icon: CreditCard },
-    { label: 'Invoices & Statements', to: '/invoices', icon: FileText },
-    { label: 'Team & Permissions', to: '/team', icon: Users },
-    { label: 'Plans & SiteCredits', to: '/plans', icon: Wallet },
-    { label: 'Notifications', to: '/notifications', icon: Bell },
-    { label: 'Help & Support', to: '/support', icon: CircleHelp },
-  ],
-  supplier: [
-    { label: 'Performance', to: '/supplier/performance', icon: ChartColumn },
-    { label: 'Booking Requests', to: '/supplier/requests', icon: Bell },
-    { label: 'Bookings & Dispatch', to: '/supplier/dispatch', icon: CalendarDays },
-    { label: 'Machines', to: '/supplier/machines', icon: BriefcaseBusiness },
-    { label: 'Compliance', to: '/supplier/compliance', icon: ShieldCheck },
-    { label: 'Compliance Alerts', to: '/supplier/compliance/alerts', icon: ShieldCheck },
-    { label: 'Payouts', to: '/supplier/payouts', icon: Wallet },
-    { label: 'Messages', to: '/messages', icon: MessageSquareText },
-    { label: 'Help & Support', to: '/support', icon: CircleHelp },
-  ],
-  operator: [
-    { label: 'Assigned Bookings', to: '/operator/bookings', icon: CalendarDays },
-    { label: 'My Documents', to: '/operator/documents', icon: ShieldCheck },
-    { label: 'Messages', to: '/messages', icon: MessageSquareText },
-    { label: 'Help & Support', to: '/support', icon: CircleHelp },
-  ],
-  admin: [
-    { label: 'Dashboard', to: '/admin', icon: ChartColumn },
-    { label: 'Approvals', to: '/admin/approvals', icon: ShieldCheck },
-    { label: 'Suppliers', to: '/admin/suppliers', icon: Building2 },
-    { label: 'Bookings', to: '/admin/bookings', icon: CalendarDays },
-  ],
-}
+import { ACCOUNT_LABELS, areaFor } from '@/auth/roles'
+import { MENU_LINKS } from '../navigation/menuLinks'
 
 export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { data: me } = useMe()
@@ -86,14 +32,14 @@ export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => voi
     <AnimatePresence>
       {open && me && (
         <div className="fixed inset-0 z-40">
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-          <motion.div
+          <m.div
             ref={panel}
             role="dialog"
             aria-modal="true"
@@ -128,7 +74,7 @@ export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => voi
               </div>
             </Link>
             <nav aria-label="Menu" className="mt-3 flex-1 overflow-y-auto px-2">
-              {LINKS[areaFor(me)].map((l) => (
+              {MENU_LINKS[areaFor(me)].map((l) => (
                 <Link
                   key={l.to}
                   to={l.to}
@@ -148,7 +94,7 @@ export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => voi
               <LogOut className="size-5" aria-hidden />
               Log Out
             </button>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>

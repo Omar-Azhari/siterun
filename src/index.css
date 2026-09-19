@@ -29,6 +29,8 @@
   /* Actions */
   --color-primary: #006cff;
   --color-primary-hover: #0a5ce0;
+  /* Brand blue lifted for small text on the dark backgrounds (4.5:1 or better). */
+  --color-primary-text: #3386ff;
 
   /* Text */
   --color-fg: #ffffff;
@@ -92,4 +94,14 @@
 }
 .leaflet-tooltip.map-chip::before {
   display: none;
+}
+
+/*
+ * `text-primary` is used for links and small labels; the brand blue is 4.2:1 on the
+ * app background, so text uses the lifted shade. Buttons keep `bg-primary`.
+ */
+@layer utilities {
+  .text-primary {
+    color: var(--color-primary-text);
+  }
 }

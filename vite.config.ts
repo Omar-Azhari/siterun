@@ -1,11 +1,26 @@
 /// <reference types="vitest/config" />
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+/**
+ * `vite preview` matches the Vercel rewrites: `/` serves the prerendered landing
+ * (dist/index.html) and every other page route serves the app shell (dist/app.html).
+ */
+const appShellInPreview: Plugin = {
+  name: 'app-shell-in-preview',
+  configurePreviewServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      const path = req.url?.split('?')[0] ?? '/'
+      if (req.method === 'GET' && path !== '/' && !path.includes('.')) req.url = '/app.html'
+      next()
+    })
+  },
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), appShellInPreview],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

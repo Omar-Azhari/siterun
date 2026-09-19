@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { useForm, type Resolver } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronDown } from 'lucide-react'
 import { Screen } from '@/components/layout/Screen'
@@ -17,13 +15,18 @@ import {
 } from '@/components/ui'
 import { showDemoLogins } from '@/data/client'
 import { useApiMutation } from '@/data/hooks'
-import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/data/seed'
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/data/constants'
 
-const schema = z.object({
-  email: z.email('Enter a valid email address'),
-  password: z.string().min(1, 'Enter your password'),
-})
-type Values = z.infer<typeof schema>
+type Values = { email: string; password: string }
+
+// Two checks, so no zod here: it keeps the login page's first load small.
+const resolver: Resolver<Values> = async (values) => {
+  const errors: Partial<Record<keyof Values, { type: string; message: string }>> = {}
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
+    errors.email = { type: 'pattern', message: 'Enter a valid email address' }
+  if (!values.password) errors.password = { type: 'required', message: 'Enter your password' }
+  return Object.keys(errors).length ? { values: {}, errors } : { values, errors: {} }
+}
 
 /** Board 01 · Log In. Redirect after login is handled by the PublicOnly guard. */
 export function LoginPage() {
@@ -35,7 +38,7 @@ export function LoginPage() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { email: '', password: '' } })
+  } = useForm<Values>({ resolver, defaultValues: { email: '', password: '' } })
   const login = useApiMutation((api, v: Values) => api.signIn(v.email, v.password, keep), {
     silent: true,
   })

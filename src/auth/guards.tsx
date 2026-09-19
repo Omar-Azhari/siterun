@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { useMe } from '@/data/hooks'
+import { hasStoredSession } from '@/data/session'
 import { ErrorState } from '@/components/ui'
 import { areaFor, homePathFor, needsOnboarding, type AppArea } from './roles'
 
@@ -67,7 +68,8 @@ export function RequireArea({ area }: { area: AppArea | AppArea[] }) {
 export function PublicOnly() {
   const me = useMe()
   const location = useLocation()
-  if (me.isPending) return <FullPageSpinner />
+  // Without a stored session the visitor is signed out: show the page straight away.
+  if (me.isPending && hasStoredSession()) return <FullPageSpinner />
   if (me.data && !location.pathname.startsWith('/verify')) {
     const next = new URLSearchParams(location.search).get('next')
     const target = needsOnboarding(me.data)

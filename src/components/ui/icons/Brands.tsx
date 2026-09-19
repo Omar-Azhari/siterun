@@ -35,7 +35,17 @@ export function VisaLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 48 30" aria-hidden {...props}>
       <rect width="48" height="30" rx="4" fill="#fff" />
-      <text x="24" y="20.5" textAnchor="middle" fontFamily="Arial, sans-serif" fontStyle="italic" fontWeight="900" fontSize="15" letterSpacing="-0.5" fill="#1a1f71">
+      <text
+        x="24"
+        y="20.5"
+        textAnchor="middle"
+        fontFamily="Arial, sans-serif"
+        fontStyle="italic"
+        fontWeight="900"
+        fontSize="15"
+        letterSpacing="-0.5"
+        fill="#1a1f71"
+      >
         VISA
       </text>
     </svg>
@@ -56,7 +66,15 @@ export function AmexLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 40 24" aria-hidden {...props}>
       <rect width="40" height="24" rx="3" fill="#2e77bc" />
-      <text x="20" y="15.5" textAnchor="middle" fontFamily="Arial" fontWeight="700" fontSize="9" fill="#fff">
+      <text
+        x="20"
+        y="15.5"
+        textAnchor="middle"
+        fontFamily="Arial"
+        fontWeight="700"
+        fontSize="9"
+        fill="#fff"
+      >
         AMEX
       </text>
     </svg>

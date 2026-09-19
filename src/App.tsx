@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ToastProvider } from '@/components/ui'
+import { MotionProvider } from '@/components/ui/MotionProvider'
 import { AuthSync } from '@/auth/AuthSync'
 import { FullPageSpinner } from '@/auth/guards'
 import { AppRoutes } from './routes'
@@ -15,16 +16,18 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <ToastProvider>
-          <AuthSync />
-          <ScrollToTop />
-          <Suspense fallback={<FullPageSpinner />}>
-            <AppRoutes />
-          </Suspense>
-        </ToastProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <MotionProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ToastProvider>
+            <AuthSync />
+            <ScrollToTop />
+            <Suspense fallback={<FullPageSpinner />}>
+              <AppRoutes />
+            </Suspense>
+          </ToastProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </MotionProvider>
   )
 }

@@ -4,7 +4,7 @@ import { ShieldCheck } from 'lucide-react'
 import { Screen } from '@/components/layout/Screen'
 import { Button, OtpInput, ScreenTitle, useToast } from '@/components/ui'
 import { getApi, isDemo } from '@/data/client'
-import { DEMO_OTP } from '@/data/demo/demoApi'
+import { DEMO_OTP } from '@/data/constants'
 import { useApiMutation, useMe } from '@/data/hooks'
 
 const RESEND_SECONDS = 30

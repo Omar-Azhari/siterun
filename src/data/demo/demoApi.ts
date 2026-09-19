@@ -25,6 +25,7 @@ import {
 } from '@/lib/booking'
 import { geocodeLocal } from '@/lib/geo'
 import { ApiError, type Api, type MachineDraft, type TimeRange } from '../api'
+import { DEMO_OTP } from '../constants'
 import { buildSeed, DB_VERSION, type DemoDb } from '../seed'
 import type {
   AppNotification,
@@ -43,7 +44,6 @@ import type {
 
 const DB_KEY = 'siterun-demo-db'
 const SESSION_KEY = 'siterun-demo-session'
-export const DEMO_OTP = '123456'
 
 const PLAN_PRICES = { starter: 9900, pro: 24900, enterprise: 0 } as const
 const CREDIT_PACKS: Record<number, number> = {

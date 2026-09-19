@@ -10,6 +10,7 @@ const page = <T extends Record<string, unknown>>(loader: () => Promise<T>, name:
 
 // Board 01
 const WelcomePage = page(() => import('@/pages/auth/WelcomePage'), 'WelcomePage')
+const LandingPage = page(() => import('@/pages/marketing/LandingPage'), 'LandingPage')
 const ChooseRolePage = page(() => import('@/pages/auth/ChooseRolePage'), 'ChooseRolePage')
 const SignUpPage = page(() => import('@/pages/auth/SignUpPage'), 'SignUpPage')
 const LoginPage = page(() => import('@/pages/auth/LoginPage'), 'LoginPage')
@@ -30,7 +31,10 @@ const PrivacyPage = lazy(async () => {
 })
 
 // Board 02
-const CreateSiteLocationPage = page(() => import('@/pages/sites/CreateSiteLocationPage'), 'CreateSiteLocationPage')
+const CreateSiteLocationPage = page(
+  () => import('@/pages/sites/CreateSiteLocationPage'),
+  'CreateSiteLocationPage',
+)
 const SiteDetailsPage = page(() => import('@/pages/sites/SiteDetailsPage'), 'SiteDetailsPage')
 const SiteAccessPage = page(() => import('@/pages/sites/SiteAccessPage'), 'SiteAccessPage')
 const SitesPage = page(() => import('@/pages/sites/SitesPage'), 'SitesPage')
@@ -43,11 +47,23 @@ const PlansPage = page(() => import('@/pages/plans/PlansPage'), 'PlansPage')
 // Board 03
 const BrowsePage = page(() => import('@/pages/browse/BrowsePage'), 'BrowsePage')
 const SearchPage = page(() => import('@/pages/browse/SearchPage'), 'SearchPage')
-const SearchResultsPage = page(() => import('@/pages/browse/SearchResultsPage'), 'SearchResultsPage')
-const MachineDetailPage = page(() => import('@/pages/browse/MachineDetailPage'), 'MachineDetailPage')
+const SearchResultsPage = page(
+  () => import('@/pages/browse/SearchResultsPage'),
+  'SearchResultsPage',
+)
+const MachineDetailPage = page(
+  () => import('@/pages/browse/MachineDetailPage'),
+  'MachineDetailPage',
+)
 const BookPage = page(() => import('@/pages/browse/BookPage'), 'BookPage')
-const BookingConfirmedPage = page(() => import('@/pages/bookings/BookingConfirmedPage'), 'BookingConfirmedPage')
-const BookingDetailPage = page(() => import('@/pages/bookings/BookingDetailPage'), 'BookingDetailPage')
+const BookingConfirmedPage = page(
+  () => import('@/pages/bookings/BookingConfirmedPage'),
+  'BookingConfirmedPage',
+)
+const BookingDetailPage = page(
+  () => import('@/pages/bookings/BookingDetailPage'),
+  'BookingDetailPage',
+)
 
 // Board 04
 const ActiveHiresPage = page(() => import('@/pages/hires/ActiveHiresPage'), 'ActiveHiresPage')
@@ -58,17 +74,29 @@ const ReturnPage = page(() => import('@/pages/hires/ReturnPage'), 'ReturnPage')
 const SmartSwapPage = page(() => import('@/pages/hires/SmartSwapPage'), 'SmartSwapPage')
 
 // Board 05
-const BookingsCalendarPage = page(() => import('@/pages/bookings/BookingsCalendarPage'), 'BookingsCalendarPage')
-const ConversationsPage = page(() => import('@/pages/messages/ConversationsPage'), 'ConversationsPage')
+const BookingsCalendarPage = page(
+  () => import('@/pages/bookings/BookingsCalendarPage'),
+  'BookingsCalendarPage',
+)
+const ConversationsPage = page(
+  () => import('@/pages/messages/ConversationsPage'),
+  'ConversationsPage',
+)
 const ChatPage = page(() => import('@/pages/messages/ChatPage'), 'ChatPage')
 const PaymentsPage = page(() => import('@/pages/payments/PaymentsPage'), 'PaymentsPage')
 const AddCardPage = page(() => import('@/pages/payments/AddCardPage'), 'AddCardPage')
 const InvoicesPage = page(() => import('@/pages/payments/InvoicesPage'), 'InvoicesPage')
-const NotificationsPage = page(() => import('@/pages/notifications/NotificationsPage'), 'NotificationsPage')
+const NotificationsPage = page(
+  () => import('@/pages/notifications/NotificationsPage'),
+  'NotificationsPage',
+)
 const AccountPage = page(() => import('@/pages/account/AccountPage'), 'AccountPage')
 const ProfilePage = page(() => import('@/pages/account/AccountSubPages'), 'ProfilePage')
 const CompanyPage = page(() => import('@/pages/account/AccountSubPages'), 'CompanyPage')
-const PaymentSettingsPage = page(() => import('@/pages/account/AccountSubPages'), 'PaymentSettingsPage')
+const PaymentSettingsPage = page(
+  () => import('@/pages/account/AccountSubPages'),
+  'PaymentSettingsPage',
+)
 const AccountPrivacyPage = page(() => import('@/pages/account/AccountSubPages'), 'PrivacyPage')
 
 // Boards 07-10 (supplier)
@@ -79,19 +107,58 @@ const DetailsStep = page(() => import('@/pages/supplier/listing/DetailsStep'), '
 const PhotosStep = page(() => import('@/pages/supplier/listing/PhotosStep'), 'PhotosStep')
 const SpecsStep = page(() => import('@/pages/supplier/listing/SpecsStep'), 'SpecsStep')
 const RatesStep = page(() => import('@/pages/supplier/listing/RatesStep'), 'RatesStep')
-const ServiceAreaStep = page(() => import('@/pages/supplier/listing/ServiceAreaStep'), 'ServiceAreaStep')
-const PreviewListingPage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'PreviewListingPage')
-const ReviewSubmitPage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'ReviewSubmitPage')
-const ListingLivePage = page(() => import('@/pages/supplier/listing/ListingReviewPages'), 'ListingLivePage')
-const ComplianceChecklistPage = page(() => import('@/pages/supplier/compliance/ComplianceChecklistPage'), 'ComplianceChecklistPage')
-const RequirementsPage = page(() => import('@/pages/supplier/compliance/RequirementsPage'), 'RequirementsPage')
-const UploadDocumentPage = page(() => import('@/pages/supplier/compliance/UploadDocumentPage'), 'UploadDocumentPage')
-const ComplianceStatusPage = page(() => import('@/pages/supplier/compliance/ComplianceStatusPage'), 'ComplianceStatusPage')
-const ComplianceAlertsPage = page(() => import('@/pages/supplier/compliance/ComplianceAlertsPage'), 'ComplianceAlertsPage')
-const BookingRequestsPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'BookingRequestsPage')
-const DispatchPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'DispatchPage')
-const SupplierBookingsListPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'SupplierBookingsListPage')
-const SupplierBookingDetailPage = page(() => import('@/pages/supplier/bookings/SupplierBookingsPages'), 'SupplierBookingDetailPage')
+const ServiceAreaStep = page(
+  () => import('@/pages/supplier/listing/ServiceAreaStep'),
+  'ServiceAreaStep',
+)
+const PreviewListingPage = page(
+  () => import('@/pages/supplier/listing/ListingReviewPages'),
+  'PreviewListingPage',
+)
+const ReviewSubmitPage = page(
+  () => import('@/pages/supplier/listing/ListingReviewPages'),
+  'ReviewSubmitPage',
+)
+const ListingLivePage = page(
+  () => import('@/pages/supplier/listing/ListingReviewPages'),
+  'ListingLivePage',
+)
+const ComplianceChecklistPage = page(
+  () => import('@/pages/supplier/compliance/ComplianceChecklistPage'),
+  'ComplianceChecklistPage',
+)
+const RequirementsPage = page(
+  () => import('@/pages/supplier/compliance/RequirementsPage'),
+  'RequirementsPage',
+)
+const UploadDocumentPage = page(
+  () => import('@/pages/supplier/compliance/UploadDocumentPage'),
+  'UploadDocumentPage',
+)
+const ComplianceStatusPage = page(
+  () => import('@/pages/supplier/compliance/ComplianceStatusPage'),
+  'ComplianceStatusPage',
+)
+const ComplianceAlertsPage = page(
+  () => import('@/pages/supplier/compliance/ComplianceAlertsPage'),
+  'ComplianceAlertsPage',
+)
+const BookingRequestsPage = page(
+  () => import('@/pages/supplier/bookings/SupplierBookingsPages'),
+  'BookingRequestsPage',
+)
+const DispatchPage = page(
+  () => import('@/pages/supplier/bookings/SupplierBookingsPages'),
+  'DispatchPage',
+)
+const SupplierBookingsListPage = page(
+  () => import('@/pages/supplier/bookings/SupplierBookingsPages'),
+  'SupplierBookingsListPage',
+)
+const SupplierBookingDetailPage = page(
+  () => import('@/pages/supplier/bookings/SupplierBookingsPages'),
+  'SupplierBookingDetailPage',
+)
 const PayoutsPage = page(() => import('@/pages/supplier/PayoutsPage'), 'PayoutsPage')
 const PerformancePage = page(() => import('@/pages/supplier/PerformancePage'), 'PerformancePage')
 
@@ -104,17 +171,32 @@ const NewTicketPage = page(() => import('@/pages/support/SupportPages'), 'NewTic
 // Platform admin
 const AdminDashboardPage = page(() => import('@/pages/admin/AdminPages'), 'AdminDashboardPage')
 const AdminApprovalsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminApprovalsPage')
-const AdminMachineReviewPage = page(() => import('@/pages/admin/AdminPages'), 'AdminMachineReviewPage')
-const AdminDocumentReviewPage = page(() => import('@/pages/admin/AdminPages'), 'AdminDocumentReviewPage')
+const AdminMachineReviewPage = page(
+  () => import('@/pages/admin/AdminPages'),
+  'AdminMachineReviewPage',
+)
+const AdminDocumentReviewPage = page(
+  () => import('@/pages/admin/AdminPages'),
+  'AdminDocumentReviewPage',
+)
 const AdminSuppliersPage = page(() => import('@/pages/admin/AdminPages'), 'AdminSuppliersPage')
 const AdminBookingsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminBookingsPage')
 const AdminMorePage = page(() => import('@/pages/admin/AdminPages'), 'AdminMorePage')
 
 // Operator
 const OperatorHomePage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorHomePage')
-const OperatorBookingsPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorBookingsPage')
-const OperatorBookingDetailPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorBookingDetailPage')
-const OperatorDocumentsPage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorDocumentsPage')
+const OperatorBookingsPage = page(
+  () => import('@/pages/operator/OperatorPages'),
+  'OperatorBookingsPage',
+)
+const OperatorBookingDetailPage = page(
+  () => import('@/pages/operator/OperatorPages'),
+  'OperatorBookingDetailPage',
+)
+const OperatorDocumentsPage = page(
+  () => import('@/pages/operator/OperatorPages'),
+  'OperatorDocumentsPage',
+)
 
 // Dev
 const BrandPage = page(() => import('@/pages/dev/BrandPage'), 'BrandPage')
@@ -124,7 +206,7 @@ const DevScreensPage = page(() => import('@/pages/dev/DevScreensPage'), 'DevScre
 function RootRedirect() {
   const me = useMe()
   if (me.isPending) return <FullPageSpinner />
-  if (!me.data) return <Navigate to="/welcome" replace />
+  if (!me.data) return <LandingPage />
   return (
     <Navigate
       to={needsOnboarding(me.data) ? '/onboarding/business' : homePathFor(me.data)}

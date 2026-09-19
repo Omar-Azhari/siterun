@@ -6,7 +6,7 @@ import { BottomSheet, Button, ListRow, ScreenTitle, SectionLabel, SelectableCard
 import { cardClass } from '@/components/ui/Card'
 import { selectedClass } from '@/components/ui/SelectableCard'
 import { cn } from '@/lib/cn'
-import { imgSm } from '@/data/seed'
+import { imgSm } from '@/lib/images'
 import { useMyMachines } from '@/data/hooks'
 import { STATES, useComplianceState } from './complianceUtils'
 

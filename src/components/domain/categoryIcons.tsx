@@ -1,5 +1,10 @@
 import { Cog, Forklift, Shovel, Tractor } from 'lucide-react'
-import { CraneIcon, ExcavatorIcon, GeneratorIcon, ScissorLiftIcon } from '@/components/ui/icons/Plant'
+import {
+  CraneIcon,
+  ExcavatorIcon,
+  GeneratorIcon,
+  ScissorLiftIcon,
+} from '@/components/ui/icons/Plant'
 
 type IconLike = (props: { className?: string; strokeWidth?: number }) => React.ReactNode
 

@@ -25,7 +25,7 @@ import {
   Thumbnail,
 } from '@/components/ui'
 import { formatDateLong, formatTime } from '@/lib/format'
-import { PROJECT_TYPES } from '@/data/seed'
+import { PROJECT_TYPES } from '@/data/constants'
 import { useApiMutation, useMe, useMyBookings, useSite } from '@/data/hooks'
 import { AccessFields } from './SiteAccessPage'
 import { accessSchema, DURATIONS } from './siteDraft'

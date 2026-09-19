@@ -8,10 +8,28 @@ import type { Machine } from '@/data/types'
 import { Logo } from '@/components/brand/Logo'
 
 /** Search result card (board 03 screen 3). */
-export function MachineCard({ machine, to, available = true }: { machine: Machine; to: string; available?: boolean }) {
+export function MachineCard({
+  machine,
+  to,
+  available = true,
+}: {
+  machine: Machine
+  to: string
+  available?: boolean
+}) {
   return (
-    <Link to={to} className={cn(cardClass, 'flex items-center gap-3 p-2.5 transition-colors hover:border-line-input')}>
-      <Thumbnail src={machine.photos[0]?.replace('.webp', '-sm.webp')} alt={machine.title} className="h-[92px] w-[88px] shrink-0" />
+    <Link
+      to={to}
+      className={cn(
+        cardClass,
+        'flex items-center gap-3 p-2.5 transition-colors hover:border-line-input',
+      )}
+    >
+      <Thumbnail
+        src={machine.photos[0]?.replace('.webp', '-sm.webp')}
+        alt={machine.title}
+        className="h-[92px] w-[88px] shrink-0"
+      />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold">{machine.title}</p>
         <p className="truncate text-[13px] text-muted">
@@ -41,7 +59,11 @@ export function MachineSummary({
 }) {
   const body = (
     <>
-      <Thumbnail src={machine.photos[0]?.replace('.webp', '-sm.webp')} alt={machine.title} className="h-[70px] w-[84px] shrink-0" />
+      <Thumbnail
+        src={machine.photos[0]?.replace('.webp', '-sm.webp')}
+        alt={machine.title}
+        className="h-[70px] w-[84px] shrink-0"
+      />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-semibold">{machine.title}</p>
         <p className="truncate text-[13px] text-muted">
@@ -53,7 +75,12 @@ export function MachineSummary({
       {to && <ChevronRight className="size-5 shrink-0 text-muted" aria-hidden />}
     </>
   )
-  const cls = cn(cardClass, 'flex items-center gap-3 p-2.5', to && 'transition-colors hover:border-line-input', className)
+  const cls = cn(
+    cardClass,
+    'flex items-center gap-3 p-2.5',
+    to && 'transition-colors hover:border-line-input',
+    className,
+  )
   return to ? (
     <Link to={to} className={cls}>
       {body}
@@ -78,7 +105,12 @@ export function Rating({ value, count }: { value: number | null; count: number }
 /** Supplier logo tile. Suppliers don't upload logos yet, so we show a branded placeholder. */
 export function SupplierLogo({ className }: { className?: string }) {
   return (
-    <span className={cn('flex size-11 shrink-0 items-center justify-center rounded-lg bg-white', className)}>
+    <span
+      className={cn(
+        'flex size-11 shrink-0 items-center justify-center rounded-lg bg-white',
+        className,
+      )}
+    >
       <Logo variant="mark" tone="light" className="h-6" title="" />
     </span>
   )
@@ -89,7 +121,15 @@ export function SupplierRow({ machine, className }: { machine: Machine; classNam
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={cn(cardClass, 'flex w-full items-center gap-3 p-2.5 text-left hover:border-line-input', className)}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={cn(
+          cardClass,
+          'flex w-full items-center gap-3 p-2.5 text-left hover:border-line-input',
+          className,
+        )}
+      >
         <SupplierLogo />
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[15px] font-semibold">{machine.supplierName}</span>
@@ -108,7 +148,9 @@ export function SupplierRow({ machine, className }: { machine: Machine; classNam
             <ShieldCheck className="size-4 text-success" aria-hidden />
             Insurance, registration and service records verified by SiteRun
           </p>
-          <p className="text-muted">You can message the supplier once you’ve sent a booking request.</p>
+          <p className="text-muted">
+            You can message the supplier once you’ve sent a booking request.
+          </p>
         </div>
       </BottomSheet>
     </>

@@ -23,7 +23,11 @@ export function BaseMap({
   label: string
 }) {
   return (
-    <div role="region" aria-label={label} className={cn('relative isolate overflow-hidden', className)}>
+    <div
+      role="region"
+      aria-label={label}
+      className={cn('relative isolate overflow-hidden', className)}
+    >
       <MapContainer
         center={center}
         zoom={zoom}
@@ -55,7 +59,13 @@ export function Recenter({ center, zoom }: { center: [number, number]; zoom?: nu
   return null
 }
 
-export function FitBounds({ points, padding = 40 }: { points: [number, number][]; padding?: number }) {
+export function FitBounds({
+  points,
+  padding = 40,
+}: {
+  points: [number, number][]
+  padding?: number
+}) {
   const map = useMap()
   const key = JSON.stringify(points)
   useEffect(() => {

@@ -32,6 +32,7 @@ export function AppScreen({
       <Screen
         {...rest}
         nav={hideNav ? undefined : navRoleFor(me)}
+        sidebar={me ? navRoleFor(me) : undefined}
         header={{
           leading: root ? 'menu' : 'back',
           onMenu: () => setMenu(true),
@@ -39,6 +40,7 @@ export function AppScreen({
           unread,
           bell,
           trailing: headerTrailing,
+          withSidebar: !!me,
         }}
       />
       {root && <NavDrawer open={menu} onClose={() => setMenu(false)} />}

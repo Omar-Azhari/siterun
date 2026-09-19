@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bell, Menu } from 'lucide-react'
 import { Logo } from '@/components/brand/Logo'
+import { cn } from '@/lib/cn'
 import { IconButton } from './Button'
 
 interface AppHeaderProps {
@@ -14,6 +15,8 @@ interface AppHeaderProps {
   unread?: boolean
   /** Replaces the bell. */
   trailing?: ReactNode
+  /** The desktop sidebar already shows the logo and menu. */
+  withSidebar?: boolean
 }
 
 export function AppHeader({
@@ -23,6 +26,7 @@ export function AppHeader({
   bell = true,
   unread = false,
   trailing,
+  withSidebar = false,
 }: AppHeaderProps) {
   const navigate = useNavigate()
   return (
@@ -34,12 +38,20 @@ export function AppHeader({
           </IconButton>
         )}
         {leading === 'menu' && (
-          <IconButton label="Open menu" onClick={onMenu}>
+          <IconButton
+            label="Open menu"
+            onClick={onMenu}
+            className={cn(withSidebar && 'md:invisible')}
+          >
             <Menu className="size-[22px]" strokeWidth={1.75} />
           </IconButton>
         )}
       </div>
-      <Link to="/" className="mx-auto rounded-md" aria-label="SiteRun home">
+      <Link
+        to="/"
+        className={cn('mx-auto rounded-md', withSidebar && 'md:invisible')}
+        aria-label="SiteRun home"
+      >
         <Logo className="h-[22px]" title="SiteRun" />
       </Link>
       <div>

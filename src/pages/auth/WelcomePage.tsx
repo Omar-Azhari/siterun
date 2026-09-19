@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Logo } from '@/components/brand/Logo'
 import { ButtonLink } from '@/components/ui'
-import { img } from '@/data/seed'
+import { img, imgSm } from '@/lib/images'
 
 /** Board 01 · Splash / Welcome */
 export function WelcomePage() {
@@ -9,6 +9,9 @@ export function WelcomePage() {
     <main className="relative mx-auto flex min-h-dvh max-w-lg flex-col overflow-hidden px-6 pt-[calc(env(safe-area-inset-top)+56px)] pb-[calc(env(safe-area-inset-bottom)+28px)]">
       <img
         src={img('splash-excavator-frame')}
+        srcSet={`${imgSm('splash-excavator-frame')} 480w, ${img('splash-excavator-frame')} 1200w`}
+        // Covered by a dark gradient, so phones get the 480px file.
+        sizes="(min-width: 768px) 100vw, 270px"
         alt=""
         className="absolute inset-0 -z-10 size-full object-cover object-[70%_center]"
         {...{ fetchpriority: 'high' }}

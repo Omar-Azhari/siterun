@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { X } from 'lucide-react'
 import { IconButton } from './Button'
 
@@ -35,14 +35,14 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-40 flex items-end justify-center md:items-center">
-          <motion.div
+          <m.div
             className="absolute inset-0 bg-black/60"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-          <motion.div
+          <m.div
             ref={panel}
             role="dialog"
             aria-modal="true"
@@ -65,7 +65,7 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
             </div>
             <div className="overflow-y-auto px-5 pb-4">{children}</div>
             {footer && <div className="border-t border-line px-5 py-3">{footer}</div>}
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>

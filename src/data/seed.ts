@@ -2,6 +2,11 @@
 // Dates are relative to `today` so bookings always look current.
 import { addDays, format, setHours, setMinutes, subDays, subHours } from 'date-fns'
 import { bookingRef, bookingTotal } from '@/lib/booking'
+import { img, imgSm } from '@/lib/images'
+import { DEMO_PASSWORD } from './constants'
+
+export { DEMO_ACCOUNTS, DEMO_PASSWORD, PROJECT_TYPES } from './constants'
+export { img, imgSm }
 import type {
   AdminActivity,
   AppNotification,
@@ -61,44 +66,10 @@ export interface DemoDb {
 }
 
 export const DB_VERSION = 5
-export const DEMO_PASSWORD = 'SiteRun!2026'
 
-export const DEMO_ACCOUNTS = [
-  {
-    role: 'Contractor',
-    email: 'alex@acme.test',
-    name: 'Alex Turner',
-    org: 'Acme Construction Pty Ltd',
-  },
-  {
-    role: 'Supplier',
-    email: 'jordan@turnerplant.test',
-    name: 'Jordan Lee',
-    org: 'Turner Plant Hire',
-  },
-  { role: 'Operator', email: 'sam@turnerplant.test', name: 'Sam Nguyen', org: 'Turner Plant Hire' },
-  {
-    role: 'Organisation admin',
-    email: 'priya@buildco.test',
-    name: 'Priya Shah',
-    org: 'BuildCo Pty Ltd',
-  },
-  { role: 'Platform admin', email: 'admin@siterun.test', name: 'Morgan Blake', org: 'SiteRun' },
-] as const
 
-export const img = (name: string) => `/images/${name}.webp`
-export const imgSm = (name: string) => `/images/${name}-sm.webp`
 const $ = (dollars: number) => Math.round(dollars * 100)
 
-export const PROJECT_TYPES = [
-  'Commercial Construction',
-  'Residential Construction',
-  'Civil & Infrastructure',
-  'Industrial',
-  'Commercial Fitout',
-  'Mining & Resources',
-  'Other',
-]
 
 export function buildSeed(now: Date = new Date()): DemoDb {
   const today = setMinutes(setHours(now, 9), 41)
