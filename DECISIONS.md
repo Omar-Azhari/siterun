@@ -130,3 +130,14 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **Sign-up → verify is automated on the demo backend only.** On Supabase the 6-digit code arrives by email, and the built-in sender only mails project members, so a test can't read it. The Supabase suite covers everything after verification using the seeded accounts.
 - **e2e-flows run against the live demo project** and tidy up after themselves (the test booking is cancelled, the test listing paused). Dates are one to three years out so runs never overlap real demo data.
 - **Fixed while wiring:** creating a site no longer bounces back to step 1 while the next page loads, and Book waits for the user's sites before Continue is enabled.
+
+## Phase 5
+
+- **Desktop layout (768px and up):** a fixed left sidebar replaces the bottom nav and the menu drawer. Main destinations come first, then a "More" group with the drawer's links. Content stays a centred column (max 672px), because every screen was designed for phone width.
+- **Landing page at `/`** for signed-out visitors, using the brand board's copy ("Keep projects moving.", the four brand values, the tagline lockup). Signed-in visitors go straight to their home. The mobile Welcome screen stays at `/welcome`.
+- **The landing page is prerendered** at build time (`scripts/prerender.mjs` renders it with `renderToString` and the client hydrates it), so the hero paints before any JavaScript runs. Other routes are served `app.html`, a clean shell, via `vercel.json` (and the same rewrite in `vite preview`).
+- **Startup performance:** the backend (supabase-js or the demo store) is its own chunk behind a deferred Api, so the first screen doesn't wait for it; public pages render immediately when no session is stored; framer-motion's animation features load after first paint (`LazyMotion`); Login validates without zod. Photos under dark overlays use the 480px files on phones.
+- **Lighthouse (mobile, simulated throttling, `vite preview`):** landing 92–93 performance / 100 accessibility / 100 best practices / 100 SEO; login 90 / 100; welcome 91 / 100; sign-up 89–90 / 100. Signed-in screens weren't measured (Lighthouse can't sign in).
+- **Link colour:** the brand blue (#006CFF) is 4.2:1 on the app background, below AA for small text. `text-primary` now uses #3386FF (4.6:1 or better on every background). Buttons keep the brand blue.
+- **robots.txt** allows only the landing and legal pages; app screens are behind sign-in.
+- **Deploy:** `vercel.json` is ready (Vite, SPA rewrites, immutable asset caching, security headers). Deploying needs a Vercel login or a connected Git repository (see README).
