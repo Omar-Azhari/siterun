@@ -15,7 +15,8 @@
     "e2e": "playwright test",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "db:seed:sql": "tsx --tsconfig tsconfig.app.json scripts/seed-sql.ts",
-    "test:rls": "vitest run --config supabase/tests/vitest.config.ts"
+    "test:rls": "vitest run --config supabase/tests/vitest.config.ts",
+    "e2e:flows": "playwright test --config playwright.flows.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

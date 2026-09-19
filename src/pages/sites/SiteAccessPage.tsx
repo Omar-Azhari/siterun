@@ -1,9 +1,18 @@
+import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Phone, User } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { Button, formatAuMobile, Input, ScreenTitle, SectionLabel, Textarea, TimeField } from '@/components/ui'
+import {
+  Button,
+  formatAuMobile,
+  Input,
+  ScreenTitle,
+  SectionLabel,
+  Textarea,
+  TimeField,
+} from '@/components/ui'
 import { useApiMutation } from '@/data/hooks'
 import { accessSchema, useSiteDraft, type AccessValues } from './siteDraft'
 
@@ -21,9 +30,37 @@ export function AccessFields({
     <>
       <p className="mb-1.5 text-sm font-semibold">Delivery hours</p>
       <div className="flex items-start gap-2">
-        <Controller control={control} name="deliveryFrom" render={({ field }) => <TimeField label="From" hideLabel compact value={field.value} onChange={field.onChange} error={errors.deliveryFrom?.message} className="flex-1" />} />
+        <Controller
+          control={control}
+          name="deliveryFrom"
+          render={({ field }) => (
+            <TimeField
+              label="From"
+              hideLabel
+              compact
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.deliveryFrom?.message}
+              className="flex-1"
+            />
+          )}
+        />
         <ArrowRight className="mt-3 size-4 shrink-0 text-muted" aria-hidden />
-        <Controller control={control} name="deliveryTo" render={({ field }) => <TimeField label="To" hideLabel compact value={field.value} onChange={field.onChange} error={errors.deliveryTo?.message} className="flex-1" />} />
+        <Controller
+          control={control}
+          name="deliveryTo"
+          render={({ field }) => (
+            <TimeField
+              label="To"
+              hideLabel
+              compact
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.deliveryTo?.message}
+              className="flex-1"
+            />
+          )}
+        />
       </div>
       <Textarea
         label="Access notes (optional)"
@@ -35,7 +72,14 @@ export function AccessFields({
         {...register('accessNotes')}
       />
       <SectionLabel className="mt-4">Site contact</SectionLabel>
-      <Input label="Contact name" hideLabel placeholder="Contact name" leftIcon={<User strokeWidth={1.75} />} error={errors.contactName?.message} {...register('contactName')} />
+      <Input
+        label="Contact name"
+        hideLabel
+        placeholder="Contact name"
+        leftIcon={<User strokeWidth={1.75} />}
+        error={errors.contactName?.message}
+        {...register('contactName')}
+      />
       <Controller
         control={control}
         name="contactPhone"
@@ -68,6 +112,7 @@ export function SiteAccessPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const { draft, update, clear } = useSiteDraft(params.get('demo') === '1')
+  const [done, setDone] = useState(false)
   const form = useForm<AccessValues>({
     resolver: zodResolver(accessSchema),
     defaultValues: {
@@ -78,31 +123,35 @@ export function SiteAccessPage() {
       contactPhone: draft.contactPhone?.replace(/^\+61\s*/, '') ?? '',
     },
   })
-  const create = useApiMutation((api, v: AccessValues) =>
-    api.createSite({
-      name: draft.name ?? '',
-      address: draft.address ?? '',
-      suburb: draft.suburb ?? '',
-      state: draft.state ?? 'VIC',
-      postcode: draft.postcode ?? '',
-      lat: draft.lat ?? 0,
-      lng: draft.lng ?? 0,
-      projectType: draft.projectType ?? 'Other',
-      startDate: draft.startDate ?? '',
-      durationMonths: draft.durationMonths ?? 6,
-      status: 'planning',
-      ...v,
-      contactPhone: `+61 ${v.contactPhone}`,
-    }),
+  const create = useApiMutation(
+    (api, v: AccessValues) =>
+      api.createSite({
+        name: draft.name ?? '',
+        address: draft.address ?? '',
+        suburb: draft.suburb ?? '',
+        state: draft.state ?? 'VIC',
+        postcode: draft.postcode ?? '',
+        lat: draft.lat ?? 0,
+        lng: draft.lng ?? 0,
+        projectType: draft.projectType ?? 'Other',
+        startDate: draft.startDate ?? '',
+        durationMonths: draft.durationMonths ?? 6,
+        status: 'planning',
+        ...v,
+        contactPhone: `+61 ${v.contactPhone}`,
+      }),
     { success: (s) => `${s.name} created` },
   )
 
-  if (!draft.name) return <Navigate to="/sites/new/details" replace />
+  if (!draft.name && !done) return <Navigate to="/sites/new/details" replace />
 
   const onSubmit = form.handleSubmit((v) => {
     update(v)
     create.mutate(v, {
       onSuccess: () => {
+        // This page can stay mounted while the next route loads; don't send the user
+        // back to step 1 once the draft is cleared.
+        setDone(true)
         clear()
         navigate('/team/invite?onboarding=1')
       },
@@ -118,9 +167,16 @@ export function SiteAccessPage() {
         </Button>
       }
     >
-      <ScreenTitle title="Site Access Window" subtitle="Let suppliers know when they can deliver and access the site." />
+      <ScreenTitle
+        title="Site Access Window"
+        subtitle="Let suppliers know when they can deliver and access the site."
+      />
       <form id="site-access" onSubmit={onSubmit} noValidate>
-        <AccessFields control={form.control} errors={form.formState.errors} register={form.register} />
+        <AccessFields
+          control={form.control}
+          errors={form.formState.errors}
+          register={form.register}
+        />
       </form>
     </AppScreen>
   )
