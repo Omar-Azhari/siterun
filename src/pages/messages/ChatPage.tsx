@@ -24,13 +24,17 @@ export function ChatPage() {
   const [file, setFile] = useState<File | null>(null)
   const bottom = useRef<HTMLDivElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
-  const send = useApiMutation((api, v: { body: string; file: File | null }) => api.sendMessage(id ?? '', v.body, v.file))
+  const send = useApiMutation((api, v: { body: string; file: File | null }) =>
+    api.sendMessage(id ?? '', v.body, v.file),
+  )
 
   useEffect(() => {
     if (!id) return
     void getApi().markConversationRead(id)
     return getApi().subscribeMessages(id, (m) => {
-      qc.setQueryData<Message[]>(['messages', id], (old) => (old?.some((x) => x.id === m.id) ? old : [...(old ?? []), m]))
+      qc.setQueryData<Message[]>(['messages', id], (old) =>
+        old?.some((x) => x.id === m.id) ? old : [...(old ?? []), m],
+      )
       void getApi().markConversationRead(id)
     })
   }, [id, qc])
@@ -54,7 +58,8 @@ export function ChatPage() {
   }
 
   const c = conv.data
-  const mine = (m: Message) => m.senderId === me?.profile.id || (!!m.senderId && m.senderName === me?.profile.fullName)
+  const mine = (m: Message) =>
+    m.senderId === me?.profile.id || (!!m.senderId && m.senderName === me?.profile.fullName)
 
   return (
     <AppScreen
@@ -84,7 +89,12 @@ export function ChatPage() {
               e.target.value = ''
             }}
           />
-          <button type="button" aria-label="Attach a file" onClick={() => fileInput.current?.click()} className="flex size-12 shrink-0 items-center justify-center rounded-full text-[#dae4ef] hover:bg-white/5">
+          <button
+            type="button"
+            aria-label="Attach a file"
+            onClick={() => fileInput.current?.click()}
+            className="flex size-12 shrink-0 items-center justify-center rounded-full text-[#dae4ef] hover:bg-white/5"
+          >
             <Paperclip className="size-5" />
           </button>
           <div className="flex min-h-12 flex-1 flex-col justify-center rounded-3xl border border-line-input bg-input px-4 focus-within:border-primary">
@@ -92,7 +102,12 @@ export function ChatPage() {
               <span className="mt-2 inline-flex max-w-full items-center gap-1 self-start rounded-md bg-white/10 px-2 py-0.5 text-xs">
                 <Paperclip className="size-3" aria-hidden />
                 <span className="truncate">{file.name}</span>
-                <button type="button" aria-label="Remove attachment" onClick={() => setFile(null)} className="-mr-1 p-1">
+                <button
+                  type="button"
+                  aria-label="Remove attachment"
+                  onClick={() => setFile(null)}
+                  className="-mr-1 p-1"
+                >
                   <X className="size-3" />
                 </button>
               </span>
@@ -122,14 +137,26 @@ export function ChatPage() {
       }
     >
       <h1 className="font-display text-[26px] leading-tight font-bold">Messages</h1>
-      <p className="mb-3 text-[15px] text-muted">Chat with suppliers about your bookings, delivery and site details.</p>
+      <p className="mb-3 text-[15px] text-muted">
+        Chat with suppliers about your bookings, delivery and site details.
+      </p>
       {conv.isPending && <ListSkeleton rows={1} thumb={false} />}
       {conv.isSuccess && !c && <EmptyState title="Conversation not found" />}
       {c && (
         <button
           type="button"
-          onClick={() => c.bookingId && navigate(me?.org?.kind === 'supplier' ? `/supplier/bookings/${c.bookingId}` : `/bookings/${c.bookingId}`)}
-          className={cn(cardClass, 'flex w-full items-center gap-3 p-3 text-left hover:border-line-input')}
+          onClick={() =>
+            c.bookingId &&
+            navigate(
+              me?.org?.kind === 'supplier'
+                ? `/supplier/bookings/${c.bookingId}`
+                : `/bookings/${c.bookingId}`,
+            )
+          }
+          className={cn(
+            cardClass,
+            'flex w-full items-center gap-3 p-3 text-left hover:border-line-input',
+          )}
         >
           <span className="flex size-12 items-center justify-center rounded-full bg-primary">
             <Truck className="size-6" aria-hidden />
@@ -153,7 +180,10 @@ export function ChatPage() {
       <ol className="mt-4 space-y-3" aria-live="polite" aria-label="Messages">
         {messages.data?.map((m) =>
           m.system ? (
-            <li key={m.id} className="mx-auto max-w-[85%] rounded-lg bg-white/5 px-3 py-1.5 text-center text-xs text-muted">
+            <li
+              key={m.id}
+              className="mx-auto max-w-[85%] rounded-lg bg-white/5 px-3 py-1.5 text-center text-xs text-muted"
+            >
               {m.body}
             </li>
           ) : (
@@ -161,7 +191,9 @@ export function ChatPage() {
               <div
                 className={cn(
                   'max-w-[78%] rounded-2xl px-4 py-2.5 text-[15px] leading-snug whitespace-pre-wrap',
-                  mine(m) ? 'rounded-br-md bg-primary text-white' : 'rounded-bl-md bg-[#222c3c] text-fg',
+                  mine(m)
+                    ? 'rounded-br-md bg-primary text-white'
+                    : 'rounded-bl-md bg-[#222c3c] text-fg',
                 )}
               >
                 {!mine(m) && <span className="sr-only">{m.senderName}: </span>}
@@ -175,7 +207,12 @@ export function ChatPage() {
               </div>
               <span className="mt-1 flex items-center gap-1 px-1 text-[11px] text-muted">
                 {format(parseISO(m.createdAt), 'h:mm a')}
-                {mine(m) && <CheckCheck className={cn('size-3.5', m.readAt ? 'text-primary' : 'text-muted')} aria-label={m.readAt ? 'Read' : 'Sent'} />}
+                {mine(m) && (
+                  <CheckCheck
+                    className={cn('size-3.5', m.readAt ? 'text-primary' : 'text-muted')}
+                    aria-label={m.readAt ? 'Read' : 'Sent'}
+                  />
+                )}
               </span>
             </li>
           ),

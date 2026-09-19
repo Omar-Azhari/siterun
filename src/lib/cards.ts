@@ -24,7 +24,10 @@ export function cardBrand(digits: string): CardBrand | null {
 }
 
 /** "04/28" → { month: 4, year: 2028, expired } */
-export function parseExpiry(value: string, now: Date = new Date()): { month: number; year: number; expired: boolean } | null {
+export function parseExpiry(
+  value: string,
+  now: Date = new Date(),
+): { month: number; year: number; expired: boolean } | null {
   const m = /^(\d{2})\/(\d{2})$/.exec(value)
   if (!m) return null
   const month = Number(m[1])

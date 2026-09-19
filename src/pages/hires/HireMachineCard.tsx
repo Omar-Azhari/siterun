@@ -8,10 +8,22 @@ import { cn } from '@/lib/cn'
 import type { BookingView } from '@/data/types'
 
 /** Machine card at the top of the hire sub-screens (board 04). */
-export function HireMachineCard({ b, extra, to }: { b: BookingView; extra?: ReactNode; to?: string }) {
+export function HireMachineCard({
+  b,
+  extra,
+  to,
+}: {
+  b: BookingView
+  extra?: ReactNode
+  to?: string
+}) {
   const body = (
     <>
-      <Thumbnail src={b.machine.photos[0]?.replace('.webp', '-sm.webp')} alt={b.machine.title} className="h-[76px] w-[92px]" />
+      <Thumbnail
+        src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+        alt={b.machine.title}
+        className="h-[76px] w-[92px]"
+      />
       <div className="min-w-0 flex-1">
         <p className="truncate text-base font-semibold">{b.machine.title}</p>
         <p className="truncate text-sm text-muted">

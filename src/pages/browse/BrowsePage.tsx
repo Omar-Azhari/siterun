@@ -22,11 +22,18 @@ function ActiveHiresStrip() {
           View all ›
         </Link>
       </div>
-      <ul className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+      <ul className="-mx-4 flex snap-x [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1">
         {hires.data.map((b) => (
           <li key={b.id} className="snap-start">
-            <Link to={`/hires/${b.id}`} className={cn(cardClass, 'flex w-60 items-center gap-2.5 p-2')}>
-              <Thumbnail src={b.machine.photos[0]?.replace('.webp', '-sm.webp')} alt="" className="size-12" />
+            <Link
+              to={`/hires/${b.id}`}
+              className={cn(cardClass, 'flex w-60 items-center gap-2.5 p-2')}
+            >
+              <Thumbnail
+                src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+                alt=""
+                className="size-12"
+              />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold">{b.machine.title}</span>
                 <span className="block truncate text-xs text-muted">{b.site?.name}</span>
@@ -50,7 +57,10 @@ export function BrowsePage() {
   return (
     <AppScreen root>
       {pathname === '/home' && <ActiveHiresStrip />}
-      <ScreenTitle title="Browse Equipment" subtitle="Quality equipment from trusted suppliers across Australia." />
+      <ScreenTitle
+        title="Browse Equipment"
+        subtitle="Quality equipment from trusted suppliers across Australia."
+      />
       {categories.isError && <ErrorState onRetry={() => void categories.refetch()} />}
       <ul className="grid grid-cols-2 gap-2.5">
         {categories.isPending &&
@@ -70,8 +80,16 @@ export function BrowsePage() {
               )}
             >
               <span className="relative flex-1 overflow-hidden">
-                <img src={c.imageUrl} alt="" loading={i < 4 ? 'eager' : 'lazy'} className="absolute inset-0 size-full object-cover transition-transform group-hover:scale-105" />
-                <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
+                <img
+                  src={c.imageUrl}
+                  alt=""
+                  loading={i < 4 ? 'eager' : 'lazy'}
+                  className="absolute inset-0 size-full object-cover transition-transform group-hover:scale-105"
+                />
+                <span
+                  aria-hidden
+                  className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent"
+                />
               </span>
               <span className="flex items-center justify-between px-3 pb-2.5 text-[15px] font-semibold">
                 {SHORT[c.name] ?? c.name}

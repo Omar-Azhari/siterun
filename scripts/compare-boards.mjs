@@ -22,19 +22,28 @@ const boards = process.argv.slice(2).length ? process.argv.slice(2) : Object.key
 for (const b of boards) {
   const dir = path.join(OUT, `board-${b}`)
   if (!fs.existsSync(dir)) continue
-  const shots = fs.readdirSync(dir).filter((f) => f.endsWith('.png')).sort()
+  const shots = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.png'))
+    .sort()
   const W = 1448
   const board = await sharp(`design/${IMAGES[b]}`).resize({ width: W }).png().toBuffer()
   const bh = (await sharp(board).metadata()).height
   const cols = shots.length
   const gap = 12
   const tw = Math.floor((W - gap * (cols + 1)) / cols)
-  const tiles = await Promise.all(shots.map((f) => sharp(path.join(dir, f)).resize({ width: tw }).png().toBuffer()))
-  const th = Math.max(...(await Promise.all(tiles.map(async (t) => (await sharp(t).metadata()).height))))
+  const tiles = await Promise.all(
+    shots.map((f) => sharp(path.join(dir, f)).resize({ width: tw }).png().toBuffer()),
+  )
+  const th = Math.max(
+    ...(await Promise.all(tiles.map(async (t) => (await sharp(t).metadata()).height))),
+  )
   const composite = [{ input: board, left: 0, top: 0 }]
   tiles.forEach((t, i) => composite.push({ input: t, left: gap + i * (tw + gap), top: bh + gap }))
   const out = path.join(OUT, `board-${b}-compare.png`)
-  await sharp({ create: { width: W, height: bh + th + gap * 2, channels: 3, background: '#1b2533' } })
+  await sharp({
+    create: { width: W, height: bh + th + gap * 2, channels: 3, background: '#1b2533' },
+  })
     .composite(composite)
     .png()
     .toFile(out)

@@ -2,7 +2,17 @@ import { useMemo, useState } from 'react'
 import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { ChevronRight, Download, FileText } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { BottomSheet, Button, EmptyState, ErrorState, ListSkeleton, ScreenTitle, SegmentedTabs, StatusPill, useToast } from '@/components/ui'
+import {
+  BottomSheet,
+  Button,
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  ScreenTitle,
+  SegmentedTabs,
+  StatusPill,
+  useToast,
+} from '@/components/ui'
 import { cardClass } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import { formatDate, formatMoney } from '@/lib/format'
@@ -54,19 +64,30 @@ export function InvoicesPage() {
   const statementNow = () => {
     if (!org) return
     const [key, list] = months[0] ?? [format(new Date(), 'yyyy-MM'), []]
-    void run('statement', () => downloadStatementPdf(list, org, format(parseISO(`${key}-01`), 'MMMM yyyy')))
+    void run('statement', () =>
+      downloadStatementPdf(list, org, format(parseISO(`${key}-01`), 'MMMM yyyy')),
+    )
   }
 
   return (
     <AppScreen
       root
       footer={
-        <Button arrow leftIcon={<Download className="absolute left-4 size-5" />} loading={busy === 'statement'} disabled={!org || !invoices.data} onClick={statementNow}>
+        <Button
+          arrow
+          leftIcon={<Download className="absolute left-4 size-5" />}
+          loading={busy === 'statement'}
+          disabled={!org || !invoices.data}
+          onClick={statementNow}
+        >
           Download Statement
         </Button>
       }
     >
-      <ScreenTitle title="Invoices & Statements" subtitle="View, download and track your invoices." />
+      <ScreenTitle
+        title="Invoices & Statements"
+        subtitle="View, download and track your invoices."
+      />
       <SegmentedTabs
         variant="joined"
         label="Documents"
@@ -80,15 +101,35 @@ export function InvoicesPage() {
       <div className="mt-3 space-y-2" role="tabpanel">
         {invoices.isPending && <ListSkeleton rows={4} thumb={false} />}
         {invoices.isError && <ErrorState onRetry={() => void invoices.refetch()} />}
-        {invoices.data?.length === 0 && <EmptyState icon={<FileText strokeWidth={1.75} />} title="No invoices yet" description="Invoices appear here after each hire." />}
+        {invoices.data?.length === 0 && (
+          <EmptyState
+            icon={<FileText strokeWidth={1.75} />}
+            title="No invoices yet"
+            description="Invoices appear here after each hire."
+          />
+        )}
         {tab === 'invoices' &&
           invoices.data?.map((i) => (
-            <button key={i.id} type="button" onClick={() => setOpen(i)} className={cn(cardClass, 'flex w-full items-center gap-3 p-3 text-left hover:border-line-input')}>
-              <FileText className="size-9 shrink-0 fill-primary text-app" strokeWidth={1.4} aria-hidden />
+            <button
+              key={i.id}
+              type="button"
+              onClick={() => setOpen(i)}
+              className={cn(
+                cardClass,
+                'flex w-full items-center gap-3 p-3 text-left hover:border-line-input',
+              )}
+            >
+              <FileText
+                className="size-9 shrink-0 fill-primary text-app"
+                strokeWidth={1.4}
+                aria-hidden
+              />
               <span className="min-w-0 flex-1">
                 <span className="block text-base font-semibold">{i.number}</span>
                 <span className="block text-sm text-muted">{formatDate(i.issuedAt)}</span>
-                <span className="block text-base font-semibold">{formatMoney(total(i), { cents: true })}</span>
+                <span className="block text-base font-semibold">
+                  {formatMoney(total(i), { cents: true })}
+                </span>
               </span>
               <StatusPill {...dueLabel(i)} />
               <ChevronRight className="size-5 text-muted" aria-hidden />
@@ -104,16 +145,30 @@ export function InvoicesPage() {
                 type="button"
                 disabled={busy === key}
                 onClick={() => void run(key, () => downloadStatementPdf(list, org, label))}
-                className={cn(cardClass, 'flex w-full items-center gap-3 p-3 text-left hover:border-line-input disabled:opacity-60')}
+                className={cn(
+                  cardClass,
+                  'flex w-full items-center gap-3 p-3 text-left hover:border-line-input disabled:opacity-60',
+                )}
               >
-                <FileText className="size-9 shrink-0 fill-primary text-app" strokeWidth={1.4} aria-hidden />
+                <FileText
+                  className="size-9 shrink-0 fill-primary text-app"
+                  strokeWidth={1.4}
+                  aria-hidden
+                />
                 <span className="flex-1">
                   <span className="block text-base font-semibold">{label}</span>
                   <span className="block text-sm text-muted">
-                    {list.length} invoice{list.length === 1 ? '' : 's'} · {formatMoney(list.reduce((a, i) => a + total(i), 0), { cents: true })}
+                    {list.length} invoice{list.length === 1 ? '' : 's'} ·{' '}
+                    {formatMoney(
+                      list.reduce((a, i) => a + total(i), 0),
+                      { cents: true },
+                    )}
                   </span>
                 </span>
-                <Download className="size-5 text-primary" aria-label={`Download ${label} statement`} />
+                <Download
+                  className="size-5 text-primary"
+                  aria-label={`Download ${label} statement`}
+                />
               </button>
             )
           })}
@@ -125,7 +180,11 @@ export function InvoicesPage() {
         title={open?.number ?? ''}
         footer={
           open && org ? (
-            <Button leftIcon={<Download className="size-5" />} loading={busy === open.id} onClick={() => void run(open.id, () => downloadInvoicePdf(open, org))}>
+            <Button
+              leftIcon={<Download className="size-5" />}
+              loading={busy === open.id}
+              onClick={() => void run(open.id, () => downloadInvoicePdf(open, org))}
+            >
               Download PDF
             </Button>
           ) : undefined
@@ -134,7 +193,9 @@ export function InvoicesPage() {
         {open && (
           <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted">Issued {formatDate(open.issuedAt)} · Due {formatDate(open.dueDate)}</span>
+              <span className="text-muted">
+                Issued {formatDate(open.issuedAt)} · Due {formatDate(open.dueDate)}
+              </span>
               <StatusPill {...dueLabel(open)} />
             </div>
             {open.lines.map((l, n) => (

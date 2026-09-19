@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight, Construction, MapPin, Plus, SlidersHorizontal, UsersRound } from 'lucide-react'
+import {
+  ChevronRight,
+  Construction,
+  MapPin,
+  Plus,
+  SlidersHorizontal,
+  UsersRound,
+} from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import {
   BottomSheet,
@@ -49,10 +56,22 @@ export function SitesPage() {
         Add New Site
       </ButtonLink>
       <div className="mt-3 flex gap-2">
-        <SearchInput className="mb-0 flex-1" placeholder="Search sites..." value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ('')} />
-        <IconButton label={`Filter sites${filter !== 'all' ? ' (1 active)' : ''}`} onClick={() => setOpen(true)} className="size-12 border border-line-input bg-input">
+        <SearchInput
+          className="mb-0 flex-1"
+          placeholder="Search sites..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onClear={() => setQ('')}
+        />
+        <IconButton
+          label={`Filter sites${filter !== 'all' ? ' (1 active)' : ''}`}
+          onClick={() => setOpen(true)}
+          className="size-12 border border-line-input bg-input"
+        >
           <SlidersHorizontal className="size-5" />
-          {filter !== 'all' && <span className="absolute top-2 right-2 size-2 rounded-full bg-primary" />}
+          {filter !== 'all' && (
+            <span className="absolute top-2 right-2 size-2 rounded-full bg-primary" />
+          )}
         </IconButton>
       </div>
 
@@ -63,11 +82,19 @@ export function SitesPage() {
           <EmptyState
             icon={<MapPin strokeWidth={1.75} />}
             title={sites.data.length ? 'No sites match' : 'No sites yet'}
-            description={sites.data.length ? 'Try a different search or filter.' : 'Add your first project site to start hiring equipment.'}
+            description={
+              sites.data.length
+                ? 'Try a different search or filter.'
+                : 'Add your first project site to start hiring equipment.'
+            }
           />
         )}
         {list.map((s) => (
-          <Link key={s.id} to={`/sites/${s.id}`} className={cn(cardClass, 'block p-3 transition-colors hover:border-line-input')}>
+          <Link
+            key={s.id}
+            to={`/sites/${s.id}`}
+            className={cn(cardClass, 'block p-3 transition-colors hover:border-line-input')}
+          >
             <div className="flex gap-3">
               <Thumbnail src={s.photoUrl} alt={s.name} className="h-[72px] w-[84px]" />
               <div className="min-w-0 flex-1">
@@ -84,13 +111,15 @@ export function SitesPage() {
               <p className="flex items-center gap-2">
                 <Construction className="size-5 text-[#dae4ef]" strokeWidth={1.5} aria-hidden />
                 <span>
-                  <span className="block text-sm font-semibold text-fg">{s.activeHires}</span>Active hires
+                  <span className="block text-sm font-semibold text-fg">{s.activeHires}</span>Active
+                  hires
                 </span>
               </p>
               <p className="flex items-center gap-2">
                 <UsersRound className="size-5 text-[#dae4ef]" strokeWidth={1.5} aria-hidden />
                 <span>
-                  <span className="block text-sm font-semibold text-fg">{s.teamCount}</span>Team members
+                  <span className="block text-sm font-semibold text-fg">{s.teamCount}</span>Team
+                  members
                 </span>
               </p>
             </div>
@@ -98,10 +127,20 @@ export function SitesPage() {
         ))}
       </div>
 
-      <BottomSheet open={open} onClose={() => setOpen(false)} title="Filter sites" footer={<Button onClick={() => setOpen(false)}>Show {list.length} sites</Button>}>
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Filter sites"
+        footer={<Button onClick={() => setOpen(false)}>Show {list.length} sites</Button>}
+      >
         <div role="radiogroup" aria-label="Site status" className="space-y-2">
           {STATUS_FILTERS.map((f) => (
-            <SelectableCard key={f.value} selected={filter === f.value} onSelect={() => setFilter(f.value)} title={f.label} />
+            <SelectableCard
+              key={f.value}
+              selected={filter === f.value}
+              onSelect={() => setFilter(f.value)}
+              title={f.label}
+            />
           ))}
         </div>
       </BottomSheet>

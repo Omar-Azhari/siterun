@@ -8,14 +8,33 @@ import { AppScreen } from '@/components/layout/AppScreen'
 import { AddressAutocomplete } from '@/components/domain/AddressAutocomplete'
 import { BrandMark } from '@/components/domain/BrandMark'
 import { PasswordChecklist } from '@/components/domain/PasswordChecklist'
-import { Button, Card, Input, ListRow, PasswordInput, ScreenTitle, SectionLabel, Skeleton, ToggleRow } from '@/components/ui'
+import {
+  Button,
+  Card,
+  Input,
+  ListRow,
+  PasswordInput,
+  ScreenTitle,
+  SectionLabel,
+  Skeleton,
+  ToggleRow,
+} from '@/components/ui'
 import { formatAbn, isValidAbn } from '@/lib/abn'
 import { formatDate, formatMoney } from '@/lib/format'
-import { useApiMutation, useMe, usePaymentMethods, usePayoutSummary, useSubscription } from '@/data/hooks'
+import {
+  useApiMutation,
+  useMe,
+  usePaymentMethods,
+  usePayoutSummary,
+  useSubscription,
+} from '@/data/hooks'
 import { areaFor } from '@/auth/roles'
 import { passwordSchema, phoneSchema } from '../auth/authShared'
 
-const profileSchema = z.object({ fullName: z.string().trim().min(2, 'Enter your name'), phone: phoneSchema })
+const profileSchema = z.object({
+  fullName: z.string().trim().min(2, 'Enter your name'),
+  phone: phoneSchema,
+})
 
 export function ProfilePage() {
   const { data: me } = useMe()
@@ -24,14 +43,49 @@ export function ProfilePage() {
     resolver: zodResolver(profileSchema),
     values: me ? { fullName: me.profile.fullName, phone: me.profile.phone } : undefined,
   })
-  const save = useApiMutation((api, v: z.infer<typeof profileSchema>) => api.updateProfile(v), { success: 'Profile updated' })
-  if (!me) return <AppScreen><Skeleton className="h-40" /></AppScreen>
+  const save = useApiMutation((api, v: z.infer<typeof profileSchema>) => api.updateProfile(v), {
+    success: 'Profile updated',
+  })
+  if (!me)
+    return (
+      <AppScreen>
+        <Skeleton className="h-40" />
+      </AppScreen>
+    )
   return (
-    <AppScreen footer={<Button arrow loading={save.isPending} onClick={form.handleSubmit((v) => save.mutate(v, { onSuccess: () => navigate('/account') }))}>Save</Button>}>
+    <AppScreen
+      footer={
+        <Button
+          arrow
+          loading={save.isPending}
+          onClick={form.handleSubmit((v) =>
+            save.mutate(v, { onSuccess: () => navigate('/account') }),
+          )}
+        >
+          Save
+        </Button>
+      }
+    >
       <ScreenTitle title="Your Profile" subtitle="How you appear to suppliers and your team." />
-      <Input label="Full name" autoComplete="name" error={form.formState.errors.fullName?.message} {...form.register('fullName')} />
-      <Input label="Email" value={me.profile.email} disabled hint="Contact support to change your login email." />
-      <Input label="Phone" type="tel" autoComplete="tel" error={form.formState.errors.phone?.message} {...form.register('phone')} />
+      <Input
+        label="Full name"
+        autoComplete="name"
+        error={form.formState.errors.fullName?.message}
+        {...form.register('fullName')}
+      />
+      <Input
+        label="Email"
+        value={me.profile.email}
+        disabled
+        hint="Contact support to change your login email."
+      />
+      <Input
+        label="Phone"
+        type="tel"
+        autoComplete="tel"
+        error={form.formState.errors.phone?.message}
+        {...form.register('phone')}
+      />
     </AppScreen>
   )
 }
@@ -51,21 +105,86 @@ export function CompanyPage() {
   const canEdit = me?.role === 'owner'
   const form = useForm<z.infer<typeof companySchema>>({
     resolver: zodResolver(companySchema),
-    values: org ? { name: org.name, abn: org.abn, contactName: org.contactName, email: org.email, phone: org.phone, address: org.address } : undefined,
+    values: org
+      ? {
+          name: org.name,
+          abn: org.abn,
+          contactName: org.contactName,
+          email: org.email,
+          phone: org.phone,
+          address: org.address,
+        }
+      : undefined,
   })
-  const save = useApiMutation((api, v: z.infer<typeof companySchema>) => api.updateOrganisation({ ...v, abn: formatAbn(v.abn) }), { success: 'Company details saved' })
-  if (!org) return <AppScreen><Skeleton className="h-40" /></AppScreen>
+  const save = useApiMutation(
+    (api, v: z.infer<typeof companySchema>) =>
+      api.updateOrganisation({ ...v, abn: formatAbn(v.abn) }),
+    { success: 'Company details saved' },
+  )
+  if (!org)
+    return (
+      <AppScreen>
+        <Skeleton className="h-40" />
+      </AppScreen>
+    )
   const e = form.formState.errors
   return (
-    <AppScreen footer={canEdit ? <Button arrow loading={save.isPending} onClick={form.handleSubmit((v) => save.mutate(v))}>Save Changes</Button> : undefined}>
-      <ScreenTitle title="Company Details" subtitle={canEdit ? 'Shown on bookings and invoices.' : 'Only the owner can change these details.'} />
+    <AppScreen
+      footer={
+        canEdit ? (
+          <Button arrow loading={save.isPending} onClick={form.handleSubmit((v) => save.mutate(v))}>
+            Save Changes
+          </Button>
+        ) : undefined
+      }
+    >
+      <ScreenTitle
+        title="Company Details"
+        subtitle={
+          canEdit ? 'Shown on bookings and invoices.' : 'Only the owner can change these details.'
+        }
+      />
       <fieldset disabled={!canEdit}>
         <Input label="Company name" error={e.name?.message} {...form.register('name')} />
-        <Controller control={form.control} name="abn" render={({ field }) => <Input label="ABN" inputMode="numeric" value={field.value} onChange={(ev) => field.onChange(formatAbn(ev.target.value))} valid={isValidAbn(field.value)} error={e.abn?.message} />} />
-        <Input label="Contact name" error={e.contactName?.message} {...form.register('contactName')} />
-        <Input label="Business email" type="email" error={e.email?.message} {...form.register('email')} />
+        <Controller
+          control={form.control}
+          name="abn"
+          render={({ field }) => (
+            <Input
+              label="ABN"
+              inputMode="numeric"
+              value={field.value}
+              onChange={(ev) => field.onChange(formatAbn(ev.target.value))}
+              valid={isValidAbn(field.value)}
+              error={e.abn?.message}
+            />
+          )}
+        />
+        <Input
+          label="Contact name"
+          error={e.contactName?.message}
+          {...form.register('contactName')}
+        />
+        <Input
+          label="Business email"
+          type="email"
+          error={e.email?.message}
+          {...form.register('email')}
+        />
         <Input label="Phone" type="tel" error={e.phone?.message} {...form.register('phone')} />
-        <Controller control={form.control} name="address" render={({ field }) => <AddressAutocomplete label="Business address" value={field.value} onChange={field.onChange} onSelect={(p) => field.onChange(p.label)} error={e.address?.message} />} />
+        <Controller
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <AddressAutocomplete
+              label="Business address"
+              value={field.value}
+              onChange={field.onChange}
+              onSelect={(p) => field.onChange(p.label)}
+              error={e.address?.message}
+            />
+          )}
+        />
       </fieldset>
     </AppScreen>
   )
@@ -89,9 +208,16 @@ export function PaymentSettingsPage() {
             <p className="text-muted">BSB ••• ••1 · Account •••• 4821</p>
           </div>
         </Card>
-        <p className="mt-2 text-xs text-muted">Payouts are sent within 2 business days of a request. SiteRun keeps a 10% service fee from each completed hire.</p>
+        <p className="mt-2 text-xs text-muted">
+          Payouts are sent within 2 business days of a request. SiteRun keeps a 10% service fee from
+          each completed hire.
+        </p>
         <SectionLabel>Balance</SectionLabel>
-        <ListRow to="/supplier/payouts" title={payouts.data ? formatMoney(payouts.data.availableCents, { cents: true }) : '…'} subtitle="Available for payout" />
+        <ListRow
+          to="/supplier/payouts"
+          title={payouts.data ? formatMoney(payouts.data.availableCents, { cents: true }) : '…'}
+          subtitle="Available for payout"
+        />
       </AppScreen>
     )
 
@@ -118,7 +244,9 @@ export function PaymentSettingsPage() {
             <p className="text-base font-semibold capitalize">
               {sub.data.plan} · {sub.data.period}
             </p>
-            {sub.data.renewsAt && <p className="text-sm text-muted">Renews {formatDate(sub.data.renewsAt)}</p>}
+            {sub.data.renewsAt && (
+              <p className="text-sm text-muted">Renews {formatDate(sub.data.renewsAt)}</p>
+            )}
           </>
         ) : (
           <Link to="/plans" className="flex items-center justify-between text-sm text-primary">
@@ -128,14 +256,18 @@ export function PaymentSettingsPage() {
       </Card>
       <SectionLabel>SiteCredits</SectionLabel>
       <Card>
-        <p className="font-display text-2xl font-bold">{(sub.data?.creditsBalance ?? 0).toLocaleString('en-AU')}</p>
+        <p className="font-display text-2xl font-bold">
+          {(sub.data?.creditsBalance ?? 0).toLocaleString('en-AU')}
+        </p>
         <p className="text-sm text-muted">Credits are applied to hires before your card.</p>
       </Card>
     </AppScreen>
   )
 }
 
-const pwSchema = z.object({ password: passwordSchema, confirm: z.string() }).refine((v) => v.password === v.confirm, { message: 'Passwords don’t match', path: ['confirm'] })
+const pwSchema = z
+  .object({ password: passwordSchema, confirm: z.string() })
+  .refine((v) => v.password === v.confirm, { message: 'Passwords don’t match', path: ['confirm'] })
 
 function readPrefs() {
   try {
@@ -147,12 +279,27 @@ function readPrefs() {
 
 export function PrivacyPage() {
   const navigate = useNavigate()
-  const form = useForm<z.infer<typeof pwSchema>>({ resolver: zodResolver(pwSchema), defaultValues: { password: '', confirm: '' } })
+  const form = useForm<z.infer<typeof pwSchema>>({
+    resolver: zodResolver(pwSchema),
+    defaultValues: { password: '', confirm: '' },
+  })
   const password = useWatch({ control: form.control, name: 'password' })
-  const [prefs, setPrefs] = useState<Record<string, boolean>>(() => ({ email: true, sms: true, marketing: false, ...readPrefs() }))
-  const update = useApiMutation((api, pw: string) => api.updatePassword(pw), { success: 'Password changed' })
+  const [prefs, setPrefs] = useState<Record<string, boolean>>(() => ({
+    email: true,
+    sms: true,
+    marketing: false,
+    ...readPrefs(),
+  }))
+  const update = useApiMutation((api, pw: string) => api.updatePassword(pw), {
+    success: 'Password changed',
+  })
   const deletion = useApiMutation(
-    (api) => api.createTicket({ subject: 'Account deletion request', category: 'Privacy', description: 'Please delete my account and personal data.' }),
+    (api) =>
+      api.createTicket({
+        subject: 'Account deletion request',
+        category: 'Privacy',
+        description: 'Please delete my account and personal data.',
+      }),
     { success: 'Request received. We’ll confirm by email within 30 days.' },
   )
   const setPref = (k: string, v: boolean) => {
@@ -169,24 +316,63 @@ export function PrivacyPage() {
     <AppScreen>
       <ScreenTitle title="Privacy & Security" subtitle="Your data and preferences." />
       <SectionLabel>Change password</SectionLabel>
-      <form onSubmit={form.handleSubmit((v) => update.mutate(v.password, { onSuccess: () => form.reset() }))} noValidate>
-        <PasswordInput label="New password" autoComplete="new-password" error={form.formState.errors.password?.message} {...form.register('password')} />
+      <form
+        onSubmit={form.handleSubmit((v) =>
+          update.mutate(v.password, { onSuccess: () => form.reset() }),
+        )}
+        noValidate
+      >
+        <PasswordInput
+          label="New password"
+          autoComplete="new-password"
+          error={form.formState.errors.password?.message}
+          {...form.register('password')}
+        />
         <PasswordChecklist value={password} />
-        <PasswordInput label="Confirm password" autoComplete="new-password" error={form.formState.errors.confirm?.message} {...form.register('confirm')} />
+        <PasswordInput
+          label="Confirm password"
+          autoComplete="new-password"
+          error={form.formState.errors.confirm?.message}
+          {...form.register('confirm')}
+        />
         <Button type="submit" variant="secondary" size="md" block loading={update.isPending}>
           Update Password
         </Button>
       </form>
       <SectionLabel>Notifications</SectionLabel>
       <div className="space-y-2">
-        <ToggleRow title="Email updates" description="Bookings, invoices and documents" checked={prefs.email ?? true} onChange={(v) => setPref('email', v)} />
-        <ToggleRow title="SMS alerts" description="Deliveries and collections" checked={prefs.sms ?? true} onChange={(v) => setPref('sms', v)} />
-        <ToggleRow title="Product news" description="Occasional updates from SiteRun" checked={prefs.marketing ?? false} onChange={(v) => setPref('marketing', v)} />
+        <ToggleRow
+          title="Email updates"
+          description="Bookings, invoices and documents"
+          checked={prefs.email ?? true}
+          onChange={(v) => setPref('email', v)}
+        />
+        <ToggleRow
+          title="SMS alerts"
+          description="Deliveries and collections"
+          checked={prefs.sms ?? true}
+          onChange={(v) => setPref('sms', v)}
+        />
+        <ToggleRow
+          title="Product news"
+          description="Occasional updates from SiteRun"
+          checked={prefs.marketing ?? false}
+          onChange={(v) => setPref('marketing', v)}
+        />
       </div>
       <SectionLabel>Your data</SectionLabel>
       <div className="space-y-2">
         <ListRow to="/privacy" title="Privacy Policy" subtitle="How we handle your information" />
-        <Button variant="danger" size="md" block loading={deletion.isPending} onClick={() => window.confirm('Request deletion of your account and data?') && deletion.mutate(undefined, { onSuccess: () => navigate('/support') })}>
+        <Button
+          variant="danger"
+          size="md"
+          block
+          loading={deletion.isPending}
+          onClick={() =>
+            window.confirm('Request deletion of your account and data?') &&
+            deletion.mutate(undefined, { onSuccess: () => navigate('/support') })
+          }
+        >
           Request Account Deletion
         </Button>
       </div>

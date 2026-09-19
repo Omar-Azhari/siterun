@@ -2,7 +2,17 @@ import { useState } from 'react'
 import { BriefcaseBusiness } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { hirePill } from '@/components/domain/bookingStatus'
-import { ButtonLink, EmptyState, ErrorState, ListRow, ListSkeleton, ScreenTitle, SegmentedTabs, StatusPill, Thumbnail } from '@/components/ui'
+import {
+  ButtonLink,
+  EmptyState,
+  ErrorState,
+  ListRow,
+  ListSkeleton,
+  ScreenTitle,
+  SegmentedTabs,
+  StatusPill,
+  Thumbnail,
+} from '@/components/ui'
 import { useActiveHires } from '@/data/hooks'
 
 type Tab = 'all' | 'site' | 'transit'
@@ -37,15 +47,31 @@ export function ActiveHiresPage() {
           <EmptyState
             icon={<BriefcaseBusiness strokeWidth={1.75} />}
             title={all.length ? 'Nothing in this view' : 'No active hires'}
-            description={all.length ? 'Try another tab.' : 'Machines you hire will appear here once they’re on the way.'}
-            action={!all.length ? <ButtonLink to="/browse" size="md" block>Browse equipment</ButtonLink> : undefined}
+            description={
+              all.length
+                ? 'Try another tab.'
+                : 'Machines you hire will appear here once they’re on the way.'
+            }
+            action={
+              !all.length ? (
+                <ButtonLink to="/browse" size="md" block>
+                  Browse equipment
+                </ButtonLink>
+              ) : undefined
+            }
           />
         )}
         {list.map((b) => (
           <ListRow
             key={b.id}
             to={`/hires/${b.id}`}
-            leading={<Thumbnail src={b.machine.photos[0]?.replace('.webp', '-sm.webp')} alt={b.machine.title} className="h-[84px] w-[72px]" />}
+            leading={
+              <Thumbnail
+                src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+                alt={b.machine.title}
+                className="h-[84px] w-[72px]"
+              />
+            }
             title={b.machine.title}
             subtitle={`${b.machine.make} ${b.machine.model}`}
             meta={

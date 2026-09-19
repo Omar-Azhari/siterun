@@ -1,5 +1,15 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Building2, CalendarDays, ChevronRight, DollarSign, MapPin, MessageSquareText, Navigation, Repeat2, Truck } from 'lucide-react'
+import {
+  Building2,
+  CalendarDays,
+  ChevronRight,
+  DollarSign,
+  MapPin,
+  MessageSquareText,
+  Navigation,
+  Repeat2,
+  Truck,
+} from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { hirePill } from '@/components/domain/bookingStatus'
 import { Button, ButtonLink, StatusPill } from '@/components/ui'
@@ -9,7 +19,19 @@ import { HireGate } from './HireGate'
 import { isLive, useHire } from './hireShared'
 import { PhotoCarousel } from '../browse/MachineDetailPage'
 
-function Row({ icon, label, children, to, onClick }: { icon: React.ReactNode; label: string; children: React.ReactNode; to?: string; onClick?: () => void }) {
+function Row({
+  icon,
+  label,
+  children,
+  to,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  children: React.ReactNode
+  to?: string
+  onClick?: () => void
+}) {
   const body = (
     <>
       <span className="mt-0.5 text-primary [&_svg]:size-6">{icon}</span>
@@ -21,8 +43,18 @@ function Row({ icon, label, children, to, onClick }: { icon: React.ReactNode; la
     </>
   )
   const cls = 'flex w-full gap-3 border-b border-line py-3 text-left last:border-0'
-  if (to) return <Link to={to} className={cls}>{body}</Link>
-  if (onClick) return <button type="button" onClick={onClick} className={cls}>{body}</button>
+  if (to)
+    return (
+      <Link to={to} className={cls}>
+        {body}
+      </Link>
+    )
+  if (onClick)
+    return (
+      <button type="button" onClick={onClick} className={cls}>
+        {body}
+      </button>
+    )
   return <div className={cls}>{body}</div>
 }
 
@@ -44,11 +76,19 @@ export function HireDetailPage() {
         canChange ? (
           <>
             {b.status === 'in_transit' && (
-              <ButtonLink to={`/hires/${b.id}/tracking`} arrow leftIcon={<Navigation className="size-5" />}>
+              <ButtonLink
+                to={`/hires/${b.id}/tracking`}
+                arrow
+                leftIcon={<Navigation className="size-5" />}
+              >
                 Track Delivery
               </ButtonLink>
             )}
-            <ButtonLink to={`/hires/${b.id}/extend`} arrow variant={b.status === 'in_transit' ? 'secondary' : 'primary'}>
+            <ButtonLink
+              to={`/hires/${b.id}/extend`}
+              arrow
+              variant={b.status === 'in_transit' ? 'secondary' : 'primary'}
+            >
               Extend Hire
             </ButtonLink>
             {onSite && (
@@ -56,7 +96,11 @@ export function HireDetailPage() {
                 {b.status === 'return_scheduled' ? 'Change Return' : 'Schedule Return'}
               </ButtonLink>
             )}
-            <ButtonLink to={`/hires/${b.id}/swap`} variant="secondary" leftIcon={<Repeat2 className="size-6 text-primary" />}>
+            <ButtonLink
+              to={`/hires/${b.id}/swap`}
+              variant="secondary"
+              leftIcon={<Repeat2 className="size-6 text-primary" />}
+            >
               Smart Swap
             </ButtonLink>
           </>
@@ -66,14 +110,24 @@ export function HireDetailPage() {
       <PhotoCarousel
         photos={b.machine.photos}
         alt={b.machine.title}
-        overlay={<StatusPill {...hirePill(b)} size="md" className="absolute top-3 right-3 bg-app/80 backdrop-blur" />}
+        overlay={
+          <StatusPill
+            {...hirePill(b)}
+            size="md"
+            className="absolute top-3 right-3 bg-app/80 backdrop-blur"
+          />
+        }
       />
       <h1 className="mt-3 font-display text-[26px] font-bold">{b.machine.title}</h1>
       <p className="text-[15px] text-muted">
         {b.machine.make} {b.machine.model} · {b.ref}
       </p>
       <div className="mt-2">
-        <Row icon={<Building2 strokeWidth={1.5} />} label="Supplier" onClick={() => message.mutate(b.id, { onSuccess: (cid) => navigate(`/messages/${cid}`) })}>
+        <Row
+          icon={<Building2 strokeWidth={1.5} />}
+          label="Supplier"
+          onClick={() => message.mutate(b.id, { onSuccess: (cid) => navigate(`/messages/${cid}`) })}
+        >
           <span className="flex items-center gap-2">
             {b.supplier.name}
             <MessageSquareText className="size-4 text-primary" aria-label="Message supplier" />
@@ -83,7 +137,11 @@ export function HireDetailPage() {
           {formatDateLong(b.startDate)}
           <br />– {formatDateLong(b.endDate)} ({b.days} days)
         </Row>
-        <Row icon={<MapPin strokeWidth={1.5} />} label="Site" to={b.site ? `/sites/${b.site.id}` : undefined}>
+        <Row
+          icon={<MapPin strokeWidth={1.5} />}
+          label="Site"
+          to={b.site ? `/sites/${b.site.id}` : undefined}
+        >
           {b.site?.name}
           <br />
           {b.site?.suburb}, {b.site?.state}
@@ -95,14 +153,20 @@ export function HireDetailPage() {
         </Row>
         {b.collection && (
           <Row icon={<Truck strokeWidth={1.5} />} label="Collection booked">
-            {formatDateLong(b.collection.date)}, {b.collection.slot === 'morning' ? '7:00 AM – 12:00 PM' : '12:00 PM – 5:00 PM'}
+            {formatDateLong(b.collection.date)},{' '}
+            {b.collection.slot === 'morning' ? '7:00 AM – 12:00 PM' : '12:00 PM – 5:00 PM'}
           </Row>
         )}
       </div>
       {!isLive(b) && (
         <p className="mt-3 text-sm text-muted">
           This hire is {b.status.replace('_', ' ')}.{' '}
-          <Button variant="ghost" size="sm" block={false} onClick={() => navigate(`/bookings/${b.id}`)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            block={false}
+            onClick={() => navigate(`/bookings/${b.id}`)}
+          >
             View booking
           </Button>
         </p>

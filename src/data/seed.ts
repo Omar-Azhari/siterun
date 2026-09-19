@@ -67,9 +67,7 @@ export interface DemoDb {
 
 export const DB_VERSION = 5
 
-
 const $ = (dollars: number) => Math.round(dollars * 100)
-
 
 export function buildSeed(now: Date = new Date()): DemoDb {
   const today = setMinutes(setHours(now, 9), 41)

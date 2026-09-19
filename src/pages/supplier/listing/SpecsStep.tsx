@@ -1,9 +1,26 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CircleGauge, Container, Fuel, MoveDiagonal, MoveDown, Paperclip, Plus, Weight } from 'lucide-react'
+import {
+  CircleGauge,
+  Container,
+  Fuel,
+  MoveDiagonal,
+  MoveDown,
+  Paperclip,
+  Plus,
+  Weight,
+} from 'lucide-react'
 import { Chip, Input, Select } from '@/components/ui'
 import { useApiMutation, useCategories } from '@/data/hooks'
-import { FUEL_TYPES, isEditable, SPEC_FIELDS, specNumber, specValue, stepPath, useListing } from './listingShared'
+import {
+  FUEL_TYPES,
+  isEditable,
+  SPEC_FIELDS,
+  specNumber,
+  specValue,
+  stepPath,
+  useListing,
+} from './listingShared'
 import { ListingGate, WizardFrame } from './WizardFrame'
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -28,7 +45,9 @@ export function SpecsStep() {
   const [newAttachment, setNewAttachment] = useState('')
   const [adding, setAdding] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const save = useApiMutation((api, patch: Parameters<typeof api.saveMachineDraft>[1]) => api.saveMachineDraft(id, patch))
+  const save = useApiMutation((api, patch: Parameters<typeof api.saveMachineDraft>[1]) =>
+    api.saveMachineDraft(id, patch),
+  )
 
   if (!isEditable(m)) return <ListingGate query={q} machine={m} />
 
@@ -58,7 +77,10 @@ export function SpecsStep() {
       specs[f.key] = specValue(v, f.unit)
       if (f.tonnes && !Number.isNaN(Number(v))) tonnes = Math.round(f.tonnes(Number(v)) * 10) / 10
     }
-    save.mutate({ specs, attachments: atts, fuelType, capacityTonnes: tonnes, draftStep: 4 }, { onSuccess: () => navigate(stepPath(id, 'rates')) })
+    save.mutate(
+      { specs, attachments: atts, fuelType, capacityTonnes: tonnes, draftStep: 4 },
+      { onSuccess: () => navigate(stepPath(id, 'rates')) },
+    )
   }
 
   const addAttachment = () => {
@@ -69,10 +91,18 @@ export function SpecsStep() {
   }
 
   return (
-    <WizardFrame step="specs" title="Asset Specifications" subtitle="Add detailed specifications to help customers find your machine." onContinue={onContinue} saving={save.isPending}>
+    <WizardFrame
+      step="specs"
+      title="Asset Specifications"
+      subtitle="Add detailed specifications to help customers find your machine."
+      onContinue={onContinue}
+      saving={save.isPending}
+    >
       {fields.map((f) => (
         <div key={f.key} className="flex items-start gap-3">
-          <span className="mt-8 w-8 shrink-0 text-primary [&_svg]:size-7 [&_svg]:stroke-[1.5]">{ICONS[f.key] ?? <CircleGauge />}</span>
+          <span className="mt-8 w-8 shrink-0 text-primary [&_svg]:size-7 [&_svg]:stroke-[1.5]">
+            {ICONS[f.key] ?? <CircleGauge />}
+          </span>
           <Input
             className="flex-1"
             label={`${f.key}${f.required ? ' *' : ''}`}
@@ -86,7 +116,11 @@ export function SpecsStep() {
       ))}
 
       <div className="mb-4 flex items-start gap-3">
-        <Paperclip className="mt-0.5 size-7 w-8 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
+        <Paperclip
+          className="mt-0.5 size-7 w-8 shrink-0 text-primary"
+          strokeWidth={1.5}
+          aria-hidden
+        />
         <div className="flex-1">
           <p className="mb-2 text-sm">Attachments</p>
           <div className="flex flex-wrap gap-2">
@@ -105,13 +139,25 @@ export function SpecsStep() {
                 addAttachment()
               }}
             >
-              <Input label="Attachment name" hideLabel className="mb-0 flex-1" autoFocus value={newAttachment} onChange={(e) => setNewAttachment(e.target.value)} placeholder="e.g. Tilt Bucket" />
+              <Input
+                label="Attachment name"
+                hideLabel
+                className="mb-0 flex-1"
+                autoFocus
+                value={newAttachment}
+                onChange={(e) => setNewAttachment(e.target.value)}
+                placeholder="e.g. Tilt Bucket"
+              />
               <button type="submit" className="rounded-[10px] bg-primary px-4 text-sm font-medium">
                 Add
               </button>
             </form>
           ) : (
-            <button type="button" onClick={() => setAdding(true)} className="mt-2 flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary">
+            <button
+              type="button"
+              onClick={() => setAdding(true)}
+              className="mt-2 flex min-h-11 items-center gap-1.5 text-sm font-medium text-primary"
+            >
               <Plus className="size-4" aria-hidden /> Add attachment
             </button>
           )}
@@ -120,7 +166,13 @@ export function SpecsStep() {
 
       <div className="flex items-start gap-3">
         <Fuel className="mt-8 size-7 w-8 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
-        <Select className="flex-1" label="Fuel type *" value={fuelType} onChange={(e) => setFuel(e.target.value)} options={FUEL_TYPES.map((t) => ({ value: t, label: t }))} />
+        <Select
+          className="flex-1"
+          label="Fuel type *"
+          value={fuelType}
+          onChange={(e) => setFuel(e.target.value)}
+          options={FUEL_TYPES.map((t) => ({ value: t, label: t }))}
+        />
       </div>
     </WizardFrame>
   )

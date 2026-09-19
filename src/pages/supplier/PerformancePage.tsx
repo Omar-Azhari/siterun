@@ -1,9 +1,26 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { CalendarDays, ChartColumn, ChevronRight, Gauge, Plus, ShieldAlert, Inbox } from 'lucide-react'
+import {
+  CalendarDays,
+  ChartColumn,
+  ChevronRight,
+  Gauge,
+  Plus,
+  ShieldAlert,
+  Inbox,
+} from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { Card, ErrorState, ProgressBar, ScreenTitle, SectionLabel, SegmentedTabs, Skeleton, StatTile } from '@/components/ui'
+import {
+  Card,
+  ErrorState,
+  ProgressBar,
+  ScreenTitle,
+  SectionLabel,
+  SegmentedTabs,
+  Skeleton,
+  StatTile,
+} from '@/components/ui'
 import { cardClass } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import { formatMoneyCompact } from '@/lib/format'
@@ -16,17 +33,33 @@ function Shortcuts() {
   const bookings = useSupplierBookings()
   const docs = useOrgDocuments()
   const requests = bookings.data?.filter((b) => b.status === 'requested').length ?? 0
-  const alerts = docs.data?.filter((d) => d.status === 'verified' && ['critical', 'warning', 'expired'].includes(expiryLevel(d.expiryDate).level)).length ?? 0
+  const alerts =
+    docs.data?.filter(
+      (d) =>
+        d.status === 'verified' &&
+        ['critical', 'warning', 'expired'].includes(expiryLevel(d.expiryDate).level),
+    ).length ?? 0
   const items = [
     { to: '/supplier/requests', icon: Inbox, label: 'Booking Requests', badge: requests },
     { to: '/supplier/machines/new/category', icon: Plus, label: 'Add Machine', badge: 0 },
-    { to: '/supplier/compliance/alerts', icon: ShieldAlert, label: 'Compliance Alerts', badge: alerts },
+    {
+      to: '/supplier/compliance/alerts',
+      icon: ShieldAlert,
+      label: 'Compliance Alerts',
+      badge: alerts,
+    },
   ]
   return (
     <ul className="mb-4 grid grid-cols-3 gap-2">
       {items.map((i) => (
         <li key={i.to}>
-          <Link to={i.to} className={cn(cardClass, 'relative flex h-full flex-col items-center gap-1.5 px-2 py-3 text-center text-[13px] leading-tight hover:border-line-input')}>
+          <Link
+            to={i.to}
+            className={cn(
+              cardClass,
+              'relative flex h-full flex-col items-center gap-1.5 px-2 py-3 text-center text-[13px] leading-tight hover:border-line-input',
+            )}
+          >
             <i.icon className="size-7 text-primary" strokeWidth={1.5} aria-hidden />
             {i.label}
             {i.badge > 0 && (
@@ -74,9 +107,25 @@ export function PerformancePage() {
       <div className="mt-3 grid grid-cols-2 gap-2.5" aria-busy={perf.isFetching}>
         {p ? (
           <>
-            <StatTile icon={<CalendarDays strokeWidth={1.5} />} label="Hires" value={p.hires} trend={p.hiresTrend} />
-            <StatTile icon={<Gauge strokeWidth={1.5} />} label="Utilisation" value={`${p.utilisation}%`} trend={p.utilisationTrend} />
-            <StatTile icon={<ChartColumn strokeWidth={1.5} />} label="Revenue" value={formatMoneyCompact(p.revenueCents)} trend={p.revenueTrend} className="col-span-2" />
+            <StatTile
+              icon={<CalendarDays strokeWidth={1.5} />}
+              label="Hires"
+              value={p.hires}
+              trend={p.hiresTrend}
+            />
+            <StatTile
+              icon={<Gauge strokeWidth={1.5} />}
+              label="Utilisation"
+              value={`${p.utilisation}%`}
+              trend={p.utilisationTrend}
+            />
+            <StatTile
+              icon={<ChartColumn strokeWidth={1.5} />}
+              label="Revenue"
+              value={formatMoneyCompact(p.revenueCents)}
+              trend={p.revenueTrend}
+              className="col-span-2"
+            />
           </>
         ) : (
           <>
@@ -87,17 +136,48 @@ export function PerformancePage() {
         )}
       </div>
 
-      <SectionLabel action={<Link to="/supplier/bookings">View all ›</Link>}>Hire Trend</SectionLabel>
+      <SectionLabel action={<Link to="/supplier/bookings">View all ›</Link>}>
+        Hire Trend
+      </SectionLabel>
       <Card className="px-1 pt-3 pb-1">
         {p ? (
-          <figure aria-label={`Hires per ${range === '1y' ? 'month' : range === '90d' ? 'week' : 'day'}. Peak ${Math.max(...p.trend.map((t) => t.hires))}.`}>
+          <figure
+            aria-label={`Hires per ${range === '1y' ? 'month' : range === '90d' ? 'week' : 'day'}. Peak ${Math.max(...p.trend.map((t) => t.hires))}.`}
+          >
             <ResponsiveContainer width="100%" height={170}>
               <BarChart data={p.trend} margin={{ top: 4, right: 8, bottom: 0, left: -24 }}>
                 <CartesianGrid vertical={false} stroke="#1a2d3e" />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} interval={tickEvery - 1} tick={{ fill: '#aeb9c9', fontSize: 11 }} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: '#aeb9c9', fontSize: 11 }} width={40} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#04182b', border: '1px solid #2a3f50', borderRadius: 10, color: '#fff' }} labelStyle={{ color: '#aeb9c9' }} />
-                <Bar dataKey="hires" name="Hires" fill="#006cff" radius={[3, 3, 0, 0]} maxBarSize={14} />
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  axisLine={false}
+                  interval={tickEvery - 1}
+                  tick={{ fill: '#aeb9c9', fontSize: 11 }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: '#aeb9c9', fontSize: 11 }}
+                  width={40}
+                />
+                <Tooltip
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  contentStyle={{
+                    background: '#04182b',
+                    border: '1px solid #2a3f50',
+                    borderRadius: 10,
+                    color: '#fff',
+                  }}
+                  labelStyle={{ color: '#aeb9c9' }}
+                />
+                <Bar
+                  dataKey="hires"
+                  name="Hires"
+                  fill="#006cff"
+                  radius={[3, 3, 0, 0]}
+                  maxBarSize={14}
+                />
               </BarChart>
             </ResponsiveContainer>
           </figure>
@@ -106,12 +186,22 @@ export function PerformancePage() {
         )}
       </Card>
 
-      <SectionLabel action={<Link to="/supplier/machines">View all ›</Link>}>Top Performing Machines</SectionLabel>
+      <SectionLabel action={<Link to="/supplier/machines">View all ›</Link>}>
+        Top Performing Machines
+      </SectionLabel>
       <Card className="space-y-3">
-        {p?.topMachines.length === 0 && <p className="text-sm text-muted">No hires in this period yet.</p>}
+        {p?.topMachines.length === 0 && (
+          <p className="text-sm text-muted">No hires in this period yet.</p>
+        )}
         {p?.topMachines.map((t, i) => (
-          <Link key={t.machineId} to={`/supplier/machines/${t.machineId}`} className="flex items-center gap-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#34445a] text-sm font-semibold">{i + 1}</span>
+          <Link
+            key={t.machineId}
+            to={`/supplier/machines/${t.machineId}`}
+            className="flex items-center gap-3"
+          >
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#34445a] text-sm font-semibold">
+              {i + 1}
+            </span>
             <span className="min-w-0 flex-1">
               <span className="flex justify-between text-[15px]">
                 <span className="truncate font-medium">{t.title}</span>

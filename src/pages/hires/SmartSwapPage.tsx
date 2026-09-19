@@ -11,7 +11,10 @@ import type { Machine } from '@/data/types'
 import { HireGate } from './HireGate'
 import { useHire } from './hireShared'
 
-const sizeLabel = (m: Machine | undefined, fallback: string) => (m?.capacityTonnes ? `${m.capacityTonnes}t ${m.title.replace(/^[\d.]+t\s*/, '').toLowerCase()}` : fallback)
+const sizeLabel = (m: Machine | undefined, fallback: string) =>
+  m?.capacityTonnes
+    ? `${m.capacityTonnes}t ${m.title.replace(/^[\d.]+t\s*/, '').toLowerCase()}`
+    : fallback
 
 /** Board 04 · Smart Swap */
 export function SmartSwapPage() {
@@ -22,31 +25,53 @@ export function SmartSwapPage() {
   const slug = categories.data?.find((c) => c.id === b?.machine.categoryId)?.slug
   const similar = useSearch({ categorySlug: slug, pageSize: 50 })
   const [choice, setChoice] = useState<SwapOptionId>('same')
-  const swap = useApiMutation((api, opt: SwapOptionId) => api.smartSwap(id ?? '', opt), { success: 'Smart Swap requested' })
+  const swap = useApiMutation((api, opt: SwapOptionId) => api.smartSwap(id ?? '', opt), {
+    success: 'Smart Swap requested',
+  })
   if (!b) return <HireGate state={state} retry={() => void q.refetch()} />
 
   const cap = b.machine.capacityTonnes ?? 0
   const others = (similar.data?.items ?? []).filter((m) => m.id !== b.machine.id)
-  const bigger = others.filter((m) => (m.capacityTonnes ?? 0) > cap).sort((x, y) => (x.capacityTonnes ?? 0) - (y.capacityTonnes ?? 0))[0]
-  const smaller = others.filter((m) => (m.capacityTonnes ?? 0) < cap && m.capacityTonnes).sort((x, y) => (y.capacityTonnes ?? 0) - (x.capacityTonnes ?? 0))[0]
+  const bigger = others
+    .filter((m) => (m.capacityTonnes ?? 0) > cap)
+    .sort((x, y) => (x.capacityTonnes ?? 0) - (y.capacityTonnes ?? 0))[0]
+  const smaller = others
+    .filter((m) => (m.capacityTonnes ?? 0) < cap && m.capacityTonnes)
+    .sort((x, y) => (y.capacityTonnes ?? 0) - (x.capacityTonnes ?? 0))[0]
   const same = others.find((m) => m.capacityTonnes === cap)
   const noun = b.machine.title.replace(/^[\d.]+t\s*/, '').toLowerCase()
   const desc: Record<SwapOptionId, { text: string; photo: string | undefined }> = {
-    same: { text: `Swap for another ${cap ? `${cap}t ` : ''}${noun} at no additional cost.`, photo: (same ?? b.machine).photos[0] },
-    upgrade: { text: `Move to a ${sizeLabel(bigger, `larger ${noun}`)} for more power.`, photo: (bigger ?? b.machine).photos[0] },
-    downgrade: { text: `Switch to a ${sizeLabel(smaller, `smaller ${noun}`)} and save.`, photo: (smaller ?? b.machine).photos[0] },
+    same: {
+      text: `Swap for another ${cap ? `${cap}t ` : ''}${noun} at no additional cost.`,
+      photo: (same ?? b.machine).photos[0],
+    },
+    upgrade: {
+      text: `Move to a ${sizeLabel(bigger, `larger ${noun}`)} for more power.`,
+      photo: (bigger ?? b.machine).photos[0],
+    },
+    downgrade: {
+      text: `Switch to a ${sizeLabel(smaller, `smaller ${noun}`)} and save.`,
+      photo: (smaller ?? b.machine).photos[0],
+    },
   }
 
   return (
     <AppScreen
       hideNav
       footer={
-        <Button arrow loading={swap.isPending} onClick={() => swap.mutate(choice, { onSuccess: () => navigate(`/hires/${b.id}`) })}>
+        <Button
+          arrow
+          loading={swap.isPending}
+          onClick={() => swap.mutate(choice, { onSuccess: () => navigate(`/hires/${b.id}`) })}
+        >
           Confirm Smart Swap
         </Button>
       }
     >
-      <ScreenTitle title="Smart Swap" subtitle="Need a different machine? Swap it without the hassle." />
+      <ScreenTitle
+        title="Smart Swap"
+        subtitle="Need a different machine? Swap it without the hassle."
+      />
       <Card className="flex items-center gap-4 border-primary bg-gradient-to-b from-selected to-[#012a57] py-4">
         <Repeat2 className="size-9 shrink-0 text-primary" strokeWidth={1.75} aria-hidden />
         <div>
@@ -63,12 +88,25 @@ export function SmartSwapPage() {
             indicator={choice === o.id ? 'check' : 'radio'}
             indicatorPosition="top-right"
             className="items-start"
-            icon={<Thumbnail src={desc[o.id].photo?.replace('.webp', '-sm.webp')} alt="" className="h-[68px] w-[60px]" />}
+            icon={
+              <Thumbnail
+                src={desc[o.id].photo?.replace('.webp', '-sm.webp')}
+                alt=""
+                className="h-[68px] w-[60px]"
+              />
+            }
             label={`${o.title}, ${o.delta === 0 ? 'free' : `${o.delta > 0 ? 'plus' : 'minus'} ${formatMoney(Math.abs(o.delta))} per day`}`}
             title={<span className="text-sm font-medium">{o.title}</span>}
           >
-            <span className={cn('block text-lg font-bold', o.delta === 0 ? 'text-[#3ddc84]' : 'text-[#f7b84b]')}>
-              {o.delta === 0 ? 'Free' : `${o.delta > 0 ? '+' : '−'} ${formatMoney(Math.abs(o.delta))} / day`}
+            <span
+              className={cn(
+                'block text-lg font-bold',
+                o.delta === 0 ? 'text-[#3ddc84]' : 'text-[#f7b84b]',
+              )}
+            >
+              {o.delta === 0
+                ? 'Free'
+                : `${o.delta > 0 ? '+' : '−'} ${formatMoney(Math.abs(o.delta))} / day`}
             </span>
             <span className="mt-0.5 block pr-6 text-[13px] text-muted">{desc[o.id].text}</span>
           </SelectableCard>

@@ -25,7 +25,9 @@ export function CreateSiteLocationPage() {
   const [query, setQuery] = useState('')
   const [pos, setPos] = useState<[number, number]>([draft.lat ?? -37.6833, draft.lng ?? 144.9583])
   const [label, setLabel] = useState(
-    draft.address ? `${draft.address}\n${draft.suburb} ${draft.state} ${draft.postcode}`.trim() : '123 Construction Rd\nCampbellfield, VIC',
+    draft.address
+      ? `${draft.address}\n${draft.suburb} ${draft.state} ${draft.postcode}`.trim()
+      : '123 Construction Rd\nCampbellfield, VIC',
   )
   const [place, setPlace] = useState({
     address: draft.address ?? '123 Construction Rd',
@@ -89,8 +91,18 @@ export function CreateSiteLocationPage() {
   }
 
   return (
-    <AppScreen hideNav footer={<Button arrow onClick={confirm}>Confirm Location</Button>}>
-      <ScreenTitle title="Create Your First Site" subtitle="Find your project location and drop a pin on the map." />
+    <AppScreen
+      hideNav
+      footer={
+        <Button arrow onClick={confirm}>
+          Confirm Location
+        </Button>
+      }
+    >
+      <ScreenTitle
+        title="Create Your First Site"
+        subtitle="Find your project location and drop a pin on the map."
+      />
       <AddressAutocomplete
         label="Search address or suburb"
         hideLabel
@@ -109,10 +121,24 @@ export function CreateSiteLocationPage() {
         }}
       />
       <div className="relative -mx-4 mt-1">
-        <BaseMap center={pos} zoom={16} tiles={tiles} label="Site location map" className="h-[min(58dvh,460px)]">
+        <BaseMap
+          center={pos}
+          zoom={16}
+          tiles={tiles}
+          label="Site location map"
+          className="h-[min(58dvh,460px)]"
+        >
           <Recenter center={recentre} zoom={16} />
           <ClickToMove onMove={(lat, lng) => void moveTo(lat, lng)} />
-          <Marker position={pos} icon={pinIcon} draggable eventHandlers={handlers} ref={marker} keyboard title="Site pin (drag to adjust)">
+          <Marker
+            position={pos}
+            icon={pinIcon}
+            draggable
+            eventHandlers={handlers}
+            ref={marker}
+            keyboard
+            title="Site pin (drag to adjust)"
+          >
             <Tooltip permanent direction="top" offset={[0, -50]} className="site-pin-label">
               {label.split('\n').map((l) => (
                 <div key={l}>{l}</div>
@@ -121,7 +147,12 @@ export function CreateSiteLocationPage() {
           </Marker>
         </BaseMap>
         <div className="absolute top-3 right-3 z-[500] flex flex-col overflow-hidden rounded-xl border border-white/10 bg-app/85 backdrop-blur">
-          <button type="button" onClick={locate} aria-label="Use my location" className="flex size-11 items-center justify-center hover:bg-white/10">
+          <button
+            type="button"
+            onClick={locate}
+            aria-label="Use my location"
+            className="flex size-11 items-center justify-center hover:bg-white/10"
+          >
             <LocateFixed className="size-5" />
           </button>
           <button
@@ -134,7 +165,9 @@ export function CreateSiteLocationPage() {
           </button>
         </div>
       </div>
-      <p className="mt-2 text-xs text-muted">Drag the pin or tap the map to fine-tune the site entrance.</p>
+      <p className="mt-2 text-xs text-muted">
+        Drag the pin or tap the map to fine-tune the site entrance.
+      </p>
     </AppScreen>
   )
 }

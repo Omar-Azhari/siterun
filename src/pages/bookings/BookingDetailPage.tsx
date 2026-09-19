@@ -1,9 +1,26 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { CalendarDays, CircleDollarSign, MapPin, MessageSquareText, ShieldCheck, Truck } from 'lucide-react'
+import {
+  CalendarDays,
+  CircleDollarSign,
+  MapPin,
+  MessageSquareText,
+  ShieldCheck,
+  Truck,
+} from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { MachineSummary, SupplierRow } from '@/components/domain/MachineBits'
 import { basePill, DELIVERY_LABEL } from '@/components/domain/bookingStatus'
-import { Button, ButtonLink, Card, CopyButton, EmptyState, ErrorState, ListSkeleton, ScreenTitle, StatusPill } from '@/components/ui'
+import {
+  Button,
+  ButtonLink,
+  Card,
+  CopyButton,
+  EmptyState,
+  ErrorState,
+  ListSkeleton,
+  ScreenTitle,
+  StatusPill,
+} from '@/components/ui'
 import { formatDateLong, formatMoney } from '@/lib/format'
 import { gstOf } from '@/lib/booking'
 import { useApiMutation, useBooking, useMe } from '@/data/hooks'
@@ -15,13 +32,30 @@ export function BookingDetailPage() {
   const navigate = useNavigate()
   const { data: me } = useMe()
   const booking = useBooking(id)
-  const cancel = useApiMutation((api, bid: string) => api.cancelBooking(bid), { success: 'Booking cancelled' })
+  const cancel = useApiMutation((api, bid: string) => api.cancelBooking(bid), {
+    success: 'Booking cancelled',
+  })
   const message = useApiMutation((api, bid: string) => api.openConversationForBooking(bid))
   const b = booking.data
 
-  if (booking.isPending) return <AppScreen><ListSkeleton rows={3} /></AppScreen>
-  if (booking.isError) return <AppScreen><ErrorState onRetry={() => void booking.refetch()} /></AppScreen>
-  if (!b) return <AppScreen><EmptyState title="Booking not found" /></AppScreen>
+  if (booking.isPending)
+    return (
+      <AppScreen>
+        <ListSkeleton rows={3} />
+      </AppScreen>
+    )
+  if (booking.isError)
+    return (
+      <AppScreen>
+        <ErrorState onRetry={() => void booking.refetch()} />
+      </AppScreen>
+    )
+  if (!b)
+    return (
+      <AppScreen>
+        <EmptyState title="Booking not found" />
+      </AppScreen>
+    )
 
   const active = ['in_transit', 'on_site', 'return_scheduled'].includes(b.status)
   const canChange = me?.role !== 'viewer'
@@ -41,7 +75,9 @@ export function BookingDetailPage() {
             block
             leftIcon={<MessageSquareText className="size-5 text-primary" />}
             loading={message.isPending}
-            onClick={() => message.mutate(b.id, { onSuccess: (cid) => navigate(`/messages/${cid}`) })}
+            onClick={() =>
+              message.mutate(b.id, { onSuccess: (cid) => navigate(`/messages/${cid}`) })
+            }
           >
             Message {b.supplier.name}
           </Button>
@@ -62,7 +98,10 @@ export function BookingDetailPage() {
       }
     >
       <div className="flex items-start justify-between">
-        <ScreenTitle title="Booking Details" subtitle={b.site ? `${b.site.name}, ${b.site.suburb}` : undefined} />
+        <ScreenTitle
+          title="Booking Details"
+          subtitle={b.site ? `${b.site.name}, ${b.site.suburb}` : undefined}
+        />
         <StatusPill {...basePill(b.status, b.startDate)} className="mt-1.5" />
       </div>
       <Card className="flex items-center justify-between py-3">
@@ -78,7 +117,9 @@ export function BookingDetailPage() {
           {formatDateLong(b.startDate)} – {formatDateLong(b.endDate)} ({b.days} days)
         </DetailLine>
         <DetailLine icon={<Truck />} label={DELIVERY_LABEL[b.delivery]}>
-          {b.delivery === 'pickup' ? `Supplier yard, ${b.machine.suburb} ${b.machine.state}` : b.deliveryAddress}
+          {b.delivery === 'pickup'
+            ? `Supplier yard, ${b.machine.suburb} ${b.machine.state}`
+            : b.deliveryAddress}
         </DetailLine>
         {b.site && (
           <DetailLine icon={<MapPin />} label="Site">
@@ -94,10 +135,15 @@ export function BookingDetailPage() {
             {formatMoney(b.dailyRate)}/day · {b.hireType === 'wet' ? 'Wet hire' : 'Dry hire'}
           </span>
           <span className="block text-fg">
-            {formatMoney(b.totalCents)} ex. GST · {formatMoney(b.totalCents + gstOf(b.totalCents), { cents: true })} inc. GST
+            {formatMoney(b.totalCents)} ex. GST ·{' '}
+            {formatMoney(b.totalCents + gstOf(b.totalCents), { cents: true })} inc. GST
           </span>
         </DetailLine>
-        {b.declineReason && <p className="rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-[#fca5a5]">Declined: {b.declineReason}</p>}
+        {b.declineReason && (
+          <p className="rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-[#fca5a5]">
+            Declined: {b.declineReason}
+          </p>
+        )}
       </Card>
       <SupplierRow machine={b.machine} className="mt-2.5" />
     </AppScreen>

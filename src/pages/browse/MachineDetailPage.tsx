@@ -3,7 +3,16 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CircleCheck, Container, MoveDiagonal, Weight } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { SupplierRow } from '@/components/domain/MachineBits'
-import { Button, EmptyState, ErrorState, Price, SectionLabel, SelectableCard, Skeleton, StatusPill } from '@/components/ui'
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  Price,
+  SectionLabel,
+  SelectableCard,
+  Skeleton,
+  StatusPill,
+} from '@/components/ui'
 import { useMachine, useMe } from '@/data/hooks'
 import type { HireType } from '@/data/types'
 import { areaFor } from '@/auth/roles'
@@ -14,7 +23,15 @@ const SPEC_ICONS: Record<string, React.ReactNode> = {
   'Bucket capacity': <Container strokeWidth={1.5} />,
 }
 
-export function PhotoCarousel({ photos, alt, overlay }: { photos: string[]; alt: string; overlay?: React.ReactNode }) {
+export function PhotoCarousel({
+  photos,
+  alt,
+  overlay,
+}: {
+  photos: string[]
+  alt: string
+  overlay?: React.ReactNode
+}) {
   const [index, setIndex] = useState(0)
   const track = useRef<HTMLDivElement>(null)
   const go = (i: number) => {
@@ -23,16 +40,23 @@ export function PhotoCarousel({ photos, alt, overlay }: { photos: string[]; alt:
     el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
   }
   return (
-    <div className="relative -mx-4" role="region" aria-roledescription="carousel" aria-label={`${alt} photos`}>
+    <div
+      className="relative -mx-4"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={`${alt} photos`}
+    >
       <div
         ref={track}
-        onScroll={(e) => setIndex(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}
+        onScroll={(e) =>
+          setIndex(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))
+        }
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight') go(Math.min(photos.length - 1, index + 1))
           if (e.key === 'ArrowLeft') go(Math.max(0, index - 1))
         }}
         tabIndex={0}
-        className="flex aspect-[4/3] snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] focus-visible:outline-offset-[-4px]"
+        className="flex aspect-[4/3] snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto focus-visible:outline-offset-[-4px]"
       >
         {photos.map((src, i) => (
           <img
@@ -46,7 +70,10 @@ export function PhotoCarousel({ photos, alt, overlay }: { photos: string[]; alt:
       </div>
       {overlay}
       {photos.length > 1 && (
-        <span className="absolute right-3 bottom-3 rounded-md bg-black/60 px-2 py-0.5 text-xs font-medium" aria-live="polite">
+        <span
+          className="absolute right-3 bottom-3 rounded-md bg-black/60 px-2 py-0.5 text-xs font-medium"
+          aria-live="polite"
+        >
           {index + 1}/{photos.length}
         </span>
       )}
@@ -73,8 +100,21 @@ export function MachineDetailPage() {
         <Skeleton className="mt-4 h-16" />
       </AppScreen>
     )
-  if (machine.isError) return <AppScreen><ErrorState onRetry={() => void machine.refetch()} /></AppScreen>
-  if (!m) return <AppScreen><EmptyState title="Machine not available" description="This listing may have been paused or removed." /></AppScreen>
+  if (machine.isError)
+    return (
+      <AppScreen>
+        <ErrorState onRetry={() => void machine.refetch()} />
+      </AppScreen>
+    )
+  if (!m)
+    return (
+      <AppScreen>
+        <EmptyState
+          title="Machine not available"
+          description="This listing may have been paused or removed."
+        />
+      </AppScreen>
+    )
 
   const hireType = m.hireTypes.includes(hire) ? hire : (m.hireTypes[0] ?? 'dry')
   const specs = Object.entries(m.specs).slice(0, 3)
@@ -105,7 +145,11 @@ export function MachineDetailPage() {
             {m.make} {m.model}
           </p>
         </div>
-        {m.status === 'live' ? <StatusPill status="available" className="mt-1.5" /> : <StatusPill label="Not listed" tone="neutral" />}
+        {m.status === 'live' ? (
+          <StatusPill status="available" className="mt-1.5" />
+        ) : (
+          <StatusPill label="Not listed" tone="neutral" />
+        )}
       </div>
       <SupplierRow machine={m} className="mt-3" />
 
@@ -113,7 +157,9 @@ export function MachineDetailPage() {
         <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
           {specs.map(([k, v]) => (
             <div key={k} className="flex flex-col items-center gap-1 py-1">
-              <span className="text-[#dae4ef] [&_svg]:size-6">{SPEC_ICONS[k] ?? <Weight strokeWidth={1.5} />}</span>
+              <span className="text-[#dae4ef] [&_svg]:size-6">
+                {SPEC_ICONS[k] ?? <Weight strokeWidth={1.5} />}
+              </span>
               <dd className="text-[13px] font-semibold">{v}</dd>
               <dt className="text-[11px] text-muted">{k}</dt>
             </div>
@@ -134,14 +180,27 @@ export function MachineDetailPage() {
               indicatorPosition="left"
               className="items-start"
               label={`${t === 'dry' ? 'Dry' : 'Wet'} hire${offered ? '' : ', not offered'}`}
-              title={<span className="text-[13px] font-normal text-[#dae4ef]">{t === 'dry' ? 'Dry Hire' : 'Wet Hire'}</span>}
+              title={
+                <span className="text-[13px] font-normal text-[#dae4ef]">
+                  {t === 'dry' ? 'Dry Hire' : 'Wet Hire'}
+                </span>
+              }
             >
-              {offered && rate ? <Price cents={rate} className="block" /> : <span className="text-xs text-muted">Not offered</span>}
+              {offered && rate ? (
+                <Price cents={rate} className="block" />
+              ) : (
+                <span className="text-xs text-muted">Not offered</span>
+              )}
             </SelectableCard>
           )
         })}
       </div>
-      <p className="mt-1.5 text-xs text-muted">{hireType === 'dry' ? 'Machine only. You supply a licensed operator.' : 'Includes a licensed operator.'} Prices exclude GST.</p>
+      <p className="mt-1.5 text-xs text-muted">
+        {hireType === 'dry'
+          ? 'Machine only. You supply a licensed operator.'
+          : 'Includes a licensed operator.'}{' '}
+        Prices exclude GST.
+      </p>
 
       {m.features.length > 0 && (
         <>

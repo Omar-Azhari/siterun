@@ -6,7 +6,10 @@ const [, , svgPath, cropPath, outPath] = process.argv
 const svg = fs.readFileSync(svgPath, 'utf8')
 const png = new Resvg(svg, { fitTo: { mode: 'width', value: 780 } }).render().asPng()
 const crop = await sharp(cropPath).resize(780, 740).png().toBuffer()
-const blended = await sharp(crop).composite([{ input: png, blend: 'difference' }]).png().toBuffer()
+const blended = await sharp(crop)
+  .composite([{ input: png, blend: 'difference' }])
+  .png()
+  .toBuffer()
 await sharp({ create: { width: 780 * 3 + 40, height: 740, channels: 3, background: '#ffffff' } })
   .composite([
     { input: crop, left: 0, top: 0 },

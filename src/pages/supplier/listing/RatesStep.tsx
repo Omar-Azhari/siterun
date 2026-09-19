@@ -27,30 +27,65 @@ export function RatesStep() {
   const [minBooking, setMinBooking] = useState<string | null>(null)
   const [from, setFrom] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
-  const save = useApiMutation((api, patch: Parameters<typeof api.saveMachineDraft>[1]) => api.saveMachineDraft(id, patch))
+  const save = useApiMutation((api, patch: Parameters<typeof api.saveMachineDraft>[1]) =>
+    api.saveMachineDraft(id, patch),
+  )
 
   if (!isEditable(m)) return <ListingGate query={q} machine={m} />
-  const r = rates ?? { hourly: dollars(m.rates.hourly), daily: dollars(m.rates.daily), weekly: dollars(m.rates.weekly), wetDaily: dollars(m.rates.wetDaily) }
+  const r = rates ?? {
+    hourly: dollars(m.rates.hourly),
+    daily: dollars(m.rates.daily),
+    weekly: dollars(m.rates.weekly),
+    wetDaily: dollars(m.rates.wetDaily),
+  }
   const types = hireTypes ?? m.hireTypes
   const set = (k: string, v: string) => setRates({ ...r, [k]: v.replace(/[^\d.]/g, '') })
 
   const errors = submitted
     ? {
-        hourly: !moneyOk(r.hourly ?? '') ? 'Enter a valid amount' : unit === 'hourly' && !r.hourly ? 'Required' : undefined,
-        daily: !r.daily ? 'A daily rate is required' : !moneyOk(r.daily) ? 'Enter a valid amount' : undefined,
-        weekly: !moneyOk(r.weekly ?? '') ? 'Enter a valid amount' : unit === 'weekly' && !r.weekly ? 'Required' : undefined,
-        wetDaily: types.includes('wet') && (!r.wetDaily || !moneyOk(r.wetDaily)) ? 'Enter the wet hire daily rate' : undefined,
+        hourly: !moneyOk(r.hourly ?? '')
+          ? 'Enter a valid amount'
+          : unit === 'hourly' && !r.hourly
+            ? 'Required'
+            : undefined,
+        daily: !r.daily
+          ? 'A daily rate is required'
+          : !moneyOk(r.daily)
+            ? 'Enter a valid amount'
+            : undefined,
+        weekly: !moneyOk(r.weekly ?? '')
+          ? 'Enter a valid amount'
+          : unit === 'weekly' && !r.weekly
+            ? 'Required'
+            : undefined,
+        wetDaily:
+          types.includes('wet') && (!r.wetDaily || !moneyOk(r.wetDaily))
+            ? 'Enter the wet hire daily rate'
+            : undefined,
         types: types.length === 0 ? 'Choose at least one hire type' : undefined,
       }
     : {}
 
   const onContinue = () => {
     setSubmitted(true)
-    const ok = r.daily && moneyOk(r.daily) && moneyOk(r.hourly ?? '') && moneyOk(r.weekly ?? '') && types.length > 0 && (!types.includes('wet') || (r.wetDaily && moneyOk(r.wetDaily))) && !(unit === 'hourly' && !r.hourly) && !(unit === 'weekly' && !r.weekly)
+    const ok =
+      r.daily &&
+      moneyOk(r.daily) &&
+      moneyOk(r.hourly ?? '') &&
+      moneyOk(r.weekly ?? '') &&
+      types.length > 0 &&
+      (!types.includes('wet') || (r.wetDaily && moneyOk(r.wetDaily))) &&
+      !(unit === 'hourly' && !r.hourly) &&
+      !(unit === 'weekly' && !r.weekly)
     if (!ok) return
     save.mutate(
       {
-        rates: { hourly: cents(r.hourly ?? ''), daily: cents(r.daily ?? '') ?? 0, weekly: cents(r.weekly ?? ''), wetDaily: types.includes('wet') ? cents(r.wetDaily ?? '') : null },
+        rates: {
+          hourly: cents(r.hourly ?? ''),
+          daily: cents(r.daily ?? '') ?? 0,
+          weekly: cents(r.weekly ?? ''),
+          wetDaily: types.includes('wet') ? cents(r.wetDaily ?? '') : null,
+        },
         hireTypes: types,
         minBooking: minBooking ?? m.minBooking,
         availableFrom: from ?? m.availableFrom,
@@ -60,7 +95,8 @@ export function RatesStep() {
     )
   }
 
-  const toggleType = (t: HireType) => setHireTypes(types.includes(t) ? types.filter((x) => x !== t) : [...types, t])
+  const toggleType = (t: HireType) =>
+    setHireTypes(types.includes(t) ? types.filter((x) => x !== t) : [...types, t])
   const rateInput = (key: 'hourly' | 'daily' | 'weekly', label: string) => (
     <Input
       label={`${label} rate (ex. GST)${key === unit || key === 'daily' ? ' *' : ''}`}
@@ -73,7 +109,13 @@ export function RatesStep() {
   )
 
   return (
-    <WizardFrame step="rates" title="Rates & Availability" subtitle="Set your hire rates and when the machine is available." onContinue={onContinue} saving={save.isPending}>
+    <WizardFrame
+      step="rates"
+      title="Rates & Availability"
+      subtitle="Set your hire rates and when the machine is available."
+      onContinue={onContinue}
+      saving={save.isPending}
+    >
       <SegmentedTabs
         label="Main pricing unit"
         variant="joined"
@@ -100,7 +142,14 @@ export function RatesStep() {
             ['wet', 'Wet Hire', 'With operator'],
           ] as const
         ).map(([t, title, sub]) => (
-          <div key={t} className={cn(cardClass, 'rounded-[12px] px-3 py-1', types.includes(t) && selectedClass)}>
+          <div
+            key={t}
+            className={cn(
+              cardClass,
+              'rounded-[12px] px-3 py-1',
+              types.includes(t) && selectedClass,
+            )}
+          >
             <Checkbox checked={types.includes(t)} onChange={() => toggleType(t)} className="w-full">
               <span>
                 <span className="block text-[15px] font-semibold text-fg">{title}</span>
@@ -110,14 +159,38 @@ export function RatesStep() {
           </div>
         ))}
       </div>
-      {errors.types && <p role="alert" className="mt-1 text-xs text-[#f87171]">{errors.types}</p>}
+      {errors.types && (
+        <p role="alert" className="mt-1 text-xs text-[#f87171]">
+          {errors.types}
+        </p>
+      )}
       {types.includes('wet') && (
-        <Input className="mt-3" label="Wet hire daily rate (ex. GST) *" inputMode="decimal" value={r.wetDaily ?? ''} onChange={(e) => set('wetDaily', e.target.value)} leftIcon={<span className="text-fg">$</span>} hint="Includes a licensed operator." error={errors.wetDaily} />
+        <Input
+          className="mt-3"
+          label="Wet hire daily rate (ex. GST) *"
+          inputMode="decimal"
+          value={r.wetDaily ?? ''}
+          onChange={(e) => set('wetDaily', e.target.value)}
+          leftIcon={<span className="text-fg">$</span>}
+          hint="Includes a licensed operator."
+          error={errors.wetDaily}
+        />
       )}
 
-      <Select className="mt-3" label="Minimum booking period *" value={minBooking ?? m.minBooking} onChange={(e) => setMinBooking(e.target.value)} options={MIN_BOOKINGS.map((v) => ({ value: v, label: v }))} />
+      <Select
+        className="mt-3"
+        label="Minimum booking period *"
+        value={minBooking ?? m.minBooking}
+        onChange={(e) => setMinBooking(e.target.value)}
+        options={MIN_BOOKINGS.map((v) => ({ value: v, label: v }))}
+      />
       <p className="mb-1.5 text-[15px] font-semibold">Availability</p>
-      <DateField label="Available from" value={from ?? m.availableFrom} min={format(new Date(), 'yyyy-MM-dd')} onChange={setFrom} />
+      <DateField
+        label="Available from"
+        value={from ?? m.availableFrom}
+        min={format(new Date(), 'yyyy-MM-dd')}
+        onChange={setFrom}
+      />
     </WizardFrame>
   )
 }

@@ -8,5 +8,5 @@ export function useHire(id?: string) {
   return { q, b, state } as const
 }
 
-export const isLive = (b: BookingView) => ['in_transit', 'on_site', 'return_scheduled', 'confirmed'].includes(b.status)
-
+export const isLive = (b: BookingView) =>
+  ['in_transit', 'on_site', 'return_scheduled', 'confirmed'].includes(b.status)

@@ -3,7 +3,16 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { CalendarDays, ChevronRight, Plus } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { BottomSheet, Button, Card, DateField, Price, ScreenTitle, SectionLabel, SelectableCard } from '@/components/ui'
+import {
+  BottomSheet,
+  Button,
+  Card,
+  DateField,
+  Price,
+  ScreenTitle,
+  SectionLabel,
+  SelectableCard,
+} from '@/components/ui'
 import { extensionCost, extensionRate, extensionTiers } from '@/lib/booking'
 import { formatDateLong, formatMoney } from '@/lib/format'
 import { useApiMutation } from '@/data/hooks'
@@ -14,7 +23,13 @@ import { cn } from '@/lib/cn'
 
 function PlusMark({ on }: { on: boolean }) {
   return (
-    <span aria-hidden className={cn('flex size-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px]', on ? 'border-primary bg-primary' : 'border-muted')}>
+    <span
+      aria-hidden
+      className={cn(
+        'flex size-[26px] shrink-0 items-center justify-center rounded-full border-[1.5px]',
+        on ? 'border-primary bg-primary' : 'border-muted',
+      )}
+    >
       {on && <Plus className="size-4 text-white" strokeWidth={3} />}
     </span>
   )
@@ -44,7 +59,12 @@ export function ExtendHirePage() {
     <AppScreen
       hideNav
       footer={
-        <Button arrow disabled={days <= 0} loading={extend.isPending} onClick={() => extend.mutate(newEnd, { onSuccess: () => navigate(`/hires/${b.id}`) })}>
+        <Button
+          arrow
+          disabled={days <= 0}
+          loading={extend.isPending}
+          onClick={() => extend.mutate(newEnd, { onSuccess: () => navigate(`/hires/${b.id}`) })}
+        >
           Confirm Extension
         </Button>
       }
@@ -91,13 +111,33 @@ export function ExtendHirePage() {
       <Card className="mt-4">
         <p className="text-sm text-muted">Estimated additional cost</p>
         <p className="mt-1" aria-live="polite">
-          <span className="font-display text-[32px] font-bold">{formatMoney(cost)}</span> <span className="text-sm text-muted">(ex. GST)</span>
+          <span className="font-display text-[32px] font-bold">{formatMoney(cost)}</span>{' '}
+          <span className="text-sm text-muted">(ex. GST)</span>
         </p>
-        <p className="text-sm text-muted">{days > 0 ? `${days} days × ${formatMoney(rate)}/day${b.quantity > 1 ? ` × ${b.quantity}` : ''}` : 'Choose a new end date'}</p>
+        <p className="text-sm text-muted">
+          {days > 0
+            ? `${days} days × ${formatMoney(rate)}/day${b.quantity > 1 ? ` × ${b.quantity}` : ''}`
+            : 'Choose a new end date'}
+        </p>
       </Card>
 
-      <BottomSheet open={sheet} onClose={() => setSheet(false)} title="Custom end date" footer={<Button disabled={!custom} onClick={() => setSheet(false)}>Use this date</Button>}>
-        <DateField label="New end date" value={custom} min={minCustom} onChange={setCustom} hint={`Current hire ends ${formatDateLong(b.endDate)}`} />
+      <BottomSheet
+        open={sheet}
+        onClose={() => setSheet(false)}
+        title="Custom end date"
+        footer={
+          <Button disabled={!custom} onClick={() => setSheet(false)}>
+            Use this date
+          </Button>
+        }
+      >
+        <DateField
+          label="New end date"
+          value={custom}
+          min={minCustom}
+          onChange={setCustom}
+          hint={`Current hire ends ${formatDateLong(b.endDate)}`}
+        />
       </BottomSheet>
     </AppScreen>
   )

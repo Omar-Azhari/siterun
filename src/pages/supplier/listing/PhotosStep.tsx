@@ -30,7 +30,11 @@ export function PhotosStep() {
     const room = MAX - photos.length
     if (room <= 0) return toast.error('Photo limit reached', `You can add up to ${MAX} photos.`)
     const chosen = files.filter((f) => f.type.startsWith('image/')).slice(0, room)
-    if (files.length > room) toast.info(`Only ${room} more photo${room === 1 ? '' : 's'} added`, `Listings can have up to ${MAX} photos.`)
+    if (files.length > room)
+      toast.info(
+        `Only ${room} more photo${room === 1 ? '' : 's'} added`,
+        `Listings can have up to ${MAX} photos.`,
+      )
     setUploading(chosen.length)
     try {
       const urls: string[] = []
@@ -66,21 +70,48 @@ export function PhotosStep() {
         if (dragFrom !== null) move(dragFrom, i)
         setDragFrom(null)
       }}
-      className={cn('group relative overflow-hidden rounded-[12px] border border-line bg-input', i === 0 ? 'col-span-2 aspect-[16/10]' : 'aspect-[4/3]', dragFrom === i && 'opacity-50')}
+      className={cn(
+        'group relative overflow-hidden rounded-[12px] border border-line bg-input',
+        i === 0 ? 'col-span-2 aspect-[16/10]' : 'aspect-[4/3]',
+        dragFrom === i && 'opacity-50',
+      )}
     >
-      <img src={src} alt={i === 0 ? 'Main photo' : `Photo ${i + 1}`} className="size-full cursor-grab object-cover" />
-      {i === 0 && <span className="absolute bottom-2 left-2 rounded-md bg-app/85 px-2 py-1 text-xs font-medium">Main photo</span>}
-      <button type="button" aria-label={`Delete photo ${i + 1}`} onClick={() => remove(i)} className="absolute top-2 right-2 flex size-9 items-center justify-center rounded-lg bg-app/80 hover:bg-danger">
+      <img
+        src={src}
+        alt={i === 0 ? 'Main photo' : `Photo ${i + 1}`}
+        className="size-full cursor-grab object-cover"
+      />
+      {i === 0 && (
+        <span className="absolute bottom-2 left-2 rounded-md bg-app/85 px-2 py-1 text-xs font-medium">
+          Main photo
+        </span>
+      )}
+      <button
+        type="button"
+        aria-label={`Delete photo ${i + 1}`}
+        onClick={() => remove(i)}
+        className="absolute top-2 right-2 flex size-9 items-center justify-center rounded-lg bg-app/80 hover:bg-danger"
+      >
         <Trash2 className="size-4" />
       </button>
       <div className="absolute right-2 bottom-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
         {i > 0 && (
-          <button type="button" aria-label={`Move photo ${i + 1} earlier`} onClick={() => move(i, i - 1)} className="flex size-8 items-center justify-center rounded-lg bg-app/80 hover:bg-primary">
+          <button
+            type="button"
+            aria-label={`Move photo ${i + 1} earlier`}
+            onClick={() => move(i, i - 1)}
+            className="flex size-8 items-center justify-center rounded-lg bg-app/80 hover:bg-primary"
+          >
             <ArrowLeft className="size-4" />
           </button>
         )}
         {i < photos.length - 1 && (
-          <button type="button" aria-label={`Move photo ${i + 1} later`} onClick={() => move(i, i + 1)} className="flex size-8 items-center justify-center rounded-lg bg-app/80 hover:bg-primary">
+          <button
+            type="button"
+            aria-label={`Move photo ${i + 1} later`}
+            onClick={() => move(i, i + 1)}
+            className="flex size-8 items-center justify-center rounded-lg bg-app/80 hover:bg-primary"
+          >
             <ArrowRight className="size-4" />
           </button>
         )}
@@ -95,12 +126,20 @@ export function PhotosStep() {
       subtitle="Add clear photos of your machine from multiple angles."
       disabled={photos.length === 0 || uploading > 0}
       saving={next.isPending}
-      onContinue={() => next.mutate(undefined, { onSuccess: () => navigate(stepPath(id, 'specs')) })}
+      onContinue={() =>
+        next.mutate(undefined, { onSuccess: () => navigate(stepPath(id, 'specs')) })
+      }
     >
-      <ul className="grid grid-cols-2 gap-2.5" aria-label={`${photos.length} of ${MAX} photos. Drag to reorder.`}>
+      <ul
+        className="grid grid-cols-2 gap-2.5"
+        aria-label={`${photos.length} of ${MAX} photos. Drag to reorder.`}
+      >
         {photos.map(tile)}
         {Array.from({ length: uploading }, (_, i) => (
-          <li key={`up-${i}`} className="flex aspect-[4/3] items-center justify-center rounded-[12px] border border-line bg-input">
+          <li
+            key={`up-${i}`}
+            className="flex aspect-[4/3] items-center justify-center rounded-[12px] border border-line bg-input"
+          >
             <Loader2 className="size-6 animate-spin text-primary" aria-label="Uploading" />
           </li>
         ))}
@@ -118,7 +157,9 @@ export function PhotosStep() {
             >
               <CirclePlus className="size-8" strokeWidth={1.5} aria-hidden />
               <span className="text-sm font-medium">Add photo</span>
-              <span className="text-xs text-muted">{photos.length}/{MAX} · JPG or PNG</span>
+              <span className="text-xs text-muted">
+                {photos.length}/{MAX} · JPG or PNG
+              </span>
             </button>
           </li>
         )}
@@ -137,7 +178,9 @@ export function PhotosStep() {
           void upload(files)
         }}
       />
-      <p className="mt-3 text-xs text-muted">Drag photos to reorder. The first photo is shown in search results.</p>
+      <p className="mt-3 text-xs text-muted">
+        Drag photos to reorder. The first photo is shown in search results.
+      </p>
     </WizardFrame>
   )
 }

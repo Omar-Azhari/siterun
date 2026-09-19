@@ -11,7 +11,11 @@ import { createServer } from 'vite'
 const shell = readFileSync('dist/index.html', 'utf8')
 writeFileSync('dist/app.html', shell)
 
-const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' })
+const vite = await createServer({
+  server: { middlewareMode: true },
+  appType: 'custom',
+  logLevel: 'error',
+})
 const { LandingPage } = await vite.ssrLoadModule('/src/pages/marketing/LandingPage.tsx')
 // Same tree as src/pages/marketing/landingRoot.tsx, so hydration matches.
 const html = renderToString(

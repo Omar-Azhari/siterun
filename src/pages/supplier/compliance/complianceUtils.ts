@@ -34,15 +34,19 @@ export function useComplianceState() {
 export type DocState = 'verified' | 'pending' | 'rejected' | 'missing' | 'expired'
 
 export function latestFor(docs: ComplianceDocument[], req: ComplianceRequirement) {
-  return docs.filter((d) => d.requirementId === req.id).sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt))[0]
+  return docs
+    .filter((d) => d.requirementId === req.id)
+    .sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt))[0]
 }
 
-export function docState(doc: ComplianceDocument | undefined, today = new Date().toISOString().slice(0, 10)): DocState {
+export function docState(
+  doc: ComplianceDocument | undefined,
+  today = new Date().toISOString().slice(0, 10),
+): DocState {
   if (!doc) return 'missing'
   if (doc.status === 'verified' && doc.expiryDate && doc.expiryDate < today) return 'expired'
   return doc.status
 }
-
 
 const TYPES = ['application/pdf', 'image/jpeg', 'image/png']
 const MAX = 10 * 1024 * 1024
@@ -54,4 +58,3 @@ export function validateFile(f: File): string | null {
   if (f.size === 0) return 'This file is empty.'
   return null
 }
-

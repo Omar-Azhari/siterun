@@ -48,10 +48,21 @@ export function SiteDetailsPage() {
     >
       <ScreenTitle title="Site Details" subtitle="Tell us about your project." />
       <form id="site-details" onSubmit={onSubmit} noValidate>
-        <Input label="Site name" placeholder="Riverside Apartments" error={errors.name?.message} {...register('name')} />
+        <Input
+          label="Site name"
+          placeholder="Riverside Apartments"
+          error={errors.name?.message}
+          {...register('name')}
+        />
         <div className="mb-3.5">
           <p className="mb-1.5 text-sm text-[#dae4ef]">Address</p>
-          <Link to="/sites/new/location" className={cn(cardClass, 'flex items-center gap-3 rounded-[10px] border-line-input bg-input bg-none px-3.5 py-3 hover:border-primary')}>
+          <Link
+            to="/sites/new/location"
+            className={cn(
+              cardClass,
+              'flex items-center gap-3 rounded-[10px] border-line-input bg-input bg-none px-3.5 py-3 hover:border-primary',
+            )}
+          >
             <span className="flex-1 text-[15px] leading-snug">
               {draft.address}
               <br />
@@ -61,13 +72,30 @@ export function SiteDetailsPage() {
             <span className="sr-only">Change location</span>
           </Link>
         </div>
-        <Select label="Project type" options={PROJECT_TYPES.map((t) => ({ value: t, label: t }))} error={errors.projectType?.message} {...register('projectType')} />
+        <Select
+          label="Project type"
+          options={PROJECT_TYPES.map((t) => ({ value: t, label: t }))}
+          error={errors.projectType?.message}
+          {...register('projectType')}
+        />
         <Controller
           control={control}
           name="startDate"
-          render={({ field }) => <DateField label="Start date" value={field.value} onChange={field.onChange} error={errors.startDate?.message} />}
+          render={({ field }) => (
+            <DateField
+              label="Start date"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.startDate?.message}
+            />
+          )}
         />
-        <Select label="Expected duration" options={DURATIONS} error={errors.durationMonths?.message} {...register('durationMonths')} />
+        <Select
+          label="Expected duration"
+          options={DURATIONS}
+          error={errors.durationMonths?.message}
+          {...register('durationMonths')}
+        />
       </form>
     </AppScreen>
   )

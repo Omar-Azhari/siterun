@@ -95,19 +95,51 @@ export function AdminDashboardPage() {
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         {s ? (
           <>
-            <StatTile icon={<UsersRound strokeWidth={1.5} />} label="Users" value={s.users.toLocaleString('en-AU')} trend={s.usersTrend} />
-            <StatTile icon={<Building2 strokeWidth={1.5} />} label="Suppliers" value={s.suppliers.toLocaleString('en-AU')} trend={s.suppliersTrend} />
-            <StatTile icon={<CalendarDays strokeWidth={1.5} />} label="Bookings" value={s.bookings.toLocaleString('en-AU')} trend={s.bookingsTrend} />
-            <StatTile icon={<Wallet strokeWidth={1.5} />} label="Payouts" value={formatMoneyCompact(s.payoutsCents)} trend={s.payoutsTrend} />
-            <StatTile icon={<TriangleAlert className="text-danger" strokeWidth={1.5} />} label="Disputes" value={s.disputes} trend={s.disputesTrend} className="col-span-2" />
+            <StatTile
+              icon={<UsersRound strokeWidth={1.5} />}
+              label="Users"
+              value={s.users.toLocaleString('en-AU')}
+              trend={s.usersTrend}
+            />
+            <StatTile
+              icon={<Building2 strokeWidth={1.5} />}
+              label="Suppliers"
+              value={s.suppliers.toLocaleString('en-AU')}
+              trend={s.suppliersTrend}
+            />
+            <StatTile
+              icon={<CalendarDays strokeWidth={1.5} />}
+              label="Bookings"
+              value={s.bookings.toLocaleString('en-AU')}
+              trend={s.bookingsTrend}
+            />
+            <StatTile
+              icon={<Wallet strokeWidth={1.5} />}
+              label="Payouts"
+              value={formatMoneyCompact(s.payoutsCents)}
+              trend={s.payoutsTrend}
+            />
+            <StatTile
+              icon={<TriangleAlert className="text-danger" strokeWidth={1.5} />}
+              label="Disputes"
+              value={s.disputes}
+              trend={s.disputesTrend}
+              className="col-span-2"
+            />
           </>
         ) : (
-          Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className={cn('h-24', i === 4 && 'col-span-2')} />)
+          Array.from({ length: 5 }, (_, i) => (
+            <Skeleton key={i} className={cn('h-24', i === 4 && 'col-span-2')} />
+          ))
         )}
       </div>
       <SectionLabel
         action={
-          <button type="button" onClick={() => setAll((v) => !v)} className="flex min-h-11 items-center">
+          <button
+            type="button"
+            onClick={() => setAll((v) => !v)}
+            className="flex min-h-11 items-center"
+          >
             {all ? 'Show less' : 'View all ›'}
           </button>
         }
@@ -145,7 +177,9 @@ export function AdminApprovalsPage() {
       <SegmentedTabs
         label="Approval queue"
         value={tab}
-        onChange={(v) => setParams(v === 'documents' ? { tab: 'documents' } : {}, { replace: true })}
+        onChange={(v) =>
+          setParams(v === 'documents' ? { tab: 'documents' } : {}, { replace: true })
+        }
         options={[
           { value: 'machines', label: 'Machines', count: machines.data?.length ?? 0 },
           { value: 'documents', label: 'Documents', count: docs.data?.length ?? 0 },
@@ -156,11 +190,21 @@ export function AdminApprovalsPage() {
           <>
             {machines.isPending && <ListSkeleton rows={3} />}
             {machines.isError && <ErrorState onRetry={() => void machines.refetch()} />}
-            {machines.data?.length === 0 && <EmptyState icon={<ShieldCheck strokeWidth={1.75} />} title="Queue is clear" description="No listings waiting for review." />}
+            {machines.data?.length === 0 && (
+              <EmptyState
+                icon={<ShieldCheck strokeWidth={1.75} />}
+                title="Queue is clear"
+                description="No listings waiting for review."
+              />
+            )}
             {machines.data?.map((m) => (
               <Card key={m.id} className="p-3">
                 <div className="flex gap-3">
-                  <Thumbnail src={m.photos[0]?.replace('.webp', '-sm.webp')} alt={m.title} className="h-[84px] w-[92px]" />
+                  <Thumbnail
+                    src={m.photos[0]?.replace('.webp', '-sm.webp')}
+                    alt={m.title}
+                    className="h-[84px] w-[92px]"
+                  />
                   <div className="min-w-0">
                     <p className="text-base font-semibold">{m.title}</p>
                     <p className="text-sm text-[#dae4ef]">
@@ -170,7 +214,13 @@ export function AdminApprovalsPage() {
                     <StatusPill status="pending_review" className="mt-1" />
                   </div>
                 </div>
-                <ButtonLink to={`/admin/approvals/machines/${m.id}`} size="md" block arrow className="mt-3">
+                <ButtonLink
+                  to={`/admin/approvals/machines/${m.id}`}
+                  size="md"
+                  block
+                  arrow
+                  className="mt-3"
+                >
                   Review
                 </ButtonLink>
               </Card>
@@ -180,7 +230,9 @@ export function AdminApprovalsPage() {
         {tab === 'documents' && (
           <>
             {docs.isPending && <ListSkeleton rows={3} thumb={false} />}
-            {docs.data?.length === 0 && <EmptyState icon={<FileText strokeWidth={1.75} />} title="No documents to verify" />}
+            {docs.data?.length === 0 && (
+              <EmptyState icon={<FileText strokeWidth={1.75} />} title="No documents to verify" />
+            )}
             {docs.data?.map((d) => (
               <ListRow
                 key={d.id}
@@ -198,7 +250,19 @@ export function AdminApprovalsPage() {
   )
 }
 
-function RejectSheet({ open, onClose, onReject, loading, what }: { open: boolean; onClose: () => void; onReject: (reason: string) => void; loading: boolean; what: string }) {
+function RejectSheet({
+  open,
+  onClose,
+  onReject,
+  loading,
+  what,
+}: {
+  open: boolean
+  onClose: () => void
+  onReject: (reason: string) => void
+  loading: boolean
+  what: string
+}) {
   const [reason, setReason] = useState('')
   return (
     <BottomSheet
@@ -206,12 +270,24 @@ function RejectSheet({ open, onClose, onReject, loading, what }: { open: boolean
       onClose={onClose}
       title={`Reject ${what}`}
       footer={
-        <Button variant="danger" disabled={reason.trim().length < 5} loading={loading} onClick={() => onReject(reason)}>
+        <Button
+          variant="danger"
+          disabled={reason.trim().length < 5}
+          loading={loading}
+          onClick={() => onReject(reason)}
+        >
           Send Rejection
         </Button>
       }
     >
-      <Textarea label="Reason (sent to the supplier)" rows={4} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} hint="Be specific so they know what to fix." />
+      <Textarea
+        label="Reason (sent to the supplier)"
+        rows={4}
+        maxLength={500}
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        hint="Be specific so they know what to fix."
+      />
     </BottomSheet>
   )
 }
@@ -226,18 +302,40 @@ export function AdminMachineReviewPage() {
   const categories = useCategories()
   const [rejecting, setRejecting] = useState(false)
   const [docReject, setDocReject] = useState<ComplianceDocument | null>(null)
-  const review = useApiMutation((api, v: { approve: boolean; reason?: string }) => api.reviewMachine(id, v.approve, v.reason), {
-    success: (m) => (m.status === 'live' ? `${m.title} is now live` : 'Rejection sent to supplier'),
-  })
-  const reviewDoc = useApiMutation((api, v: { id: string; approve: boolean; reason?: string }) => api.reviewDocument(v.id, v.approve, v.reason), {
-    success: (d) => (d.status === 'verified' ? 'Document verified' : 'Document rejected'),
-  })
+  const review = useApiMutation(
+    (api, v: { approve: boolean; reason?: string }) => api.reviewMachine(id, v.approve, v.reason),
+    {
+      success: (m) =>
+        m.status === 'live' ? `${m.title} is now live` : 'Rejection sent to supplier',
+    },
+  )
+  const reviewDoc = useApiMutation(
+    (api, v: { id: string; approve: boolean; reason?: string }) =>
+      api.reviewDocument(v.id, v.approve, v.reason),
+    {
+      success: (d) => (d.status === 'verified' ? 'Document verified' : 'Document rejected'),
+    },
+  )
   const m = q.data
-  if (q.isPending) return <AppScreen><ListSkeleton rows={4} /></AppScreen>
-  if (!m) return <AppScreen><EmptyState title="Listing not found" /></AppScreen>
-  const groups = categories.data?.find((c) => c.id === m.categoryId)?.requirementGroups ?? ['general']
+  if (q.isPending)
+    return (
+      <AppScreen>
+        <ListSkeleton rows={4} />
+      </AppScreen>
+    )
+  if (!m)
+    return (
+      <AppScreen>
+        <EmptyState title="Listing not found" />
+      </AppScreen>
+    )
+  const groups = categories.data?.find((c) => c.id === m.categoryId)?.requirementGroups ?? [
+    'general',
+  ]
   const required = (reqs.data ?? []).filter((r) => (groups as string[]).includes(r.group))
-  const allVerified = required.filter((r) => r.required).every((r) => docState(latestFor(docs.data ?? [], r)) === 'verified')
+  const allVerified = required
+    .filter((r) => r.required)
+    .every((r) => docState(latestFor(docs.data ?? [], r)) === 'verified')
   const pending = m.status === 'pending_review'
 
   const openDoc = async (d: ComplianceDocument) => {
@@ -253,7 +351,15 @@ export function AdminMachineReviewPage() {
             <Button variant="danger" size="md" block onClick={() => setRejecting(true)}>
               Reject
             </Button>
-            <Button size="md" block disabled={!allVerified} loading={review.isPending} onClick={() => review.mutate({ approve: true }, { onSuccess: () => navigate('/admin/approvals') })}>
+            <Button
+              size="md"
+              block
+              disabled={!allVerified}
+              loading={review.isPending}
+              onClick={() =>
+                review.mutate({ approve: true }, { onSuccess: () => navigate('/admin/approvals') })
+              }
+            >
               Approve
             </Button>
           </div>
@@ -281,7 +387,8 @@ export function AdminMachineReviewPage() {
         </p>
         <p>
           <span className="text-muted">Rates: </span>
-          {formatMoney(m.rates.daily)}/day{m.rates.wetDaily ? ` · wet ${formatMoney(m.rates.wetDaily)}` : ''}
+          {formatMoney(m.rates.daily)}/day
+          {m.rates.wetDaily ? ` · wet ${formatMoney(m.rates.wetDaily)}` : ''}
         </p>
         <p>
           <span className="text-muted">Base: </span>
@@ -310,11 +417,17 @@ export function AdminMachineReviewPage() {
                     {!r.required && <span className="text-xs text-muted"> (optional)</span>}
                   </span>
                   <span className="block text-xs text-muted">
-                    {d ? `${d.fileName}${d.expiryDate ? ` · expires ${formatDate(d.expiryDate)}` : ''}` : 'Not uploaded'}
+                    {d
+                      ? `${d.fileName}${d.expiryDate ? ` · expires ${formatDate(d.expiryDate)}` : ''}`
+                      : 'Not uploaded'}
                   </span>
                 </span>
                 {d?.fileUrl && (
-                  <button type="button" className="text-sm text-primary" onClick={() => void openDoc(d)}>
+                  <button
+                    type="button"
+                    className="text-sm text-primary"
+                    onClick={() => void openDoc(d)}
+                  >
                     Open
                   </button>
                 )}
@@ -324,7 +437,12 @@ export function AdminMachineReviewPage() {
                   <Button variant="danger" size="sm" block onClick={() => setDocReject(d)}>
                     Reject
                   </Button>
-                  <Button size="sm" block loading={reviewDoc.isPending && reviewDoc.variables?.id === d.id} onClick={() => reviewDoc.mutate({ id: d.id, approve: true })}>
+                  <Button
+                    size="sm"
+                    block
+                    loading={reviewDoc.isPending && reviewDoc.variables?.id === d.id}
+                    onClick={() => reviewDoc.mutate({ id: d.id, approve: true })}
+                  >
                     Verify
                   </Button>
                 </div>
@@ -335,11 +453,35 @@ export function AdminMachineReviewPage() {
       </ul>
       {pending && !allVerified && (
         <p className="mt-3 flex items-center gap-2 text-sm text-[#f7b84b]">
-          <CircleAlert className="size-4" aria-hidden /> Verify every required document before approving.
+          <CircleAlert className="size-4" aria-hidden /> Verify every required document before
+          approving.
         </p>
       )}
-      <RejectSheet open={rejecting} onClose={() => setRejecting(false)} what="listing" loading={review.isPending} onReject={(reason) => review.mutate({ approve: false, reason }, { onSuccess: () => navigate('/admin/approvals') })} />
-      <RejectSheet open={!!docReject} onClose={() => setDocReject(null)} what="document" loading={reviewDoc.isPending} onReject={(reason) => docReject && reviewDoc.mutate({ id: docReject.id, approve: false, reason }, { onSuccess: () => setDocReject(null) })} />
+      <RejectSheet
+        open={rejecting}
+        onClose={() => setRejecting(false)}
+        what="listing"
+        loading={review.isPending}
+        onReject={(reason) =>
+          review.mutate(
+            { approve: false, reason },
+            { onSuccess: () => navigate('/admin/approvals') },
+          )
+        }
+      />
+      <RejectSheet
+        open={!!docReject}
+        onClose={() => setDocReject(null)}
+        what="document"
+        loading={reviewDoc.isPending}
+        onReject={(reason) =>
+          docReject &&
+          reviewDoc.mutate(
+            { id: docReject.id, approve: false, reason },
+            { onSuccess: () => setDocReject(null) },
+          )
+        }
+      />
     </AppScreen>
   )
 }
@@ -351,12 +493,34 @@ export function AdminDocumentReviewPage() {
   const docs = usePendingDocuments()
   const reqs = useRequirements()
   const [rejecting, setRejecting] = useState(false)
-  const review = useApiMutation((api, v: { approve: boolean; reason?: string }) => api.reviewDocument(id, v.approve, v.reason), {
-    success: (d) => (d.status === 'verified' ? 'Document verified' : 'Rejection sent to supplier'),
-  })
+  const review = useApiMutation(
+    (api, v: { approve: boolean; reason?: string }) => api.reviewDocument(id, v.approve, v.reason),
+    {
+      success: (d) =>
+        d.status === 'verified' ? 'Document verified' : 'Rejection sent to supplier',
+    },
+  )
   const d = docs.data?.find((x) => x.id === id)
-  if (docs.isPending) return <AppScreen><ListSkeleton rows={3} /></AppScreen>
-  if (!d) return <AppScreen><EmptyState title="Already reviewed" description="This document is no longer in the queue." action={<ButtonLink to="/admin/approvals?tab=documents" size="md" block>Back to queue</ButtonLink>} /></AppScreen>
+  if (docs.isPending)
+    return (
+      <AppScreen>
+        <ListSkeleton rows={3} />
+      </AppScreen>
+    )
+  if (!d)
+    return (
+      <AppScreen>
+        <EmptyState
+          title="Already reviewed"
+          description="This document is no longer in the queue."
+          action={
+            <ButtonLink to="/admin/approvals?tab=documents" size="md" block>
+              Back to queue
+            </ButtonLink>
+          }
+        />
+      </AppScreen>
+    )
   const req = reqs.data?.find((r) => r.id === d.requirementId)
   const done = () => navigate('/admin/approvals?tab=documents')
 
@@ -367,13 +531,21 @@ export function AdminDocumentReviewPage() {
           <Button variant="danger" size="md" block onClick={() => setRejecting(true)}>
             Reject
           </Button>
-          <Button size="md" block loading={review.isPending} onClick={() => review.mutate({ approve: true }, { onSuccess: done })}>
+          <Button
+            size="md"
+            block
+            loading={review.isPending}
+            onClick={() => review.mutate({ approve: true }, { onSuccess: done })}
+          >
             Verify
           </Button>
         </div>
       }
     >
-      <ScreenTitle title={req?.name ?? 'Document'} subtitle={`${d.orgName}${d.machineTitle ? ` · ${d.machineTitle}` : ''}`} />
+      <ScreenTitle
+        title={req?.name ?? 'Document'}
+        subtitle={`${d.orgName}${d.machineTitle ? ` · ${d.machineTitle}` : ''}`}
+      />
       <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-[14px] border border-line bg-white/5">
         {d.fileUrl && d.fileUrl.startsWith('data:image') ? (
           <img src={d.fileUrl} alt={d.fileName} className="size-full object-contain" />
@@ -409,7 +581,13 @@ export function AdminDocumentReviewPage() {
         )}
         <p className="text-xs text-subtle">{req?.description}</p>
       </Card>
-      <RejectSheet open={rejecting} onClose={() => setRejecting(false)} what="document" loading={review.isPending} onReject={(reason) => review.mutate({ approve: false, reason }, { onSuccess: done })} />
+      <RejectSheet
+        open={rejecting}
+        onClose={() => setRejecting(false)}
+        what="document"
+        loading={review.isPending}
+        onReject={(reason) => review.mutate({ approve: false, reason }, { onSuccess: done })}
+      />
     </AppScreen>
   )
 }
@@ -417,18 +595,32 @@ export function AdminDocumentReviewPage() {
 export function AdminSuppliersPage() {
   const suppliers = useSupplierOrgs()
   const [q, setQ] = useState('')
-  const list = (suppliers.data ?? []).filter((s) => s.name.toLowerCase().includes(q.trim().toLowerCase()))
+  const list = (suppliers.data ?? []).filter((s) =>
+    s.name.toLowerCase().includes(q.trim().toLowerCase()),
+  )
   return (
     <AppScreen root>
-      <ScreenTitle title="Suppliers" subtitle={`${suppliers.data?.length ?? '…'} suppliers on SiteRun`} />
-      <SearchInput placeholder="Search suppliers..." value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ('')} />
+      <ScreenTitle
+        title="Suppliers"
+        subtitle={`${suppliers.data?.length ?? '…'} suppliers on SiteRun`}
+      />
+      <SearchInput
+        placeholder="Search suppliers..."
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        onClear={() => setQ('')}
+      />
       {suppliers.isPending && <ListSkeleton rows={4} thumb={false} />}
       <div className="space-y-2">
         {list.map((s) => (
           <Card key={s.id} className="py-3">
             <div className="flex items-center justify-between">
               <p className="font-semibold">{s.name}</p>
-              {s.rating !== null ? <span className="text-sm text-[#dae4ef]">★ {s.rating.toFixed(1)}</span> : <StatusPill label="New" tone="info" />}
+              {s.rating !== null ? (
+                <span className="text-sm text-[#dae4ef]">★ {s.rating.toFixed(1)}</span>
+              ) : (
+                <StatusPill label="New" tone="info" />
+              )}
             </div>
             <p className="text-sm text-muted">
               {s.contactName} · {s.email}
@@ -446,16 +638,32 @@ export function AdminSuppliersPage() {
 export function AdminBookingsPage() {
   const bookings = useAllBookings()
   const [q, setQ] = useState('')
-  const list = (bookings.data ?? []).filter((b) => `${b.ref} ${b.contractor.name} ${b.supplier.name} ${b.machine.title}`.toLowerCase().includes(q.trim().toLowerCase()))
+  const list = (bookings.data ?? []).filter((b) =>
+    `${b.ref} ${b.contractor.name} ${b.supplier.name} ${b.machine.title}`
+      .toLowerCase()
+      .includes(q.trim().toLowerCase()),
+  )
   return (
     <AppScreen root>
-      <ScreenTitle title="Bookings" subtitle="All platform bookings (last 14 days of completed work)." />
-      <SearchInput placeholder="Search by ref, customer or supplier..." value={q} onChange={(e) => setQ(e.target.value)} onClear={() => setQ('')} />
+      <ScreenTitle
+        title="Bookings"
+        subtitle="All platform bookings (last 14 days of completed work)."
+      />
+      <SearchInput
+        placeholder="Search by ref, customer or supplier..."
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        onClear={() => setQ('')}
+      />
       {bookings.isPending && <ListSkeleton rows={4} />}
       <div className="space-y-2">
         {list.map((b) => (
           <Card key={b.id} className="flex items-center gap-3 py-3">
-            <Thumbnail src={b.machine.photos[0]?.replace('.webp', '-sm.webp')} alt="" className="size-12" />
+            <Thumbnail
+              src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+              alt=""
+              className="size-12"
+            />
             <div className="min-w-0 flex-1 text-sm">
               <p className="font-semibold">
                 {b.ref} · {b.machine.title}
@@ -467,7 +675,11 @@ export function AdminBookingsPage() {
                 {formatDate(b.startDate)} – {formatDate(b.endDate)} · {formatMoney(b.totalCents)}
               </p>
             </div>
-            <StatusPill {...(b.status === 'requested' ? { label: 'Requested', tone: 'warning' as const, mark: 'dot' as const } : dispatchPill(b))} />
+            <StatusPill
+              {...(b.status === 'requested'
+                ? { label: 'Requested', tone: 'warning' as const, mark: 'dot' as const }
+                : dispatchPill(b))}
+            />
           </Card>
         ))}
       </div>
@@ -481,10 +693,30 @@ export function AdminMorePage() {
     <AppScreen root>
       <ScreenTitle title="More" subtitle="Settings and tools." />
       <div className="space-y-2">
-        <ListRow to="/admin/approvals?tab=documents" leading={<FileText className="size-7 text-primary" strokeWidth={1.5} />} title="Document queue" subtitle="Verify supplier compliance documents" />
-        <ListRow to="/notifications" leading={<CircleAlert className="size-7 text-primary" strokeWidth={1.5} />} title="Notifications" subtitle="Submissions and alerts" />
-        <ListRow to="/account" leading={<CircleUserRound className="size-7 text-primary" strokeWidth={1.5} />} title="Account" subtitle="Profile and security" />
-        <ListRow to="/support" leading={<LifeBuoy className="size-7 text-primary" strokeWidth={1.5} />} title="Support" subtitle="Help articles" />
+        <ListRow
+          to="/admin/approvals?tab=documents"
+          leading={<FileText className="size-7 text-primary" strokeWidth={1.5} />}
+          title="Document queue"
+          subtitle="Verify supplier compliance documents"
+        />
+        <ListRow
+          to="/notifications"
+          leading={<CircleAlert className="size-7 text-primary" strokeWidth={1.5} />}
+          title="Notifications"
+          subtitle="Submissions and alerts"
+        />
+        <ListRow
+          to="/account"
+          leading={<CircleUserRound className="size-7 text-primary" strokeWidth={1.5} />}
+          title="Account"
+          subtitle="Profile and security"
+        />
+        <ListRow
+          to="/support"
+          leading={<LifeBuoy className="size-7 text-primary" strokeWidth={1.5} />}
+          title="Support"
+          subtitle="Help articles"
+        />
       </div>
       <Button
         variant="danger"

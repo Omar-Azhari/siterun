@@ -70,12 +70,18 @@ export const MIN_BOOKINGS = ['4 hours', '1 day', '3 days', '1 week']
 /** "21,300 kg" → "21300" for editing. Keeps ranges like "8–15" as typed. */
 export function specNumber(v: string | undefined): string {
   if (!v) return ''
-  return v.replace(/\s*[a-zA-Z³]+$/, '').replace(/,/g, '').trim()
+  return v
+    .replace(/\s*[a-zA-Z³]+$/, '')
+    .replace(/,/g, '')
+    .trim()
 }
 
 export function specValue(raw: string, unit: string): string {
   const n = Number(raw)
-  const shown = Number.isFinite(n) && raw.trim() !== '' ? n.toLocaleString('en-AU', { maximumFractionDigits: 2 }) : raw.trim()
+  const shown =
+    Number.isFinite(n) && raw.trim() !== ''
+      ? n.toLocaleString('en-AU', { maximumFractionDigits: 2 })
+      : raw.trim()
   return `${shown} ${unit}`
 }
 
@@ -93,4 +99,5 @@ export async function compressImage(file: File, maxDim = 1600): Promise<File> {
   return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' })
 }
 
-export const isEditable = (m: Machine | null | undefined): m is Machine => !!m && ['draft', 'rejected', 'paused'].includes(m.status)
+export const isEditable = (m: Machine | null | undefined): m is Machine =>
+  !!m && ['draft', 'rejected', 'paused'].includes(m.status)

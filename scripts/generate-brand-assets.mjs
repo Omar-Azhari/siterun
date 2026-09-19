@@ -91,7 +91,14 @@ function horizontal(textColor, markColors, withTagline) {
     const tagSize = (100 * wordWidth) / (probe.bb.x2 - probe.bb.x1)
     const tagBase = MARK_H + tagSize * 0.62
     const tag0 = textPath(fontTag, 'Machines. People. Progress.', tagSize, 0, tagBase, 0.02)
-    const tag = textPath(fontTag, 'Machines. People. Progress.', tagSize, word2.bb.x1 - tag0.bb.x1, tagBase, 0.02)
+    const tag = textPath(
+      fontTag,
+      'Machines. People. Progress.',
+      tagSize,
+      word2.bb.x1 - tag0.bb.x1,
+      tagBase,
+      0.02,
+    )
     body += `<path fill="${textColor}" d="${tag.d}"/>`
     height = Math.max(height, tag.bb.y2 + 2)
     width = Math.max(width, tag.bb.x2 + 2)
@@ -123,16 +130,12 @@ write('logo-lockup-tagline-white.svg', horizontal(WHITE, onDark, true).svg)
 const ICON = 1024
 const iconMarkScale = (ICON * 0.6) / MARK.h
 const iconMark = (size, scale) =>
-  markGroup(
-    onDark,
-    (size - MARK.w * scale) / 2 + size * 0.01,
-    (size - MARK.h * scale) / 2,
-    scale,
-  )
+  markGroup(onDark, (size - MARK.w * scale) / 2 + size * 0.01, (size - MARK.h * scale) / 2, scale)
 const appIconSvg = svgDoc(
   ICON,
   ICON,
-  `<rect width="${ICON}" height="${ICON}" rx="224" fill="${NAVY}"/>` + iconMark(ICON, iconMarkScale),
+  `<rect width="${ICON}" height="${ICON}" rx="224" fill="${NAVY}"/>` +
+    iconMark(ICON, iconMarkScale),
 )
 write('app-icon.svg', appIconSvg)
 // Full-bleed variant (no rounded corners) — source for iOS/Android store icons.
@@ -175,7 +178,8 @@ await writePng('icon-512.png', appIconSvg, 512)
 const maskableSvg = svgDoc(
   ICON,
   ICON,
-  `<rect width="${ICON}" height="${ICON}" fill="${NAVY}"/>` + iconMark(ICON, (ICON * 0.46) / MARK.h),
+  `<rect width="${ICON}" height="${ICON}" fill="${NAVY}"/>` +
+    iconMark(ICON, (ICON * 0.46) / MARK.h),
 )
 await writePng('icon-maskable-512.png', maskableSvg, 512)
 

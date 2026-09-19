@@ -17,8 +17,14 @@ for (const p of photos) {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`${p.name}: HTTP ${res.status}`)
   const buf = Buffer.from(await res.arrayBuffer())
-  await sharp(buf).resize({ width: 1200, withoutEnlargement: true }).webp({ quality: 72 }).toFile(large)
-  await sharp(buf).resize({ width: 480, withoutEnlargement: true }).webp({ quality: 70 }).toFile(small)
+  await sharp(buf)
+    .resize({ width: 1200, withoutEnlargement: true })
+    .webp({ quality: 72 })
+    .toFile(large)
+  await sharp(buf)
+    .resize({ width: 480, withoutEnlargement: true })
+    .webp({ quality: 70 })
+    .toFile(small)
   console.log('saved', p.name)
 }
 

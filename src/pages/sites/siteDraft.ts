@@ -80,8 +80,12 @@ export const accessSchema = z
     deliveryTo: z.string().min(1, 'Choose an end time'),
     accessNotes: z.string().max(250, 'Keep notes under 250 characters'),
     contactName: z.string().trim().min(2, 'Enter a site contact'),
-    contactPhone: z.string().refine((v) => v.replace(/\D/g, '').length >= 8, 'Enter a valid phone number'),
+    contactPhone: z
+      .string()
+      .refine((v) => v.replace(/\D/g, '').length >= 8, 'Enter a valid phone number'),
   })
-  .refine((v) => v.deliveryTo > v.deliveryFrom, { message: 'End time must be after start time', path: ['deliveryTo'] })
+  .refine((v) => v.deliveryTo > v.deliveryFrom, {
+    message: 'End time must be after start time',
+    path: ['deliveryTo'],
+  })
 export type AccessValues = z.infer<typeof accessSchema>
-

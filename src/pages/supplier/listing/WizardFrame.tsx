@@ -17,7 +17,16 @@ interface WizardFrameProps {
 }
 
 /** Shared chrome for the six "Add Machine" steps (board 07). */
-export function WizardFrame({ step, title, subtitle, children, onContinue, continueLabel = 'Continue', saving, disabled }: WizardFrameProps) {
+export function WizardFrame({
+  step,
+  title,
+  subtitle,
+  children,
+  onContinue,
+  continueLabel = 'Continue',
+  saving,
+  disabled,
+}: WizardFrameProps) {
   return (
     <AppScreen
       hideNav
@@ -27,26 +36,58 @@ export function WizardFrame({ step, title, subtitle, children, onContinue, conti
         </Button>
       }
     >
-      <ScreenTitle title={title} step={{ current: stepNumber(step), total: 6 }} subtitle={subtitle} />
+      <ScreenTitle
+        title={title}
+        step={{ current: stepNumber(step), total: 6 }}
+        subtitle={subtitle}
+      />
       {children}
     </AppScreen>
   )
 }
 
 /** Loading / error / locked states while the draft loads. */
-export function ListingGate({ query, machine }: { query: { isPending: boolean; isError: boolean; refetch: () => unknown }; machine: Machine | null | undefined }) {
+export function ListingGate({
+  query,
+  machine,
+}: {
+  query: { isPending: boolean; isError: boolean; refetch: () => unknown }
+  machine: Machine | null | undefined
+}) {
   const navigate = useNavigate()
-  if (query.isPending) return <AppScreen hideNav><ListSkeleton rows={4} /></AppScreen>
-  if (query.isError) return <AppScreen hideNav><ErrorState onRetry={() => void query.refetch()} /></AppScreen>
-  if (!machine) return <AppScreen hideNav><EmptyState title="Listing not found" /></AppScreen>
+  if (query.isPending)
+    return (
+      <AppScreen hideNav>
+        <ListSkeleton rows={4} />
+      </AppScreen>
+    )
+  if (query.isError)
+    return (
+      <AppScreen hideNav>
+        <ErrorState onRetry={() => void query.refetch()} />
+      </AppScreen>
+    )
+  if (!machine)
+    return (
+      <AppScreen hideNav>
+        <EmptyState title="Listing not found" />
+      </AppScreen>
+    )
   return (
     <AppScreen hideNav>
       <EmptyState
         title="This listing can’t be edited right now"
-        description={machine.status === 'pending_review' ? 'It’s being reviewed by SiteRun. We’ll let you know within 1 business day.' : 'Pause the listing before making changes.'}
-        action={<Button size="md" onClick={() => navigate('/supplier/machines')}>Back to machines</Button>}
+        description={
+          machine.status === 'pending_review'
+            ? 'It’s being reviewed by SiteRun. We’ll let you know within 1 business day.'
+            : 'Pause the listing before making changes.'
+        }
+        action={
+          <Button size="md" onClick={() => navigate('/supplier/machines')}>
+            Back to machines
+          </Button>
+        }
       />
     </AppScreen>
   )
 }
-

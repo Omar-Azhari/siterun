@@ -3,7 +3,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { z } from 'zod'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { Avatar, Button, Card, ListSkeleton, ScreenTitle, SectionLabel, SelectableCard } from '@/components/ui'
+import {
+  Avatar,
+  Button,
+  Card,
+  ListSkeleton,
+  ScreenTitle,
+  SectionLabel,
+  SelectableCard,
+} from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { useApiMutation, useInvitations, useMe, useMembers } from '@/data/hooks'
 import type { MemberRole } from '@/data/types'
@@ -45,9 +53,27 @@ export function InviteTeamPage() {
   }
 
   const rows = [
-    ...(members.data ?? []).map((m) => ({ key: m.id, name: m.name, email: m.email, role: m.role, status: 'member' as const })),
-    ...(invitations.data ?? []).map((i) => ({ key: i.id, name: i.email.split('@')[0] ?? i.email, email: i.email, role: i.role, status: 'invited' as const })),
-    ...pending.map((p) => ({ key: `new-${p.email}`, name: p.email.split('@')[0] ?? p.email, email: p.email, role: p.role, status: 'new' as const })),
+    ...(members.data ?? []).map((m) => ({
+      key: m.id,
+      name: m.name,
+      email: m.email,
+      role: m.role,
+      status: 'member' as const,
+    })),
+    ...(invitations.data ?? []).map((i) => ({
+      key: i.id,
+      name: i.email.split('@')[0] ?? i.email,
+      email: i.email,
+      role: i.role,
+      status: 'invited' as const,
+    })),
+    ...pending.map((p) => ({
+      key: `new-${p.email}`,
+      name: p.email.split('@')[0] ?? p.email,
+      email: p.email,
+      role: p.role,
+      status: 'new' as const,
+    })),
   ]
 
   const finish = () => navigate(onboarding ? '/plans?onboarding=1' : '/team')
@@ -61,7 +87,16 @@ export function InviteTeamPage() {
             arrow
             disabled={!canInvite || (pending.length === 0 && !onboarding)}
             loading={send.isPending}
-            onClick={() => (pending.length ? send.mutate(pending, { onSuccess: () => { setPending([]); finish() } }) : finish())}
+            onClick={() =>
+              pending.length
+                ? send.mutate(pending, {
+                    onSuccess: () => {
+                      setPending([])
+                      finish()
+                    },
+                  })
+                : finish()
+            }
           >
             {pending.length || !onboarding ? 'Send Invitations' : 'Skip for now'}
           </Button>
@@ -101,7 +136,12 @@ export function InviteTeamPage() {
             )}
           />
         </div>
-        <button type="submit" aria-label="Add to invite list" disabled={!canInvite} className="flex h-12 w-12 items-center justify-center rounded-r-[10px] bg-primary hover:bg-primary-hover disabled:opacity-45">
+        <button
+          type="submit"
+          aria-label="Add to invite list"
+          disabled={!canInvite}
+          className="flex h-12 w-12 items-center justify-center rounded-r-[10px] bg-primary hover:bg-primary-hover disabled:opacity-45"
+        >
           <Plus className="size-6" />
         </button>
       </form>
@@ -141,10 +181,17 @@ export function InviteTeamPage() {
               </div>
               <div className="text-right text-xs">
                 <p className="text-[#dae4ef]">{ROLE_LABELS[r.role]}</p>
-                {r.status !== 'member' && <p className="text-primary">{r.status === 'new' ? 'Not sent' : 'Invited'}</p>}
+                {r.status !== 'member' && (
+                  <p className="text-primary">{r.status === 'new' ? 'Not sent' : 'Invited'}</p>
+                )}
               </div>
               {r.status === 'new' && (
-                <button type="button" aria-label={`Remove ${r.email}`} onClick={() => setPending((p) => p.filter((x) => x.email !== r.email))} className="-mr-2 flex size-9 items-center justify-center rounded-lg text-muted hover:bg-white/5">
+                <button
+                  type="button"
+                  aria-label={`Remove ${r.email}`}
+                  onClick={() => setPending((p) => p.filter((x) => x.email !== r.email))}
+                  className="-mr-2 flex size-9 items-center justify-center rounded-lg text-muted hover:bg-white/5"
+                >
                   <X className="size-4" />
                 </button>
               )}

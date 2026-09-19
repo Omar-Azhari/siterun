@@ -113,15 +113,13 @@ describe.runIf(URL && KEY)('row level security', () => {
   })
 
   it('card numbers cannot be stored: only the last four digits fit', async () => {
-    const res = await alex
-      .from('payment_methods')
-      .insert({
-        org_id: ACME,
-        brand: 'visa',
-        last4: '4242424242424242',
-        exp_month: 1,
-        exp_year: 2030,
-      })
+    const res = await alex.from('payment_methods').insert({
+      org_id: ACME,
+      brand: 'visa',
+      last4: '4242424242424242',
+      exp_month: 1,
+      exp_year: 2030,
+    })
     expect(res.error).not.toBeNull()
   })
 })

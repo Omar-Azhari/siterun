@@ -1,14 +1,30 @@
 import { useState } from 'react'
 import { UserPlus } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
-import { Avatar, BottomSheet, Button, ButtonLink, Card, ErrorState, ListSkeleton, ScreenTitle, SectionLabel, SelectableCard } from '@/components/ui'
+import {
+  Avatar,
+  BottomSheet,
+  Button,
+  ButtonLink,
+  Card,
+  ErrorState,
+  ListSkeleton,
+  ScreenTitle,
+  SectionLabel,
+  SelectableCard,
+} from '@/components/ui'
 import { useApiMutation, useInvitations, useMe, useMembers } from '@/data/hooks'
 import type { MemberRole, OrgMember } from '@/data/types'
 import { ROLE_LABELS } from '@/auth/roles'
 import { ROLE_CARDS } from '@/components/domain/roleCards'
 
 const PERMISSIONS: Record<MemberRole, string[]> = {
-  owner: ['Billing, plans and payouts', 'Invite and remove people', 'Create and edit sites', 'Create and change bookings'],
+  owner: [
+    'Billing, plans and payouts',
+    'Invite and remove people',
+    'Create and edit sites',
+    'Create and change bookings',
+  ],
   project_manager: ['Invite people', 'Create and edit sites', 'Create and change bookings'],
   site_manager: ['Edit site details', 'Create and change bookings', 'Schedule returns and swaps'],
   viewer: ['View sites, bookings and reports'],
@@ -21,11 +37,20 @@ export function TeamPage() {
   const invites = useInvitations()
   const [editing, setEditing] = useState<OrgMember | null>(null)
   const [role, setRole] = useState<MemberRole>('viewer')
-  const update = useApiMutation((api, v: { id: string; role: MemberRole }) => api.updateMemberRole(v.id, v.role), { success: 'Role updated' })
+  const update = useApiMutation(
+    (api, v: { id: string; role: MemberRole }) => api.updateMemberRole(v.id, v.role),
+    { success: 'Role updated' },
+  )
   const isOwner = me?.role === 'owner'
 
   return (
-    <AppScreen footer={<ButtonLink to="/team/invite" leftIcon={<UserPlus className="size-5" />}>Invite Team Members</ButtonLink>}>
+    <AppScreen
+      footer={
+        <ButtonLink to="/team/invite" leftIcon={<UserPlus className="size-5" />}>
+          Invite Team Members
+        </ButtonLink>
+      }
+    >
       <ScreenTitle title="Team & Permissions" subtitle={me?.org?.name} />
       {members.isPending && <ListSkeleton rows={3} thumb={false} />}
       {members.isError && <ErrorState onRetry={() => void members.refetch()} />}
@@ -94,7 +119,10 @@ export function TeamPage() {
         footer={
           <Button
             loading={update.isPending}
-            onClick={() => editing && update.mutate({ id: editing.id, role }, { onSuccess: () => setEditing(null) })}
+            onClick={() =>
+              editing &&
+              update.mutate({ id: editing.id, role }, { onSuccess: () => setEditing(null) })
+            }
           >
             Save Role
           </Button>
@@ -102,7 +130,14 @@ export function TeamPage() {
       >
         <div role="radiogroup" aria-label="Role" className="space-y-2">
           {ROLE_CARDS.map((r) => (
-            <SelectableCard key={r.value} selected={role === r.value} onSelect={() => setRole(r.value)} icon={r.icon} title={r.title} description={r.description} />
+            <SelectableCard
+              key={r.value}
+              selected={role === r.value}
+              onSelect={() => setRole(r.value)}
+              icon={r.icon}
+              title={r.title}
+              description={r.description}
+            />
           ))}
         </div>
       </BottomSheet>

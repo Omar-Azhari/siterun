@@ -1604,14 +1604,24 @@ export class DemoApi implements Api {
       on_site: ['confirmed', 'in_transit'],
       completed: ['on_site', 'return_scheduled'],
     }
-    if (!allowed[to].includes(b.status)) throw new ApiError(`Can’t move a ${b.status.replace('_', ' ')} booking to ${to.replace('_', ' ')}.`, 'invalid')
+    if (!allowed[to].includes(b.status))
+      throw new ApiError(
+        `Can’t move a ${b.status.replace('_', ' ')} booking to ${to.replace('_', ' ')}.`,
+        'invalid',
+      )
     const m = this.db.machines.find((x) => x.id === b.machineId)
     const conv = this.conversationFor(b)
     b.status = to
     if (to === 'in_transit') {
       if (!this.db.deliveries.some((d) => d.bookingId === b.id)) this.createDelivery(b)
       this.systemMessage(conv, `${m?.title ?? 'Machine'} has left the yard and is on its way.`)
-      this.notifyOrg(b.contractorOrgId, { type: 'delivery', title: 'Delivery Update', body: 'Machine out for delivery', detail: m?.title ?? '', link: `/hires/${b.id}/tracking` })
+      this.notifyOrg(b.contractorOrgId, {
+        type: 'delivery',
+        title: 'Delivery Update',
+        body: 'Machine out for delivery',
+        detail: m?.title ?? '',
+        link: `/hires/${b.id}/tracking`,
+      })
     } else if (to === 'on_site') {
       const d = this.db.deliveries.find((x) => x.bookingId === b.id)
       if (d) {
@@ -1620,7 +1630,13 @@ export class DemoApi implements Api {
         d.deliveredAt = nowIso()
       }
       this.systemMessage(conv, `${m?.title ?? 'Machine'} was delivered to site.`)
-      this.notifyOrg(b.contractorOrgId, { type: 'delivery', title: 'Machine Delivered', body: m?.title ?? 'Machine', detail: 'Now on site', link: `/hires/${b.id}` })
+      this.notifyOrg(b.contractorOrgId, {
+        type: 'delivery',
+        title: 'Machine Delivered',
+        body: m?.title ?? 'Machine',
+        detail: 'Now on site',
+        link: `/hires/${b.id}`,
+      })
     } else {
       const n = 1046 + this.db.invoices.filter((i) => i.orgId === b.contractorOrgId).length
       const due = format(addDays(new Date(), 14), 'yyyy-MM-dd')
@@ -1634,10 +1650,24 @@ export class DemoApi implements Api {
         amountCents: b.totalCents,
         gstCents: gstOf(b.totalCents),
         status: 'due',
-        lines: [{ description: `${m?.title ?? 'Hire'} (${m?.make} ${m?.model}), ${b.startDate} to ${b.endDate}`, amountCents: b.totalCents }],
+        lines: [
+          {
+            description: `${m?.title ?? 'Hire'} (${m?.make} ${m?.model}), ${b.startDate} to ${b.endDate}`,
+            amountCents: b.totalCents,
+          },
+        ],
       })
       this.systemMessage(conv, `Hire ${b.ref} is complete. Invoice INV-${n} has been issued.`)
-      this.notifyOrg(b.contractorOrgId, { type: 'invoice', title: 'New Invoice', body: `INV-${n} is now available`, detail: (b.totalCents * 1.1 / 100).toLocaleString('en-AU', { style: 'currency', currency: 'AUD' }), link: '/invoices' })
+      this.notifyOrg(b.contractorOrgId, {
+        type: 'invoice',
+        title: 'New Invoice',
+        body: `INV-${n} is now available`,
+        detail: ((b.totalCents * 1.1) / 100).toLocaleString('en-AU', {
+          style: 'currency',
+          currency: 'AUD',
+        }),
+        link: '/invoices',
+      })
     }
     this.commit('bookings')
     return this.view(b)

@@ -5,7 +5,10 @@ import { chromium } from '@playwright/test'
 const b64 = (path, type) => `data:${type};base64,${readFileSync(path).toString('base64')}`
 const logo = b64('public/brand/logo-horizontal-white.svg', 'image/svg+xml')
 const photo = b64('public/images/splash-excavator-frame.webp', 'image/webp')
-const font = b64('node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2', 'font/woff2')
+const font = b64(
+  'node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2',
+  'font/woff2',
+)
 
 const html = `<!doctype html><html><head><style>
 @font-face { font-family: Jakarta; src: url(${font}) format('woff2'); font-weight: 200 800; }
