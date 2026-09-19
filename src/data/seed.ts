@@ -60,7 +60,7 @@ export interface DemoDb {
   activity: AdminActivity[]
 }
 
-export const DB_VERSION = 4
+export const DB_VERSION = 5
 export const DEMO_PASSWORD = 'SiteRun!2026'
 
 export const DEMO_ACCOUNTS = [
@@ -108,7 +108,13 @@ export function buildSeed(now: Date = new Date()): DemoDb {
     setMinutes(setHours(addDays(today, offset), h), m).toISOString()
   const year = today.getFullYear()
   let seq = 7800
-  const nextRef = () => bookingRef(year, ++seq)
+  // 7842 and 7843 are the refs shown on the design boards; generated refs skip them.
+  const RESERVED_REFS = new Set([7842, 7843])
+  const nextRef = () => {
+    do seq++
+    while (RESERVED_REFS.has(seq))
+    return bookingRef(year, seq)
+  }
 
   // ---- Organisations ----------------------------------------------------------
   const org = (
