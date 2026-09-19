@@ -57,7 +57,8 @@ export const useDocuments = (filter: { machineId?: string; profileId?: string },
 export const useOrgDocuments = () => useQuery(q(['orgDocuments'], (a) => a.listOrgDocuments()))
 export const useSupplierBookings = () =>
   useQuery(q(['supplierBookings'], (a) => a.listSupplierBookings()))
-export const usePayoutSummary = () => useQuery(q(['payoutSummary'], (a) => a.getPayoutSummary()))
+export const usePayoutSummary = (enabled = true) =>
+  useQuery({ ...q(['payoutSummary'], (a) => a.getPayoutSummary()), enabled })
 export const usePayouts = () => useQuery(q(['payouts'], (a) => a.listPayouts()))
 export const usePerformance = (range: '30d' | '90d' | '1y') =>
   useQuery({

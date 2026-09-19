@@ -1,0 +1,621 @@
+[
+  {
+    "role": "public",
+    "path": "/",
+    "finalUrl": "/",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/welcome",
+    "finalUrl": "/welcome",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/login",
+    "finalUrl": "/login",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/signup/role",
+    "finalUrl": "/signup/role",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/signup?role=contractor",
+    "finalUrl": "/signup?role=contractor",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/forgot-password",
+    "finalUrl": "/forgot-password",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/terms",
+    "finalUrl": "/terms",
+    "issues": []
+  },
+  {
+    "role": "public",
+    "path": "/privacy",
+    "finalUrl": "/privacy",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/home",
+    "finalUrl": "/home",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/browse",
+    "finalUrl": "/browse",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/search",
+    "finalUrl": "/search",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/search/results?category=excavators",
+    "finalUrl": "/search/results?category=excavators",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/search/results?q=excavator&location=Melbourne",
+    "finalUrl": "/search/results?q=excavator&location=Melbourne",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54",
+    "finalUrl": "/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54/book",
+    "finalUrl": "/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54/book",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/bookings/c2778e0e-0d84-4cb0-a2d9-39ce464a5346/confirmed",
+    "finalUrl": "/bookings/c2778e0e-0d84-4cb0-a2d9-39ce464a5346/confirmed",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/bookings/c2778e0e-0d84-4cb0-a2d9-39ce464a5346",
+    "finalUrl": "/bookings/c2778e0e-0d84-4cb0-a2d9-39ce464a5346",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/bookings/a94fbf00-00c1-4d9f-a807-f35eb093dadd",
+    "finalUrl": "/bookings/a94fbf00-00c1-4d9f-a807-f35eb093dadd",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/bookings",
+    "finalUrl": "/bookings",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires",
+    "finalUrl": "/hires",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5",
+    "finalUrl": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires/eb480048-7630-48dc-a166-cb8a4e073645/tracking",
+    "finalUrl": "/hires/eb480048-7630-48dc-a166-cb8a4e073645/tracking",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/extend",
+    "finalUrl": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/extend",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/return",
+    "finalUrl": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/return",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/swap",
+    "finalUrl": "/hires/fd42c32f-c158-4769-ada7-0a0440139ca5/swap",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/sites",
+    "finalUrl": "/sites",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4",
+    "finalUrl": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4/edit",
+    "finalUrl": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4/edit",
+    "issues": [
+      "console: TypeError: Cannot read properties of undefined (reading 'split')\n    at vn (http://localhost:4173/assets/ui-CUDrS2Qb.js:9:17404)\n    at tr (http://localhost:4173/assets/ui-CUDrS2Qb.js:9:35033)\n    at ",
+      "crash: Cannot read properties of undefined (reading 'split')",
+      "blank screen"
+    ]
+  },
+  {
+    "role": "contractor",
+    "path": "/sites/new/location",
+    "finalUrl": "/sites/new/location",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/team",
+    "finalUrl": "/team",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/team/invite",
+    "finalUrl": "/team/invite",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/plans",
+    "finalUrl": "/plans",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/payments",
+    "finalUrl": "/payments",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/payments/cards/new",
+    "finalUrl": "/payments/cards/new",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/invoices",
+    "finalUrl": "/invoices",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/messages",
+    "finalUrl": "/messages",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/messages/9bd9a891-9515-4aac-a1a3-64bd58e01e30",
+    "finalUrl": "/messages/9bd9a891-9515-4aac-a1a3-64bd58e01e30",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/notifications",
+    "finalUrl": "/notifications",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/account",
+    "finalUrl": "/account",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/account/profile",
+    "finalUrl": "/account/profile",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/account/company",
+    "finalUrl": "/account/company",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/account/payment-settings",
+    "finalUrl": "/account/payment-settings",
+    "issues": [
+      "http 403: /rest/v1/rpc/payout_summary",
+      "console: Failed to load resource: the server responded with a status of 403 ()"
+    ]
+  },
+  {
+    "role": "contractor",
+    "path": "/account/privacy",
+    "finalUrl": "/account/privacy",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/support",
+    "finalUrl": "/support",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/support/requests",
+    "finalUrl": "/support/requests",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/support/articles",
+    "finalUrl": "/support/articles",
+    "issues": []
+  },
+  {
+    "role": "contractor",
+    "path": "/support/new",
+    "finalUrl": "/support/new",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier",
+    "finalUrl": "/supplier",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/performance",
+    "finalUrl": "/supplier/performance",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines",
+    "finalUrl": "/supplier/machines",
+    "issues": [
+      "request failed: https://kixhozwbtxiqzoknxlje.supabase.co/storage/v1/object/public/machine-photos/22fc4975-0c1e-4357-a0b8-5eddc20d49e8/f8 net::ERR_BLOCKED_BY_ORB"
+    ]
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/new/category",
+    "finalUrl": "/supplier/machines/new/category",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54",
+    "finalUrl": "/supplier/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/category",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/category",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/details",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/details",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/photos",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/photos",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/specs",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/specs",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/rates",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/rates",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/service-area",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/edit/service-area",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/compliance",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/compliance",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/preview",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/preview",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/review",
+    "finalUrl": "/supplier/machines/f04a1526-528f-4b00-af74-34a154972db5/review",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54/live",
+    "finalUrl": "/supplier/machines/858b505f-5fdd-444d-a1fe-4fa911ff4f54/live",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance",
+    "finalUrl": "/supplier/compliance",
+    "issues": [
+      "request failed: https://kixhozwbtxiqzoknxlje.supabase.co/storage/v1/object/public/machine-photos/22fc4975-0c1e-4357-a0b8-5eddc20d49e8/f8 net::ERR_BLOCKED_BY_ORB"
+    ]
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance/requirements/general",
+    "finalUrl": "/supplier/compliance/requirements/general",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance/requirements/crane",
+    "finalUrl": "/supplier/compliance/requirements/crane",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance/requirements/operator",
+    "finalUrl": "/supplier/compliance/requirements/operator",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance/alerts",
+    "finalUrl": "/supplier/compliance/alerts",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/compliance/upload?machine=f04a1526-528f-4b00-af74-34a154972db5&type=req-swms",
+    "finalUrl": "/supplier/compliance/upload?machine=f04a1526-528f-4b00-af74-34a154972db5&type=req-swms",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/requests",
+    "finalUrl": "/supplier/requests",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/dispatch",
+    "finalUrl": "/supplier/dispatch",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/bookings/5ca3974c-5faf-438d-a6ba-6332d6786ba1",
+    "finalUrl": "/supplier/bookings/5ca3974c-5faf-438d-a6ba-6332d6786ba1",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/bookings",
+    "finalUrl": "/supplier/bookings",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/supplier/payouts",
+    "finalUrl": "/supplier/payouts",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/messages",
+    "finalUrl": "/messages",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/messages/167c4012-84e0-4ecf-a4a8-138237c30151",
+    "finalUrl": "/messages/167c4012-84e0-4ecf-a4a8-138237c30151",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/notifications",
+    "finalUrl": "/notifications",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/account",
+    "finalUrl": "/account",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/account/company",
+    "finalUrl": "/account/company",
+    "issues": []
+  },
+  {
+    "role": "supplier",
+    "path": "/support",
+    "finalUrl": "/support",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/operator",
+    "finalUrl": "/operator",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/operator/bookings",
+    "finalUrl": "/operator/bookings",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/operator/bookings/e0f0070a-157e-4725-a166-f5e966a99e7f",
+    "finalUrl": "/operator/bookings/e0f0070a-157e-4725-a166-f5e966a99e7f",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/operator/documents",
+    "finalUrl": "/operator/documents",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/messages",
+    "finalUrl": "/messages",
+    "issues": []
+  },
+  {
+    "role": "operator",
+    "path": "/account",
+    "finalUrl": "/account",
+    "issues": []
+  },
+  {
+    "role": "org_admin",
+    "path": "/home",
+    "finalUrl": "/home",
+    "issues": []
+  },
+  {
+    "role": "org_admin",
+    "path": "/sites",
+    "finalUrl": "/sites",
+    "issues": []
+  },
+  {
+    "role": "org_admin",
+    "path": "/team",
+    "finalUrl": "/team",
+    "issues": []
+  },
+  {
+    "role": "org_admin",
+    "path": "/bookings",
+    "finalUrl": "/bookings",
+    "issues": []
+  },
+  {
+    "role": "org_admin",
+    "path": "/account",
+    "finalUrl": "/account",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin",
+    "finalUrl": "/admin",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/approvals",
+    "finalUrl": "/admin/approvals",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/approvals?tab=documents",
+    "finalUrl": "/admin/approvals?tab=documents",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/approvals/machines/89108e22-6a56-4e01-aab9-19639fb94330",
+    "finalUrl": "/admin/approvals/machines/89108e22-6a56-4e01-aab9-19639fb94330",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/approvals/documents/0babcb8c-da14-4c2e-a123-cefe8ac84630",
+    "finalUrl": "/admin/approvals/documents/0babcb8c-da14-4c2e-a123-cefe8ac84630",
+    "issues": [
+      "screen shows \"not available\""
+    ]
+  },
+  {
+    "role": "admin",
+    "path": "/admin/suppliers",
+    "finalUrl": "/admin/suppliers",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/bookings",
+    "finalUrl": "/admin/bookings",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/admin/more",
+    "finalUrl": "/admin/more",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/notifications",
+    "finalUrl": "/notifications",
+    "issues": []
+  },
+  {
+    "role": "admin",
+    "path": "/account",
+    "finalUrl": "/account",
+    "issues": []
+  },
+  {
+    "role": "no_org",
+    "path": "/onboarding/business",
+    "finalUrl": "/onboarding/business",
+    "issues": []
+  }
+]

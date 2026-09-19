@@ -195,7 +195,7 @@ export function PaymentSettingsPage() {
   const methods = usePaymentMethods()
   const sub = useSubscription()
   const isSupplier = !!me && areaFor(me) === 'supplier'
-  const payouts = usePayoutSummary()
+  const payouts = usePayoutSummary(isSupplier)
 
   if (isSupplier)
     return (

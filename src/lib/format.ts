@@ -45,7 +45,8 @@ export function formatDate(d: Date | string): string {
 }
 
 /** "7:00 AM" from "07:00" */
-export function formatTime(hhmm: string): string {
+export function formatTime(hhmm: string | null | undefined): string {
+  if (!hhmm) return ''
   const [h, m] = hhmm.split(':').map(Number)
   if (h === undefined || m === undefined || Number.isNaN(h) || Number.isNaN(m)) return ''
   const d = new Date(2000, 0, 1, h, m)
