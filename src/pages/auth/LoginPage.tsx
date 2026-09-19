@@ -15,7 +15,7 @@ import {
   PasswordInput,
   ScreenTitle,
 } from '@/components/ui'
-import { getApi, isDemo } from '@/data/client'
+import { showDemoLogins } from '@/data/client'
 import { useApiMutation } from '@/data/hooks'
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/data/seed'
 
@@ -109,7 +109,7 @@ export function LoginPage() {
           Sign up
         </Link>
       </p>
-      {isDemo(getApi()) && (
+      {showDemoLogins() && (
         <details className="group mt-8 rounded-xl border border-line bg-card p-3 text-sm">
           <summary className="flex cursor-pointer list-none items-center justify-between font-semibold">
             Demo accounts

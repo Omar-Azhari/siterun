@@ -5,7 +5,7 @@ import { Screen } from '@/components/layout/Screen'
 import { Button, OtpInput, ScreenTitle, useToast } from '@/components/ui'
 import { getApi, isDemo } from '@/data/client'
 import { DEMO_OTP } from '@/data/demo/demoApi'
-import { useApiMutation } from '@/data/hooks'
+import { useApiMutation, useMe } from '@/data/hooks'
 
 const RESEND_SECONDS = 30
 
@@ -18,6 +18,7 @@ export function VerifyPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState<string>()
   const [seconds, setSeconds] = useState(RESEND_SECONDS)
+  const me = useMe()
 
   useEffect(() => {
     if (seconds <= 0) return
@@ -30,6 +31,8 @@ export function VerifyPage() {
     success: 'We’ve sent you a new code',
   })
 
+  // Arriving from the email's confirmation link signs the user in straight away.
+  if (me.data?.profile.emailVerified) return <Navigate to="/onboarding/business" replace />
   if (!email) return <Navigate to="/signup/role" replace />
 
   const submit = (c = code) => {

@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   reporter: 'list',
-  use: { baseURL: 'http://localhost:5173', trace: 'on-first-retry' },
+  use: { baseURL: 'http://localhost:5174', trace: 'on-first-retry' },
   projects: [
     {
       name: 'mobile',
@@ -15,5 +15,12 @@ export default defineConfig({
       },
     },
   ],
-  webServer: { command: 'npm run dev', url: 'http://localhost:5173', reuseExistingServer: true },
+  // Screen tests run on the in-browser demo backend, on their own port so a
+  // Supabase-backed dev server on 5173 is left alone.
+  webServer: {
+    command: 'npx vite --port 5174 --strictPort',
+    url: 'http://localhost:5174',
+    reuseExistingServer: true,
+    env: { VITE_BACKEND: 'demo' },
+  },
 })
