@@ -99,7 +99,10 @@ export class SupabaseApi implements Api {
   readonly mode = 'supabase' as const
   readonly client: SupabaseClient
 
-  constructor(url: string, anonKey: string) {
+  constructor(
+    private readonly url: string,
+    private readonly anonKey: string,
+  ) {
     this.client = createClient(url, anonKey, {
       auth: {
         storage: rememberStorage,
@@ -182,6 +185,17 @@ export class SupabaseApi implements Api {
   }
 
   async signInWithProvider(provider: 'google' | 'apple') {
+    // An unconfigured provider sends the browser to a raw JSON error page, so check first.
+    const settings = await fetch(`${this.url}/auth/v1/settings`, {
+      headers: { apikey: this.anonKey },
+    })
+      .then((r) => r.json() as Promise<{ external?: Record<string, boolean> }>)
+      .catch(() => null)
+    if (settings && !settings.external?.[provider])
+      throw new ApiError(
+        `${provider === 'google' ? 'Google' : 'Apple'} sign-in isn’t available yet. Log in with your email and password.`,
+        'invalid',
+      )
     storageOf('local')?.setItem(REMEMBER_KEY, 'true')
     const { error } = await this.client.auth.signInWithOAuth({
       provider,

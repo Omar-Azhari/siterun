@@ -216,10 +216,7 @@ export function PaymentsPage() {
             <Button
               variant="danger"
               loading={remove.isPending}
-              onClick={() => {
-                if (window.confirm(`Remove card ending ${manage.last4}?`))
-                  remove.mutate(manage.id, { onSuccess: () => setManage(null) })
-              }}
+              onClick={() => remove.mutate(manage.id, { onSuccess: () => setManage(null) })}
             >
               Remove Card
             </Button>

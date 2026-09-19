@@ -21,32 +21,110 @@ const ID = {
   operatorJob: 'e0f0070a-157e-4725-a166-f5e966a99e7f',
 }
 
-const PUBLIC = ['/', '/welcome', '/login', '/signup/role', '/signup?role=contractor', '/forgot-password', '/terms', '/privacy']
+const PUBLIC = [
+  '/',
+  '/welcome',
+  '/login',
+  '/signup/role',
+  '/signup?role=contractor',
+  '/forgot-password',
+  '/terms',
+  '/privacy',
+]
 const CONTRACTOR = [
-  '/home', '/browse', '/search', '/search/results?category=excavators', '/search/results?q=excavator&location=Melbourne',
-  `/machines/${ID.machine}`, `/machines/${ID.machine}/book`, `/bookings/${ID.confirmed}/confirmed`, `/bookings/${ID.confirmed}`,
-  `/bookings/${ID.requested}`, '/bookings', '/hires', `/hires/${ID.hireOnSite}`, `/hires/${ID.hireInTransit}/tracking`,
-  `/hires/${ID.hireOnSite}/extend`, `/hires/${ID.hireOnSite}/return`, `/hires/${ID.hireOnSite}/swap`,
-  '/sites', `/sites/${ID.site}`, `/sites/${ID.site}/edit`, '/sites/new/location', '/team', '/team/invite', '/plans',
-  '/payments', '/payments/cards/new', '/invoices', '/messages', `/messages/${ID.conv}`, '/notifications',
-  '/account', '/account/profile', '/account/company', '/account/payment-settings', '/account/privacy',
-  '/support', '/support/requests', '/support/articles', '/support/new',
+  '/home',
+  '/browse',
+  '/search',
+  '/search/results?category=excavators',
+  '/search/results?q=excavator&location=Melbourne',
+  `/machines/${ID.machine}`,
+  `/machines/${ID.machine}/book`,
+  `/bookings/${ID.confirmed}/confirmed`,
+  `/bookings/${ID.confirmed}`,
+  `/bookings/${ID.requested}`,
+  '/bookings',
+  '/hires',
+  `/hires/${ID.hireOnSite}`,
+  `/hires/${ID.hireInTransit}/tracking`,
+  `/hires/${ID.hireOnSite}/extend`,
+  `/hires/${ID.hireOnSite}/return`,
+  `/hires/${ID.hireOnSite}/swap`,
+  '/sites',
+  `/sites/${ID.site}`,
+  `/sites/${ID.site}/edit`,
+  '/sites/new/location',
+  '/team',
+  '/team/invite',
+  '/plans',
+  '/payments',
+  '/payments/cards/new',
+  '/invoices',
+  '/messages',
+  `/messages/${ID.conv}`,
+  '/notifications',
+  '/account',
+  '/account/profile',
+  '/account/company',
+  '/account/payment-settings',
+  '/account/privacy',
+  '/support',
+  '/support/requests',
+  '/support/articles',
+  '/support/new',
 ]
 const SUPPLIER = [
-  '/supplier', '/supplier/performance', '/supplier/machines', '/supplier/machines/new/category', `/supplier/machines/${ID.machine}`,
-  `/supplier/machines/${ID.draft}/edit/category`, `/supplier/machines/${ID.draft}/edit/details`, `/supplier/machines/${ID.draft}/edit/photos`,
-  `/supplier/machines/${ID.draft}/edit/specs`, `/supplier/machines/${ID.draft}/edit/rates`, `/supplier/machines/${ID.draft}/edit/service-area`,
-  `/supplier/machines/${ID.draft}/compliance`, `/supplier/machines/${ID.draft}/preview`, `/supplier/machines/${ID.draft}/review`,
-  `/supplier/machines/${ID.machine}/live`, '/supplier/compliance', '/supplier/compliance/requirements/general',
-  '/supplier/compliance/requirements/crane', '/supplier/compliance/requirements/operator', '/supplier/compliance/alerts',
-  `/supplier/compliance/upload?machine=${ID.draft}&type=req-swms`, '/supplier/requests', '/supplier/dispatch',
-  `/supplier/bookings/${ID.supplierRequest}`, '/supplier/bookings', '/supplier/payouts', '/messages', `/messages/${ID.supplierConv}`,
-  '/notifications', '/account', '/account/company', '/support',
+  '/supplier',
+  '/supplier/performance',
+  '/supplier/machines',
+  '/supplier/machines/new/category',
+  `/supplier/machines/${ID.machine}`,
+  `/supplier/machines/${ID.draft}/edit/category`,
+  `/supplier/machines/${ID.draft}/edit/details`,
+  `/supplier/machines/${ID.draft}/edit/photos`,
+  `/supplier/machines/${ID.draft}/edit/specs`,
+  `/supplier/machines/${ID.draft}/edit/rates`,
+  `/supplier/machines/${ID.draft}/edit/service-area`,
+  `/supplier/machines/${ID.draft}/compliance`,
+  `/supplier/machines/${ID.draft}/preview`,
+  `/supplier/machines/${ID.draft}/review`,
+  `/supplier/machines/${ID.machine}/live`,
+  '/supplier/compliance',
+  '/supplier/compliance/requirements/general',
+  '/supplier/compliance/requirements/crane',
+  '/supplier/compliance/requirements/operator',
+  '/supplier/compliance/alerts',
+  `/supplier/compliance/upload?machine=${ID.draft}&type=req-swms`,
+  '/supplier/requests',
+  '/supplier/dispatch',
+  `/supplier/bookings/${ID.supplierRequest}`,
+  '/supplier/bookings',
+  '/supplier/payouts',
+  '/messages',
+  `/messages/${ID.supplierConv}`,
+  '/notifications',
+  '/account',
+  '/account/company',
+  '/support',
 ]
-const OPERATOR = ['/operator', '/operator/bookings', `/operator/bookings/${ID.operatorJob}`, '/operator/documents', '/messages', '/account']
+const OPERATOR = [
+  '/operator',
+  '/operator/bookings',
+  `/operator/bookings/${ID.operatorJob}`,
+  '/operator/documents',
+  '/messages',
+  '/account',
+]
 const ADMIN = [
-  '/admin', '/admin/approvals', '/admin/approvals?tab=documents', `/admin/approvals/machines/${ID.pendingMachine}`,
-  `/admin/approvals/documents/${ID.pendingDoc}`, '/admin/suppliers', '/admin/bookings', '/admin/more', '/notifications', '/account',
+  '/admin',
+  '/admin/approvals',
+  '/admin/approvals?tab=documents',
+  `/admin/approvals/machines/${ID.pendingMachine}`,
+  `/admin/approvals/documents/${ID.pendingDoc}`,
+  '/admin/suppliers',
+  '/admin/bookings',
+  '/admin/more',
+  '/notifications',
+  '/account',
 ]
 const ORG_ADMIN = ['/home', '/sites', '/team', '/bookings', '/account']
 const NO_ORG = ['/onboarding/business']
@@ -70,7 +148,8 @@ async function sweep(page: Page, role: string, paths: string[]) {
   page.on('pageerror', (e) => issues.push(`crash: ${e.message.slice(0, 200)}`))
   page.on('response', (r) => {
     const u = r.url()
-    if (r.status() >= 400 && !u.includes('/auth/v1/user')) issues.push(`http ${r.status()}: ${u.replace(/^https?:\/\/[^/]+/, '').slice(0, 160)}`)
+    if (r.status() >= 400 && !u.includes('/auth/v1/user'))
+      issues.push(`http ${r.status()}: ${u.replace(/^https?:\/\/[^/]+/, '').slice(0, 160)}`)
   })
   page.on('requestfailed', (r) => {
     const f = r.failure()?.errorText ?? ''
@@ -81,8 +160,24 @@ async function sweep(page: Page, role: string, paths: string[]) {
     await page.goto(path)
     await page.waitForLoadState('networkidle').catch(() => {})
     await page.waitForTimeout(600)
-    const text = await page.locator('body').innerText().catch(() => '')
-    for (const bad of ['Something went wrong', 'couldn’t load', "couldn't load", 'not found', 'Not Found', 'not available', 'Page not found', 'undefined', 'NaN', 'Invalid Date', '[object Object]', 'null']) {
+    const text = await page
+      .locator('body')
+      .innerText()
+      .catch(() => '')
+    for (const bad of [
+      'Something went wrong',
+      'couldn’t load',
+      "couldn't load",
+      'not found',
+      'Not Found',
+      'not available',
+      'Page not found',
+      'undefined',
+      'NaN',
+      'Invalid Date',
+      '[object Object]',
+      'null',
+    ]) {
       if (text.includes(bad)) issues.push(`screen shows "${bad}"`)
     }
     if (text.trim().length < 20) issues.push('blank screen')

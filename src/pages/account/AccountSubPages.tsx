@@ -11,6 +11,7 @@ import { PasswordChecklist } from '@/components/domain/PasswordChecklist'
 import {
   Button,
   Card,
+  ConfirmSheet,
   Input,
   ListRow,
   PasswordInput,
@@ -293,6 +294,7 @@ export function PrivacyPage() {
   const update = useApiMutation((api, pw: string) => api.updatePassword(pw), {
     success: 'Password changed',
   })
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const deletion = useApiMutation(
     (api) =>
       api.createTicket({
@@ -368,14 +370,22 @@ export function PrivacyPage() {
           size="md"
           block
           loading={deletion.isPending}
-          onClick={() =>
-            window.confirm('Request deletion of your account and data?') &&
-            deletion.mutate(undefined, { onSuccess: () => navigate('/support') })
-          }
+          onClick={() => setConfirmDelete(true)}
         >
           Request Account Deletion
         </Button>
       </div>
+      <ConfirmSheet
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title="Request account deletion?"
+        confirmLabel="Request Deletion"
+        loading={deletion.isPending}
+        onConfirm={() => deletion.mutate(undefined, { onSuccess: () => navigate('/support') })}
+      >
+        We’ll delete your account and data within 30 days. Records we must keep by law, such as tax
+        invoices, are retained.
+      </ConfirmSheet>
     </AppScreen>
   )
 }

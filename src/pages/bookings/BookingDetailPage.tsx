@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   CalendarDays,
@@ -14,6 +15,7 @@ import {
   Button,
   ButtonLink,
   Card,
+  ConfirmSheet,
   CopyButton,
   EmptyState,
   ErrorState,
@@ -32,6 +34,7 @@ export function BookingDetailPage() {
   const navigate = useNavigate()
   const { data: me } = useMe()
   const booking = useBooking(id)
+  const [confirmCancel, setConfirmCancel] = useState(false)
   const cancel = useApiMutation((api, bid: string) => api.cancelBooking(bid), {
     success: 'Booking cancelled',
   })
@@ -87,9 +90,7 @@ export function BookingDetailPage() {
               size="md"
               block
               loading={cancel.isPending}
-              onClick={() => {
-                if (window.confirm(`Cancel booking ${b.ref}?`)) cancel.mutate(b.id)
-              }}
+              onClick={() => setConfirmCancel(true)}
             >
               Cancel Booking
             </Button>
@@ -146,6 +147,16 @@ export function BookingDetailPage() {
         )}
       </Card>
       <SupplierRow machine={b.machine} className="mt-2.5" />
+      <ConfirmSheet
+        open={confirmCancel}
+        onClose={() => setConfirmCancel(false)}
+        title={`Cancel booking ${b.ref}?`}
+        confirmLabel="Cancel Booking"
+        loading={cancel.isPending}
+        onConfirm={() => cancel.mutate(b.id, { onSuccess: () => setConfirmCancel(false) })}
+      >
+        {b.supplier.name} will be notified. This can’t be undone.
+      </ConfirmSheet>
     </AppScreen>
   )
 }
