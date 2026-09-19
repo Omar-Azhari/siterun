@@ -1,13 +1,8 @@
-import { StrictMode, useEffect } from 'react'
+import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LandingPage } from './LandingPage'
-
-/** Leaving the landing page loads the full app at the new URL. */
-function LoadApp() {
-  useEffect(() => window.location.reload(), [])
-  return null
-}
+import { LoadApp } from './LoadApp'
 
 /**
  * Signed-out visitors at `/` get just the marketing page: no backend client and no
