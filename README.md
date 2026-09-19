@@ -45,6 +45,7 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon or publishable key (public). Never the service role key |
 | `VITE_SHOW_DEMO_LOGINS` | `true` lists the seeded demo logins on the login screen. Leave empty in production |
 | `VITE_BACKEND` | `demo` forces the in-browser demo backend even when Supabase values are set |
+| `VITE_SITE_URL` | Public site URL (no trailing slash) for canonical and social preview tags |
 
 Never commit `.env`.
 
