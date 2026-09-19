@@ -1,5 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test'
+import { createClient } from '@supabase/supabase-js'
 import { addDays, format } from 'date-fns'
+import { loadEnv } from 'vite'
 
 // End-to-end flows against the Supabase project in .env, using the seeded demo
 // accounts (supabase/seed.sql). Each run creates its own bookings and listings on
@@ -24,12 +26,28 @@ async function as(browser: Browser, email: string) {
   return page
 }
 
+/** Signs in with supabase-js to tidy up after a flow (cancel test bookings, hide test listings). */
+async function api(email: string) {
+  const env = loadEnv('development', process.cwd(), 'VITE_')
+  const client = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
+    auth: { persistSession: false },
+  })
+  await client.auth.signInWithPassword({ email, password: PASSWORD })
+  return client
+}
+
 const day = (offset: number) => format(addDays(new Date(), offset), 'yyyy-MM-dd')
 // A random window 1–3 years out keeps repeated runs off each other's dates.
 const offset = 400 + Math.floor(Math.random() * 700)
 
 test.describe.serial('contractor books, supplier accepts', () => {
   let bookingId = ''
+
+  test.afterAll(async () => {
+    if (!bookingId) return
+    const alex = await api(ALEX)
+    await alex.rpc('cancel_booking', { booking: bookingId })
+  })
 
   test('search → book → supplier accepts → contractor sees confirmation', async ({ browser }) => {
     const alex = await as(browser, ALEX)
@@ -166,6 +184,10 @@ test('supplier lists a machine, uploads documents, admin approves, machine appea
   const alex = await as(browser, ALEX)
   await alex.goto(`/search/results?q=${make}`)
   await expect(alex.getByRole('link', { name: new RegExp(make) })).toBeVisible()
+
+  // Take the test listing out of search again.
+  const supplier = await api(JORDAN)
+  await supplier.rpc('set_machine_paused', { machine: machineId, paused: true })
 })
 
 test('a non-admin is kept out of the admin area', async ({ browser }) => {
