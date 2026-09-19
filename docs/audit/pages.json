@@ -165,11 +165,7 @@
     "role": "contractor",
     "path": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4/edit",
     "finalUrl": "/sites/6a3199b3-56ff-44af-ad4d-a65751266cc4/edit",
-    "issues": [
-      "console: TypeError: Cannot read properties of undefined (reading 'split')\n    at vn (http://localhost:4173/assets/ui-CUDrS2Qb.js:9:17404)\n    at tr (http://localhost:4173/assets/ui-CUDrS2Qb.js:9:35033)\n    at ",
-      "crash: Cannot read properties of undefined (reading 'split')",
-      "blank screen"
-    ]
+    "issues": []
   },
   {
     "role": "contractor",
@@ -253,10 +249,7 @@
     "role": "contractor",
     "path": "/account/payment-settings",
     "finalUrl": "/account/payment-settings",
-    "issues": [
-      "http 403: /rest/v1/rpc/payout_summary",
-      "console: Failed to load resource: the server responded with a status of 403 ()"
-    ]
+    "issues": []
   },
   {
     "role": "contractor",
@@ -304,9 +297,7 @@
     "role": "supplier",
     "path": "/supplier/machines",
     "finalUrl": "/supplier/machines",
-    "issues": [
-      "request failed: https://kixhozwbtxiqzoknxlje.supabase.co/storage/v1/object/public/machine-photos/22fc4975-0c1e-4357-a0b8-5eddc20d49e8/f8 net::ERR_BLOCKED_BY_ORB"
-    ]
+    "issues": []
   },
   {
     "role": "supplier",
@@ -384,9 +375,7 @@
     "role": "supplier",
     "path": "/supplier/compliance",
     "finalUrl": "/supplier/compliance",
-    "issues": [
-      "request failed: https://kixhozwbtxiqzoknxlje.supabase.co/storage/v1/object/public/machine-photos/22fc4975-0c1e-4357-a0b8-5eddc20d49e8/f8 net::ERR_BLOCKED_BY_ORB"
-    ]
+    "issues": []
   },
   {
     "role": "supplier",
