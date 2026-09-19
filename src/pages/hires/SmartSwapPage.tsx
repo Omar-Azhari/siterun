@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Info, Repeat2 } from 'lucide-react'
@@ -88,13 +89,7 @@ export function SmartSwapPage() {
             indicator={choice === o.id ? 'check' : 'radio'}
             indicatorPosition="top-right"
             className="items-start"
-            icon={
-              <Thumbnail
-                src={desc[o.id].photo?.replace('.webp', '-sm.webp')}
-                alt=""
-                className="h-[68px] w-[60px]"
-              />
-            }
+            icon={<Thumbnail src={thumb(desc[o.id].photo)} alt="" className="h-[68px] w-[60px]" />}
             label={`${o.title}, ${o.delta === 0 ? 'free' : `${o.delta > 0 ? 'plus' : 'minus'} ${formatMoney(Math.abs(o.delta))} per day`}`}
             title={<span className="text-sm font-medium">{o.title}</span>}
           >

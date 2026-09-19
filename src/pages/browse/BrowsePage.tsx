@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
@@ -29,11 +30,7 @@ function ActiveHiresStrip() {
               to={`/hires/${b.id}`}
               className={cn(cardClass, 'flex w-60 items-center gap-2.5 p-2')}
             >
-              <Thumbnail
-                src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
-                alt=""
-                className="size-12"
-              />
+              <Thumbnail src={thumb(b.machine.photos[0])} alt="" className="size-12" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold">{b.machine.title}</span>
                 <span className="block truncate text-xs text-muted">{b.site?.name}</span>

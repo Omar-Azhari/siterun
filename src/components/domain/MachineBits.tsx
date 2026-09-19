@@ -6,6 +6,7 @@ import { cardClass } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import type { Machine } from '@/data/types'
 import { Logo } from '@/components/brand/Logo'
+import { thumb } from '@/lib/images'
 
 /** Search result card (board 03 screen 3). */
 export function MachineCard({
@@ -26,7 +27,7 @@ export function MachineCard({
       )}
     >
       <Thumbnail
-        src={machine.photos[0]?.replace('.webp', '-sm.webp')}
+        src={thumb(machine.photos[0])}
         alt={machine.title}
         className="h-[92px] w-[88px] shrink-0"
       />
@@ -60,7 +61,7 @@ export function MachineSummary({
   const body = (
     <>
       <Thumbnail
-        src={machine.photos[0]?.replace('.webp', '-sm.webp')}
+        src={thumb(machine.photos[0])}
         alt={machine.title}
         className="h-[70px] w-[84px] shrink-0"
       />

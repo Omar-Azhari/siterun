@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import {
@@ -57,11 +58,7 @@ function JobCard({ b }: { b: BookingView }) {
         onNow && 'border-primary',
       )}
     >
-      <Thumbnail
-        src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
-        alt=""
-        className="h-20 w-24"
-      />
+      <Thumbnail src={thumb(b.machine.photos[0])} alt="" className="h-20 w-24" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-base font-semibold">{b.machine.title}</p>
         <p className="truncate text-sm text-[#dae4ef]">

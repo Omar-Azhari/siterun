@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useState } from 'react'
 import { BriefcaseBusiness } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
@@ -67,7 +68,7 @@ export function ActiveHiresPage() {
             to={`/hires/${b.id}`}
             leading={
               <Thumbnail
-                src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+                src={thumb(b.machine.photos[0])}
                 alt={b.machine.title}
                 className="h-[84px] w-[72px]"
               />

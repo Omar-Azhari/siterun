@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
@@ -88,13 +89,7 @@ export function MachinesPage() {
           <ListRow
             key={m.id}
             to={href(m)}
-            leading={
-              <Thumbnail
-                src={m.photos[0]?.replace('.webp', '-sm.webp')}
-                alt=""
-                className="h-16 w-20"
-              />
-            }
+            leading={<Thumbnail src={thumb(m.photos[0])} alt="" className="h-16 w-20" />}
             title={m.title}
             subtitle={`${m.make || 'Make'} ${m.model}${m.assetCode ? ` · ${m.assetCode}` : ''}`}
             meta={

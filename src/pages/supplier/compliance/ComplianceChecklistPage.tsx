@@ -15,7 +15,7 @@ import {
 import { cardClass } from '@/components/ui/Card'
 import { selectedClass } from '@/components/ui/SelectableCard'
 import { cn } from '@/lib/cn'
-import { imgSm } from '@/lib/images'
+import { imgSm, thumb } from '@/lib/images'
 import { useMyMachines } from '@/data/hooks'
 import { STATES, useComplianceState } from './complianceUtils'
 
@@ -91,13 +91,7 @@ export function ComplianceChecklistPage() {
           <ListRow
             key={m.id}
             to={`/supplier/machines/${m.id}/compliance`}
-            leading={
-              <Thumbnail
-                src={m.photos[0]?.replace('.webp', '-sm.webp')}
-                alt=""
-                className="size-12"
-              />
-            }
+            leading={<Thumbnail src={thumb(m.photos[0])} alt="" className="size-12" />}
             title={m.title}
             subtitle={`${m.make} ${m.model}${m.assetCode ? ` · ${m.assetCode}` : ''}`}
             trailing={<StatusPill status={m.status} />}

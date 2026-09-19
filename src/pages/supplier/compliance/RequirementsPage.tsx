@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
@@ -139,13 +140,7 @@ export function RequirementsPage() {
                     target &&
                     navigate(`/supplier/compliance/upload?type=${target.id}&machine=${m.id}`)
                   }
-                  icon={
-                    <Thumbnail
-                      src={m.photos[0]?.replace('.webp', '-sm.webp')}
-                      alt=""
-                      className="size-11"
-                    />
-                  }
+                  icon={<Thumbnail src={thumb(m.photos[0])} alt="" className="size-11" />}
                   title={m.title}
                   description={`${m.make} ${m.model}`}
                   aside={<StatusPill status={m.status} />}

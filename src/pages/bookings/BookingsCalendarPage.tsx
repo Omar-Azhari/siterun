@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { addMonths, format, parseISO, subMonths } from 'date-fns'
@@ -32,7 +33,7 @@ function BookingCard({ b, day }: { b: BookingView; day: string }) {
   return (
     <Link to={to} className={cn(cardClass, 'flex gap-3 p-2.5 hover:border-line-input')}>
       <Thumbnail
-        src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+        src={thumb(b.machine.photos[0])}
         alt={b.machine.title}
         className="h-[88px] w-[96px]"
       />

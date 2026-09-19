@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
@@ -137,11 +138,7 @@ export function ComplianceStatusPage() {
         subtitle="All required documents for this machine are listed below."
       />
       <div className={cn(cardClass, 'flex items-center gap-3 p-2.5')}>
-        <Thumbnail
-          src={m.photos[0]?.replace('.webp', '-sm.webp')}
-          alt={m.title}
-          className="h-16 w-24"
-        />
+        <Thumbnail src={thumb(m.photos[0])} alt={m.title} className="h-16 w-24" />
         <div>
           <p className="text-base font-semibold">{m.title}</p>
           <p className="text-sm text-muted">

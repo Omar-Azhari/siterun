@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
@@ -20,7 +21,7 @@ export function HireMachineCard({
   const body = (
     <>
       <Thumbnail
-        src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
+        src={thumb(b.machine.photos[0])}
         alt={b.machine.title}
         className="h-[76px] w-[92px]"
       />

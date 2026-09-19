@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { addDays, addMonths, format, parseISO, subMonths } from 'date-fns'
@@ -390,11 +391,7 @@ export function SupplierBookingsListPage() {
             to={`/supplier/bookings/${b.id}`}
             className={cn(cardClass, 'flex items-center gap-3 p-2.5 hover:border-line-input')}
           >
-            <Thumbnail
-              src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
-              alt=""
-              className="size-14"
-            />
+            <Thumbnail src={thumb(b.machine.photos[0])} alt="" className="size-14" />
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold">{b.machine.title}</span>
               <span className="block truncate text-sm text-muted">

@@ -1,3 +1,4 @@
+import { thumb } from '@/lib/images'
 import { useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
@@ -200,11 +201,7 @@ export function AdminApprovalsPage() {
             {machines.data?.map((m) => (
               <Card key={m.id} className="p-3">
                 <div className="flex gap-3">
-                  <Thumbnail
-                    src={m.photos[0]?.replace('.webp', '-sm.webp')}
-                    alt={m.title}
-                    className="h-[84px] w-[92px]"
-                  />
+                  <Thumbnail src={thumb(m.photos[0])} alt={m.title} className="h-[84px] w-[92px]" />
                   <div className="min-w-0">
                     <p className="text-base font-semibold">{m.title}</p>
                     <p className="text-sm text-[#dae4ef]">
@@ -659,11 +656,7 @@ export function AdminBookingsPage() {
       <div className="space-y-2">
         {list.map((b) => (
           <Card key={b.id} className="flex items-center gap-3 py-3">
-            <Thumbnail
-              src={b.machine.photos[0]?.replace('.webp', '-sm.webp')}
-              alt=""
-              className="size-12"
-            />
+            <Thumbnail src={thumb(b.machine.photos[0])} alt="" className="size-12" />
             <div className="min-w-0 flex-1 text-sm">
               <p className="font-semibold">
                 {b.ref} · {b.machine.title}
