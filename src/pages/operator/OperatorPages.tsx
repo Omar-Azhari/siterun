@@ -55,7 +55,7 @@ export function OperatorHomePage() {
 
   return (
     <AppScreen root>
-      <ScreenTitle title={`G’day, ${me?.profile.fullName.split(' ')[0] ?? ''}`} subtitle={`${me?.org?.name ?? ''} · Operator`} />
+      <ScreenTitle title="Home" subtitle={me?.org?.name ?? 'Your jobs at a glance.'} />
       {issues.length > 0 && (
         <Link to="/operator/documents" className={cn(cardClass, 'mb-3 flex items-center gap-3 border-warning/50 p-3')}>
           <HardHat className="size-7 text-warning" aria-hidden />
@@ -180,7 +180,6 @@ export function OperatorDocumentsPage() {
           />
         ))}
       </div>
-      <InfoNote className="mt-3">Your supplier and SiteRun can see these documents. They’re checked before you’re assigned to a site.</InfoNote>
     </AppScreen>
   )
 }
