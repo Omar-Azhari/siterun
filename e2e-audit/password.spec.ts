@@ -18,7 +18,13 @@ test('change password twice', async ({ page }) => {
     await page.getByLabel('Confirm password').fill(pw)
     await page.getByRole('button', { name: 'Update Password' }).click()
     await page.waitForTimeout(3000)
-    console.log('after', pw, sent.length, page.url(), (await page.locator('main').innerText()).slice(0, 200).replace(/\n/g, ' | '))
+    console.log(
+      'after',
+      pw,
+      sent.length,
+      page.url(),
+      (await page.locator('main').innerText()).slice(0, 200).replace(/\n/g, ' | '),
+    )
   }
   expect(sent.length).toBe(2)
 })

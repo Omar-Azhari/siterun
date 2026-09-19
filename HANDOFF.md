@@ -8,27 +8,30 @@ Read README.md and DECISIONS.md first. They describe the stack, scripts, Supabas
 - Not deployed yet. Vercel CLI isn't logged in and the repo has no Git remote.
 - Stage 2 (Capacitor apps) not started. The brief says to wait for the owner to sign off Stage 1.
 
-## In progress: full-site audit (owner asked "check every feature, list what doesn't work")
-Pass 1 (open every page as every role against the Supabase build) is done:
-`npx playwright test --config playwright.audit.config.ts` (needs `npm run build` then `npx vite preview --port 4173` running). Results: `docs/audit/pages.json`. 101 pages, 4 issues:
+## Full-site audit (done)
+Run against the production build on Supabase (`npm run build`, `npx vite preview --port 4173`, then `npx playwright test --config playwright.audit.config.ts`). Specs are in `e2e-audit/`.
 
-1. FIXED (uncommitted before this file): `/sites/:id/edit` crashed with "Cannot read properties of undefined (reading 'split')". `formatTime()` in `src/lib/format.ts` now accepts empty values.
-2. FIXED: `/account/payment-settings` as a contractor called `payout_summary` (supplier-only, 403). `usePayoutSummary(enabled)` now only runs for suppliers.
-3. OPEN: supplier `/supplier/machines` and `/supplier/compliance` show a broken photo (`net::ERR_BLOCKED_BY_ORB`) for a leftover e2e test machine `f8851623-8707-48a3-939e-5bbe1276c875` (make `E2EMU7ZZH20`, paused). The file exists in storage bucket `machine-photos`. Two jobs: (a) delete that leftover machine; (b) find out why the public URL is blocked. Open the URL directly; likely the object is served with a bad content-type or the bucket's public read isn't working. Uploaded photos must display for real suppliers.
-4. EXPECTED: `/admin/approvals/documents/:id` says "Preview not available" for seeded documents (they have no file). Fine.
+- Pass 1, pages (`pages.spec.ts`): 101 pages as every role. Clean except "Preview not available" on seeded documents that have no file (expected).
+- Pass 2, features (`features.spec.ts`): every data-changing feature. All work. Sign-up and forgot-password on Supabase can't be automated because Supabase rejects `.test` addresses and needs SMTP (owner setup).
+- Pass 3, visuals (`visual.spec.ts`): key screens at 768 and 1440 px look right.
+
+Bugs found and fixed during the audit:
+1. Site edit page crashed (time formatter got an empty value while loading).
+2. Payment settings called a supplier-only function for contractors (403).
+3. Supplier-uploaded machine photos were broken in every thumbnail (`thumb()` in `src/lib/images.ts`).
+4. Cancel booking, card removal and account deletion used the browser's native `confirm()` popup; now an in-app sheet (`ConfirmSheet`).
+5. Google/Apple buttons sent users to a raw JSON error when the provider isn't enabled; now a clear message.
+6. Demo tracking trip ended after 90 minutes; a cron job restarts it every two hours (migration `20260919001000`, demo only).
+7. Leftover e2e test data removed from the database.
+
+After an audit run, restore the demo data in the Supabase SQL editor:
+`select private.audit_restore(); select private.audit_cleanup_new_rows();`
+(Baseline is in `private.audit_baseline`; refresh it only when the data is clean.)
 
 ## Next steps
-1. Re-run pass 1 after the fixes (`npm run build`, restart preview, run the audit config) and confirm 0 issues.
-2. Pass 2: exercise every feature that changes data, on Supabase, as the right role, and note failures. Not yet covered by `e2e-flows`:
-   - contractor: create site, edit site, invite team member, change member role, subscribe to a plan / buy SiteCredits, add and remove card, make a payment, download invoice PDF, cancel booking, schedule return, smart swap, mark notifications read, support ticket, profile and company edits, password change, message attachment.
-   - supplier: decline a request, dispatch → delivered → collected (invoice raised), request payout, pause/unpause listing, edit a rejected listing, upload an operator document.
-   - operator: view jobs, upload own documents.
-   - admin: reject a document, reject a listing, suppliers list, bookings list.
-   - auth on Supabase: sign up (email OTP needs the dashboard template, see README), forgot/reset password, "keep me signed in" off.
-   Clean up any test data afterwards (the flows spec shows how: cancel bookings, pause listings) or delete it with SQL.
-3. Pass 3: visual check at 390, 768 and 1440 px against the boards in `design/`.
-4. Give the owner a plain list of everything that doesn't work, then fix it.
-5. Owner actions still pending: deploy to Vercel, Supabase auth email template + SMTP + URLs, OAuth keys (README).
+1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README).
+2. After the owner signs off Stage 1: Stage 2 (Capacitor apps), Phase 6 in the brief.
+3. Before real launch: real payments (Stripe), real GPS, legal copy for Terms/Privacy, hide demo logins, Supabase Pro plan, error monitoring.
 
 ## Rules from the owner
 - Match the design boards exactly and don't make it look AI-made (no filler text, cute greetings, emoji, gratuitous gradients).
