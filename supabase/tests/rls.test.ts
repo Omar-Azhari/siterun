@@ -86,7 +86,7 @@ describe.runIf(URL && KEY)('row level security', () => {
     const res = await alex
       .from('profiles')
       .update({ is_platform_admin: true })
-      .eq('id', data.user!.id)
+      .eq('id', data.user?.id ?? '')
     expect(res.error?.message).toMatch(/only change your name/i)
   })
 
