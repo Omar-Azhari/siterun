@@ -97,5 +97,36 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **Rates step tabs** (Hourly/Daily/Weekly) choose the *main pricing unit* (that rate becomes required). All three rate fields stay visible as in the mockup. A daily rate is always required because search and booking price per day.
 - **Hire type on the listing wizard** is multi-select (a machine can be offered dry *and* wet), with a wet-hire daily rate field when Wet is ticked.
 - **Operator documents** are uploaded per person (HRWL, VOC, tickets, inductions). Operators manage their own from `/operator/documents`.
-- **Login** has a collapsed "Demo accounts" panel in demo mode only.
+- **Login** has a collapsed "Demo accounts" panel in demo mode, or on Supabase when `VITE_SHOW_DEMO_LOGINS=true`.
 - **Live listings must be paused before editing**, so changes can't bypass review.
+
+## Phase 3
+
+### Database
+- **Supabase project `SiteRun`** (ap-southeast-2, Sydney) holds the schema. Migrations are applied in order from `supabase/migrations`.
+- **Keys are UUIDs** throughout. The demo seed's readable ids (`org-acme`, `b-hire-tele`) become stable UUIDs (md5 of the id), so reseeding keeps links working.
+- **Business rules live in `SECURITY DEFINER` functions** (`create_booking`, `respond_to_booking`, `advance_booking`, `extend_hire`, `review_machine` …). Each one checks the caller, then sets a transaction-local `app.bypass` flag so guard triggers allow the change. Clients can't change listing status, approval fields, document review fields, `is_platform_admin`, `account_type` or `org_id` directly.
+- **No double booking** is enforced twice: `create_booking`/`respond_to_booking` check overlaps, and an exclusion constraint on `(machine_id, daterange)` covers confirmed, in-transit, on-site and return-scheduled bookings.
+- **RLS on every table**, without `FORCE`, so definer functions (owned by `postgres`) can do their checks. Views use `security_invoker` so the caller's policies apply. Policy helpers live in a `private` schema that PostgREST doesn't expose.
+- **Anonymous visitors** can call `search_machines` and read live listings, categories and supplier names. Every other function needs a signed-in user (`EXECUTE` revoked from `anon`).
+- **Advisor fixes:** `search_path` pinned on every function, `btree_gist` moved to the `extensions` schema, `auth.uid()` wrapped in `select` inside policies, indexes on foreign keys used in joins. "Unused index" notices are expected on a fresh database.
+
+### Scheduled jobs
+- **Document expiry uses pg_cron**, not an Edge Function: `run_document_expiry()` runs daily at 20:00 UTC (06:00 AEST), warns at 30/14/7 days (each once) and pauses live listings whose required documents have expired. Keeping it in SQL means no extra deploy and it uses the same rules as `submit_machine`.
+- **Delivery tracking is simulated** by pg_cron every 20 seconds: in-transit trucks move along their route over a 90 minute trip from pickup, writing `delivery_locations` and updating `deliveries` (realtime). A real deployment swaps this for driver GPS inserts; the `delivery_locations` insert policy already allows the supplier to post positions for its in-transit bookings. Old points are pruned after two days.
+
+### Seed
+- `supabase/seed.sql` is generated from the same `buildSeed()` the demo store uses (`npm run db:seed:sql`), with every date written relative to when the SQL runs. Generated booking refs skip SR-…-7842/7843, which the boards show on specific bookings.
+- **Demo accounts** are real Supabase users with the password `SiteRun!2026` and confirmed emails. `admin@siterun.test` gets `is_platform_admin` from the seed, not from sign-up.
+
+### Auth
+- **Email verification uses Supabase's 6-digit OTP** (`verifyOtp`, type `signup`). The dashboard's *Confirm signup* template must include `{{ .Token }}` (README). The email link also works: it signs the user in and the Verify screen moves on.
+- **"Keep me signed in"** controls where the Supabase session is stored: localStorage when ticked, sessionStorage when not.
+- **Invitations** are accepted automatically at sign-in and after verification (`accept_invitations`), matching on email.
+- **Google and Apple** buttons call `signInWithOAuth`. They work once the providers are enabled in the dashboard.
+
+## Phase 4
+
+- **Sign-up → verify is automated on the demo backend only.** On Supabase the 6-digit code arrives by email, and the built-in sender only mails project members, so a test can't read it. The Supabase suite covers everything after verification using the seeded accounts.
+- **e2e-flows run against the live demo project** and tidy up after themselves (the test booking is cancelled, the test listing paused). Dates are one to three years out so runs never overlap real demo data.
+- **Fixed while wiring:** creating a site no longer bounces back to step 1 while the next page loads, and Book waits for the user's sites before Continue is enabled.
