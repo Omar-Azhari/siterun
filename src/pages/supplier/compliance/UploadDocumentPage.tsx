@@ -1,13 +1,15 @@
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { addYears, format } from 'date-fns'
-import { CloudUpload, FileImage, FileText, X } from 'lucide-react'
+import { Camera as CameraIcon, CloudUpload, FileImage, FileText, X } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { Button, DateField, ScreenTitle, Select, Textarea } from '@/components/ui'
 import { cardClass } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import { useApiMutation, useCategories, useMachine, useMe, useRequirements } from '@/data/hooks'
 import { validateFile } from './complianceUtils'
+import { takePhoto } from '@/native/device'
+import { isNative } from '@/native/platform'
 
 const mb = (n: number) => `${(n / 1024 / 1024).toFixed(1)} MB`
 
@@ -128,6 +130,17 @@ export function UploadDocumentPage() {
           PDF, JPG or PNG (Max 10MB)
         </span>
       </button>
+      {isNative() && (
+        <Button
+          variant="secondary"
+          size="md"
+          className="mt-3"
+          leftIcon={<CameraIcon className="size-5 text-primary" />}
+          onClick={async () => pick((await takePhoto()) ?? undefined)}
+        >
+          Scan with camera
+        </Button>
+      )}
       <input
         ref={input}
         type="file"

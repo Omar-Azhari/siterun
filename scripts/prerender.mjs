@@ -33,7 +33,7 @@ const html = renderToString(
 await vite.close()
 
 // Signed-in visitors go straight to the app: hide the baked landing until it's replaced.
-const guard = `<script>try{var k=Object.keys(localStorage).concat(Object.keys(sessionStorage));if(k.some(function(x){return /^sb-.+-auth-token$/.test(x)||x==='siterun-demo-session'}))document.documentElement.classList.add('app-boot')}catch(e){}</script><style>.app-boot #root>*{visibility:hidden}</style>`
+const guard = `<script>try{var k=Object.keys(localStorage).concat(Object.keys(sessionStorage));if(window.Capacitor||k.some(function(x){return /^sb-.+-auth-token$/.test(x)||x==='siterun-demo-session'}))document.documentElement.classList.add('app-boot')}catch(e){}</script><style>.app-boot #root>*{visibility:hidden}</style>`
 
 writeFileSync(
   'dist/index.html',

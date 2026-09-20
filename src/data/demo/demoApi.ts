@@ -305,6 +305,14 @@ export class DemoApi implements Api {
     this.commit('profiles')
   }
 
+  async completeAuthRedirect() {
+    // The demo store has no OAuth or email links.
+  }
+
+  async savePushToken() {
+    // Push needs the Supabase backend.
+  }
+
   async signOut() {
     this.stopAllTimers()
     this.setSession(null)

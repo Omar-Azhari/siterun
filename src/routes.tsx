@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { FullPageSpinner, PublicOnly, RequireArea, RequireAuth } from '@/auth/guards'
 import { homePathFor, needsOnboarding } from '@/auth/roles'
+import { isNative } from '@/native/platform'
 import { useMe } from '@/data/hooks'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
@@ -206,7 +207,7 @@ const DevScreensPage = page(() => import('@/pages/dev/DevScreensPage'), 'DevScre
 function RootRedirect() {
   const me = useMe()
   if (me.isPending) return <FullPageSpinner />
-  if (!me.data) return <LandingPage />
+  if (!me.data) return isNative() ? <Navigate to="/welcome" replace /> : <LandingPage />
   return (
     <Navigate
       to={needsOnboarding(me.data) ? '/onboarding/business' : homePathFor(me.data)}

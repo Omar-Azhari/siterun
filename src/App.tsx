@@ -7,6 +7,7 @@ import { AuthSync } from '@/auth/AuthSync'
 import { FullPageSpinner } from '@/auth/guards'
 import { AppRoutes } from './routes'
 import { ScrollToTop } from './components/layout/ScrollToTop'
+import { OfflineNotice } from './components/layout/OfflineNotice'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,7 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ToastProvider>
+            <OfflineNotice />
             <AuthSync />
             <ScrollToTop />
             <Suspense fallback={<FullPageSpinner />}>

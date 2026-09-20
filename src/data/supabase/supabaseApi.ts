@@ -31,6 +31,7 @@ import type {
   SearchFilters,
   Site,
 } from '../types'
+import { authRedirect, isNative } from '@/native/platform'
 import * as map from './mappers'
 
 const REMEMBER_KEY = 'siterun-remember'
@@ -197,11 +198,49 @@ export class SupabaseApi implements Api {
         'invalid',
       )
     storageOf('local')?.setItem(REMEMBER_KEY, 'true')
-    const { error } = await this.client.auth.signInWithOAuth({
+    // In the app, sign in through the system browser (providers block web views) and
+    // come back on the au.com.siterun.app:// deep link.
+    const { data, error } = await this.client.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/login` },
+      options: { redirectTo: authRedirect('login'), skipBrowserRedirect: isNative() },
     })
     if (error) throw new ApiError(error.message, 'invalid')
+    if (isNative() && data.url) {
+      const { Browser } = await import('@capacitor/browser')
+      await Browser.open({ url: data.url, presentationStyle: 'popover' })
+    }
+  }
+
+  async completeAuthRedirect(url: string) {
+    const parse = (part: string | undefined) => new URLSearchParams(part ?? '')
+    const query = parse(url.split('?')[1]?.split('#')[0])
+    const hash = parse(url.split('#')[1])
+    const code = query.get('code')
+    const failure = hash.get('error_description') ?? query.get('error_description')
+    if (failure) throw new ApiError(failure, 'invalid')
+    if (code) {
+      const { error } = await this.client.auth.exchangeCodeForSession(code)
+      if (error) throw new ApiError(error.message, 'invalid')
+    } else if (hash.get('access_token') && hash.get('refresh_token')) {
+      const { error } = await this.client.auth.setSession({
+        access_token: hash.get('access_token') ?? '',
+        refresh_token: hash.get('refresh_token') ?? '',
+      })
+      if (error) throw new ApiError(error.message, 'invalid')
+    } else return
+    await this.rpc('accept_invitations').catch(() => 0)
+  }
+
+  async savePushToken(token: string, platform: string) {
+    const id = await this.uid()
+    must(
+      await this.client
+        .from('push_tokens')
+        .upsert(
+          { token, platform, profile_id: id, last_seen_at: new Date().toISOString() },
+          { onConflict: 'token' },
+        ),
+    )
   }
 
   async signUp(input: SignUpInput) {
@@ -215,7 +254,9 @@ export class SupabaseApi implements Api {
           phone: input.phone,
           account_type: input.accountType,
         },
-        emailRedirectTo: `${window.location.origin}/verify?email=${encodeURIComponent(input.email.trim().toLowerCase())}`,
+        emailRedirectTo: authRedirect(
+          `verify?email=${encodeURIComponent(input.email.trim().toLowerCase())}`,
+        ),
       },
     })
     if (error)
@@ -248,7 +289,7 @@ export class SupabaseApi implements Api {
   async requestPasswordReset(email: string) {
     // Result ignored on purpose so accounts can't be enumerated.
     await this.client.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: authRedirect('reset-password'),
     })
   }
 

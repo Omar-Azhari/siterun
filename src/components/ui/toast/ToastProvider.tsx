@@ -3,6 +3,7 @@ import { AnimatePresence, m } from 'framer-motion'
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { ToastContext, type ToastApi, type ToastInput, type ToastTone } from './toastContext'
+import { haptic } from '@/native/device'
 
 interface ToastItem extends ToastInput {
   id: number
@@ -35,8 +36,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const api = useMemo<ToastApi>(
     () => ({
       show,
-      success: (title, description) => show({ title, description, tone: 'success' }),
-      error: (title, description) => show({ title, description, tone: 'error' }),
+      success: (title, description) => {
+        void haptic('success')
+        show({ title, description, tone: 'success' })
+      },
+      error: (title, description) => {
+        void haptic('error')
+        show({ title, description, tone: 'error' })
+      },
       info: (title, description) => show({ title, description, tone: 'info' }),
     }),
     [show],

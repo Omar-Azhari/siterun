@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 /**
  * `vite preview` matches the Vercel rewrites: `/` serves the prerendered landing
@@ -20,7 +21,43 @@ const appShellInPreview: Plugin = {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), appShellInPreview],
+  plugins: [
+    react(),
+    tailwindcss(),
+    appShellInPreview,
+    // Service worker for the web app (registered in main.tsx, never inside Capacitor).
+    // Uses public/site.webmanifest. Heavy lazy chunks (PDF, charts, maps) are cached on
+    // first use instead of precached.
+    VitePWA({
+      injectRegister: null,
+      registerType: 'autoUpdate',
+      manifest: false,
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,woff2,png,ico,webmanifest}'],
+        globIgnores: ['**/react-pdf*', '**/PerformancePage*', '**/og-image.png'],
+        maximumFileSizeToCacheInBytes: 600 * 1024,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/$/, /^\/dev\//],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/images/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'photos', expiration: { maxEntries: 120, maxAgeSeconds: 30 * 86400 } },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/assets/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'lazy-chunks', expiration: { maxEntries: 80 } },
+          },
+          {
+            urlPattern: ({ url }) => url.hostname.endsWith('supabase.co') && url.pathname.includes('/storage/v1/object/public/'),
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'uploads', expiration: { maxEntries: 150, maxAgeSeconds: 30 * 86400 } },
+          },
+        ],
+      },
+    }),
+  ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

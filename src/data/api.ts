@@ -103,6 +103,10 @@ export interface Api {
   requestPasswordReset(email: string): Promise<void>
   updatePassword(password: string): Promise<void>
   signOut(): Promise<void>
+  /** Native apps: finish sign-in from an OAuth or email deep link. */
+  completeAuthRedirect(url: string): Promise<void>
+  /** Native apps: remember this device for push notifications. */
+  savePushToken(token: string, platform: string): Promise<void>
 
   // Me / account
   getMe(): Promise<Me | null>

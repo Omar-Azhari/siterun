@@ -10,6 +10,7 @@ import { pinIcon, type TileKind } from '@/components/domain/maps/mapUtils'
 import { Button, ScreenTitle, useToast } from '@/components/ui'
 import { reverseGeocode } from '@/lib/geo'
 import { useSiteDraft } from './siteDraft'
+import { currentPosition } from '@/native/device'
 
 function ClickToMove({ onMove }: { onMove: (lat: number, lng: number) => void }) {
   useMapEvents({ click: (e) => onMove(e.latlng.lat, e.latlng.lng) })
@@ -69,20 +70,14 @@ export function CreateSiteLocationPage() {
     [],
   )
 
-  const locate = () => {
-    if (!navigator.geolocation) {
-      toast.error('Location unavailable', 'Your browser doesn’t support location.')
-      return
+  const locate = async () => {
+    try {
+      const next = await currentPosition()
+      setRecentre(next)
+      void moveTo(...next)
+    } catch {
+      toast.error('Location unavailable', 'Allow location access or search for an address.')
     }
-    navigator.geolocation.getCurrentPosition(
-      (p) => {
-        const next: [number, number] = [p.coords.latitude, p.coords.longitude]
-        setRecentre(next)
-        void moveTo(...next)
-      },
-      () => toast.error('Location unavailable', 'Allow location access or search for an address.'),
-      { enableHighAccuracy: true, timeout: 8000 },
-    )
   }
 
   const confirm = () => {
@@ -149,7 +144,7 @@ export function CreateSiteLocationPage() {
         <div className="absolute top-3 right-3 z-[500] flex flex-col overflow-hidden rounded-xl border border-white/10 bg-app/85 backdrop-blur">
           <button
             type="button"
-            onClick={locate}
+            onClick={() => void locate()}
             aria-label="Use my location"
             className="flex size-11 items-center justify-center hover:bg-white/10"
           >

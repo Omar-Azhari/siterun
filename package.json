@@ -17,9 +17,23 @@
     "db:seed:sql": "tsx --tsconfig tsconfig.app.json scripts/seed-sql.ts",
     "test:rls": "vitest run --config supabase/tests/vitest.config.ts",
     "e2e:flows": "playwright test --config playwright.flows.config.ts",
-    "og:image": "node scripts/og-image.mjs"
+    "og:image": "node scripts/og-image.mjs",
+    "native:assets": "node scripts/native-assets.mjs && npx @capacitor/assets generate --iconBackgroundColor '#0B1F44' --iconBackgroundColorDark '#0B1F44' --splashBackgroundColor '#0B1F44' --splashBackgroundColorDark '#011020'"
   },
   "dependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/app": "^6.0.3",
+    "@capacitor/browser": "^6.0.6",
+    "@capacitor/camera": "^6.1.3",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/filesystem": "^6.0.4",
+    "@capacitor/geolocation": "^6.1.1",
+    "@capacitor/haptics": "^6.0.3",
+    "@capacitor/ios": "^6.2.2",
+    "@capacitor/keyboard": "^6.0.4",
+    "@capacitor/push-notifications": "^6.0.5",
+    "@capacitor/splash-screen": "^6.0.4",
+    "@capacitor/status-bar": "^6.0.3",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
@@ -41,6 +55,8 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.2.2",
     "@eslint/js": "^10.0.0",
     "@fontsource/plus-jakarta-sans": "^5.3.0",
     "@playwright/test": "^1.63.0",
@@ -66,6 +82,7 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.70.0",
     "vite": "^8.3.0",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^5.0.1"
   }
 }

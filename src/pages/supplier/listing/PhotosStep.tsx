@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, CirclePlus, Loader2, Trash2 } from 'lucide-react
 import { useToast } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { getApi } from '@/data/client'
+import { takePhoto } from '@/native/device'
+import { isNative } from '@/native/platform'
 import { useApiMutation } from '@/data/hooks'
 import { compressImage, isEditable, stepPath, useListing } from './listingShared'
 import { ListingGate, WizardFrame } from './WizardFrame'
@@ -48,6 +50,13 @@ export function PhotosStep() {
     } finally {
       setUploading(0)
     }
+  }
+
+  // Native: the camera/library prompt. Web: the file picker.
+  const addPhoto = async () => {
+    if (!isNative()) return fileInput.current?.click()
+    const file = await takePhoto()
+    if (file) await upload([file])
   }
 
   const move = (from: number, to: number) => {
@@ -147,7 +156,7 @@ export function PhotosStep() {
           <li className={cn(photos.length === 0 ? 'col-span-2 aspect-[16/10]' : 'col-span-2 h-28')}>
             <button
               type="button"
-              onClick={() => fileInput.current?.click()}
+              onClick={() => void addPhoto()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault()
