@@ -21,10 +21,12 @@ native plugins. Run `npx cap sync` after installing any Capacitor plugin.
 ## Android
 
 ### What you need
+
 - Android Studio (includes the Android SDK and an emulator)
 - JDK 17 (Android Studio ships one; Gradle here needs 17, not a newer JDK)
 
 ### Run on the emulator
+
 1. Open Android Studio → **More Actions → Virtual Device Manager** → create a Pixel device with API 34.
 2. From the project folder:
    ```bash
@@ -38,10 +40,12 @@ native plugins. Run `npx cap sync` after installing any Capacitor plugin.
    ```
 
 ### Run on a real phone
+
 1. On the phone: **Settings → About phone → tap Build number seven times**, then **Developer options → USB debugging**.
 2. Plug it in, accept the prompt, then `npx cap run android --target <device-id>` (list devices with `adb devices`).
 
 ### Release build (Play Store)
+
 1. Create a keystore once:
    ```bash
    keytool -genkey -v -keystore siterun-release.jks -alias siterun -keyalg RSA -keysize 2048 -validity 10000
@@ -65,24 +69,29 @@ native plugins. Run `npx cap sync` after installing any Capacitor plugin.
 Needs a Mac with Xcode; iOS apps can't be built on Windows.
 
 ### What you need
+
 - Xcode 15 or newer, plus the iOS simulator
 - CocoaPods (`sudo gem install cocoapods`)
 - An Apple Developer account for devices and the App Store
 
 ### Run on the simulator
+
 ```bash
 npm run build
 npx cap sync ios
 cd ios/App && pod install && cd ../..
 npx cap open ios
 ```
+
 In Xcode choose a simulator (for example iPhone 15) and press **Run**, or use `npx cap run ios`.
 
 ### Run on a real iPhone
+
 1. In Xcode open **App → Signing & Capabilities**, choose your team; Xcode manages the provisioning profile.
 2. Plug the phone in, select it as the destination, press **Run**. On the phone approve the developer certificate under **Settings → General → VPN & Device Management**.
 
 ### Release build (App Store)
+
 1. In Xcode set the destination to **Any iOS Device**, then **Product → Archive**.
 2. In the Organiser choose **Distribute App → App Store Connect**.
 
@@ -99,16 +108,16 @@ size. The splash is the mark centred on navy `#0B1F44`.
 
 ## Device features
 
-| Feature | Where it's used | Permission |
-|---|---|---|
-| Camera / photo library | Machine photos, document scans | Camera, Photos |
-| Location | "Use my location" on the site map | Location when in use |
-| Filesystem | Invoices and statements save to Documents | — |
-| Haptics | Success and error feedback | — |
-| Status bar, splash, keyboard | App chrome | — |
-| Back button (Android) | Closes sheets, then goes back, then exits | — |
-| Deep links | Sign-in and email links | — |
-| Push notifications | Off unless `VITE_PUSH_ENABLED=true` | Notifications |
+| Feature                      | Where it's used                           | Permission           |
+| ---------------------------- | ----------------------------------------- | -------------------- |
+| Camera / photo library       | Machine photos, document scans            | Camera, Photos       |
+| Location                     | "Use my location" on the site map         | Location when in use |
+| Filesystem                   | Invoices and statements save to Documents | —                    |
+| Haptics                      | Success and error feedback                | —                    |
+| Status bar, splash, keyboard | App chrome                                | —                    |
+| Back button (Android)        | Closes sheets, then goes back, then exits | —                    |
+| Deep links                   | Sign-in and email links                   | —                    |
+| Push notifications           | Off unless `VITE_PUSH_ENABLED=true`       | Notifications        |
 
 ## Sign-in inside the apps
 
@@ -139,6 +148,7 @@ when `VITE_PUSH_ENABLED=true`.
 ## Store checklists
 
 ### Google Play
+
 - Signed `.aab` from `bundleRelease`
 - App icon 512×512, feature graphic 1024×500
 - Phone screenshots (at least 2; 1080×1920 works) — the app's own screens
@@ -149,6 +159,7 @@ when `VITE_PUSH_ENABLED=true`.
 - Permissions: camera, location, notifications — explain each in the listing
 
 ### Apple App Store
+
 - Archive uploaded through Xcode
 - App icon 1024×1024 (no transparency, no rounded corners)
 - Screenshots for 6.7" and 6.5" iPhones

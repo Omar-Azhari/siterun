@@ -1,7 +1,7 @@
 # SiteRun
 
 Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
-*Machines. People. Progress.*
+_Machines. People. Progress._
 
 Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6.** Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps. See `DECISIONS.md` for design and technical decisions.
 
@@ -22,33 +22,33 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 
 ## Scripts
 
-| Script | What it does |
-|---|---|
-| `npm run dev` | Start the dev server on port 5173 |
-| `npm run build` | Type-check and build for production |
-| `npm run typecheck` | TypeScript only |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier |
-| `npm test` | Vitest unit tests (offline) |
-| `npm run test:rls` | Row Level Security tests against the Supabase project in `.env`, signed in as the seeded accounts |
-| `npm run e2e` | Playwright: component gallery, every screen against the design boards, and sign-up → verify → business profile → first site. Runs on the demo backend (port 5174) |
-| `npm run e2e:flows` | Playwright against Supabase (port 5175): search → book → supplier accepts → confirmation; extend hire; realtime messaging; supplier lists a machine → uploads documents → admin approves → machine appears in search; admin area guard |
-| `npm run og:image` | Regenerate `public/og-image.png` |
-| `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS |
-| `npx cap sync` | Copy the built web app into the Android and iOS projects |
-| `npm run db:seed:sql` | Regenerate `supabase/seed.sql` from the demo seed |
-| `npm run brand:assets` | Regenerate logos, favicons and icons from the traced mark |
+| Script                  | What it does                                                                                                                                                                                                                           |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | Start the dev server on port 5173                                                                                                                                                                                                      |
+| `npm run build`         | Type-check and build for production                                                                                                                                                                                                    |
+| `npm run typecheck`     | TypeScript only                                                                                                                                                                                                                        |
+| `npm run lint`          | ESLint                                                                                                                                                                                                                                 |
+| `npm run format`        | Prettier                                                                                                                                                                                                                               |
+| `npm test`              | Vitest unit tests (offline)                                                                                                                                                                                                            |
+| `npm run test:rls`      | Row Level Security tests against the Supabase project in `.env`, signed in as the seeded accounts                                                                                                                                      |
+| `npm run e2e`           | Playwright: component gallery, every screen against the design boards, and sign-up → verify → business profile → first site. Runs on the demo backend (port 5174)                                                                      |
+| `npm run e2e:flows`     | Playwright against Supabase (port 5175): search → book → supplier accepts → confirmation; extend hire; realtime messaging; supplier lists a machine → uploads documents → admin approves → machine appears in search; admin area guard |
+| `npm run og:image`      | Regenerate `public/og-image.png`                                                                                                                                                                                                       |
+| `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS                                                                                                                                                                            |
+| `npx cap sync`          | Copy the built web app into the Android and iOS projects                                                                                                                                                                               |
+| `npm run db:seed:sql`   | Regenerate `supabase/seed.sql` from the demo seed                                                                                                                                                                                      |
+| `npm run brand:assets`  | Regenerate logos, favicons and icons from the traced mark                                                                                                                                                                              |
 
 ## Environment variables
 
-| Variable | Description |
-|---|---|
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anon or publishable key (public). Never the service role key |
-| `VITE_SHOW_DEMO_LOGINS` | `true` lists the seeded demo logins on the login screen. Leave empty in production |
-| `VITE_BACKEND` | `demo` forces the in-browser demo backend even when Supabase values are set |
-| `VITE_SITE_URL` | Public site URL (no trailing slash) for canonical and social preview tags |
-| `VITE_PUSH_ENABLED` | `true` turns on push registration in the apps (needs Firebase and APNs first) |
+| Variable                 | Description                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`      | Supabase project URL                                                               |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon or publishable key (public). Never the service role key              |
+| `VITE_SHOW_DEMO_LOGINS`  | `true` lists the seeded demo logins on the login screen. Leave empty in production |
+| `VITE_BACKEND`           | `demo` forces the in-browser demo backend even when Supabase values are set        |
+| `VITE_SITE_URL`          | Public site URL (no trailing slash) for canonical and social preview tags          |
+| `VITE_PUSH_ENABLED`      | `true` turns on push registration in the apps (needs Firebase and APNs first)      |
 
 Never commit `.env`.
 
@@ -75,7 +75,7 @@ How it fits together:
 
 ### Auth settings (Supabase dashboard)
 
-1. **Email OTP.** Authentication → Emails → *Confirm signup*: include `{{ .Token }}` so users get the 6-digit code the Verify screen asks for, for example `Your SiteRun code is {{ .Token }}`. The link in the same email also works.
+1. **Email OTP.** Authentication → Emails → _Confirm signup_: include `{{ .Token }}` so users get the 6-digit code the Verify screen asks for, for example `Your SiteRun code is {{ .Token }}`. The link in the same email also works.
 2. **SMTP.** The built-in sender only mails project members and is rate limited. Add your own SMTP provider before inviting real users.
 3. **URL configuration.** Set the Site URL to the deployed domain and add `http://localhost:5173/**` to the redirect URLs (used by email links, password reset and OAuth).
 4. **Google / Apple.** Authentication → Providers: add the client ID and secret for each. The buttons on the login screen work once a provider is enabled.
@@ -117,11 +117,11 @@ docs/checkpoints/  Checkpoint screenshots and board comparisons
 
 All accounts use the password `SiteRun!2026` (demo backend and the seeded Supabase project). In demo mode the verification code is `123456`.
 
-| Role | Email | Organisation |
-|---|---|---|
-| Contractor | alex@acme.test | Acme Construction Pty Ltd |
-| Supplier | jordan@turnerplant.test | Turner Plant Hire |
-| Operator | sam@turnerplant.test | Turner Plant Hire |
-| Organisation admin | priya@buildco.test | BuildCo Pty Ltd |
-| Platform admin | admin@siterun.test | SiteRun |
-| New user (no business profile yet) | jamie.carter@buildco.test | — |
+| Role                               | Email                     | Organisation              |
+| ---------------------------------- | ------------------------- | ------------------------- |
+| Contractor                         | alex@acme.test            | Acme Construction Pty Ltd |
+| Supplier                           | jordan@turnerplant.test   | Turner Plant Hire         |
+| Operator                           | sam@turnerplant.test      | Turner Plant Hire         |
+| Organisation admin                 | priya@buildco.test        | BuildCo Pty Ltd           |
+| Platform admin                     | admin@siterun.test        | SiteRun                   |
+| New user (no business profile yet) | jamie.carter@buildco.test | —                         |

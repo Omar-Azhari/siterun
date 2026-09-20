@@ -3,12 +3,14 @@
 Read README.md and DECISIONS.md first. They describe the stack, scripts, Supabase setup and every decision made.
 
 ## Status
+
 - Stage 1 (web), Phases 0–5, is built, tested and committed on `main`.
 - Supabase project `kixhozwbtxiqzoknxlje` (ap-southeast-2) has all migrations in `supabase/migrations` applied and the demo seed loaded. Keys are in `.env` (not committed).
 - Not deployed yet. Vercel CLI isn't logged in and the repo has no Git remote.
 - Stage 2 (Capacitor apps) not started. The brief says to wait for the owner to sign off Stage 1.
 
 ## Full-site audit (done)
+
 Run against the production build on Supabase (`npm run build`, `npx vite preview --port 4173`, then `npx playwright test --config playwright.audit.config.ts`). Specs are in `e2e-audit/`.
 
 - Pass 1, pages (`pages.spec.ts`): 101 pages as every role. Clean except "Preview not available" on seeded documents that have no file (expected).
@@ -16,6 +18,7 @@ Run against the production build on Supabase (`npm run build`, `npx vite preview
 - Pass 3, visuals (`visual.spec.ts`): key screens at 768 and 1440 px look right.
 
 Bugs found and fixed during the audit:
+
 1. Site edit page crashed (time formatter got an empty value while loading).
 2. Payment settings called a supplier-only function for contractors (403).
 3. Supplier-uploaded machine photos were broken in every thumbnail (`thumb()` in `src/lib/images.ts`).
@@ -29,11 +32,13 @@ After an audit run, restore the demo data in the Supabase SQL editor:
 (Baseline is in `private.audit_baseline`; refresh it only when the data is clean.)
 
 ## Next steps
+
 1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README).
 2. After the owner signs off Stage 1: Stage 2 (Capacitor apps), Phase 6 in the brief.
 3. Before real launch: real payments (Stripe), real GPS, legal copy for Terms/Privacy, hide demo logins, Supabase Pro plan, error monitoring.
 
 ## Rules from the owner
+
 - Match the design boards exactly and don't make it look AI-made (no filler text, cute greetings, emoji, gratuitous gradients).
 - Work through everything without stopping for approval, except anything publishing or irreversible.
 - Payments stay mocked; never store full card numbers or CVV. Platform admin is a database flag only.
