@@ -141,3 +141,15 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **Link colour:** the brand blue (#006CFF) is 4.2:1 on the app background, below AA for small text. `text-primary` now uses #3386FF (4.6:1 or better on every background). Buttons keep the brand blue.
 - **robots.txt** allows only the landing and legal pages; app screens are behind sign-in.
 - **Deploy:** `vercel.json` is ready (Vite, SPA rewrites, immutable asset caching, security headers). Deploying needs a Vercel login or a connected Git repository (see README).
+
+## Phase 6 (Stage 2)
+
+- **PWA:** `vite-plugin-pwa` (Workbox) precaches the app shell and caches photos and lazy chunks at runtime. The heavy PDF and chart chunks are left out of the precache so the first load stays small. The service worker is registered only on the web; inside Capacitor the files are already local.
+- **Offline:** a bar appears when the device drops offline. Cached screens keep working; anything needing the server shows its normal error state.
+- **Capacitor 6** with `appId au.com.siterun.app`. `@capacitor/browser` was added beyond the brief's plugin list: Google and Apple block OAuth inside web views, so sign-in opens the system browser and returns on the deep link.
+- **Deep links** use the custom scheme `au.com.siterun.app://` (login, verify, reset-password). Universal/App Links need a live domain and store-signed app, so they're a post-deploy step.
+- **Status bar** uses Capacitor's `Style.Dark`, which means light icons on the navy background (the brief's "dark content on navy" reads as the dark style).
+- **Push notifications are off** unless `VITE_PUSH_ENABLED=true`: registering without Firebase or APNs credentials crashes on Android. Tokens are stored in `push_tokens`; sending needs a server piece.
+- **Native platform detection reads `window.Capacitor` once at startup**, because `@capacitor/core` replaces that global with its own instance when the first plugin loads, and on the web that instance reports "not native".
+- **The marketing page never shows in the apps**: they open at Welcome.
+- **Not run on a device here.** This machine has no Android SDK and iOS needs a Mac, so Checkpoint 6's emulator screenshots are outstanding. The native code paths were verified in a simulated Capacitor shell (`e2e-audit/native.spec.ts`).

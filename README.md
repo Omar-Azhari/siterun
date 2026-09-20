@@ -3,7 +3,7 @@
 Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
 *Machines. People. Progress.*
 
-Status: **Stage 1 (web) complete: Phases 0–5.** Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page and SEO. Stage 2 (Capacitor) starts once Stage 1 is signed off. See `DECISIONS.md` for design and technical decisions.
+Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6.** Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps. See `DECISIONS.md` for design and technical decisions.
 
 ## Stack
 
@@ -34,6 +34,8 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `npm run e2e` | Playwright: component gallery, every screen against the design boards, and sign-up → verify → business profile → first site. Runs on the demo backend (port 5174) |
 | `npm run e2e:flows` | Playwright against Supabase (port 5175): search → book → supplier accepts → confirmation; extend hire; realtime messaging; supplier lists a machine → uploads documents → admin approves → machine appears in search; admin area guard |
 | `npm run og:image` | Regenerate `public/og-image.png` |
+| `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS |
+| `npx cap sync` | Copy the built web app into the Android and iOS projects |
 | `npm run db:seed:sql` | Regenerate `supabase/seed.sql` from the demo seed |
 | `npm run brand:assets` | Regenerate logos, favicons and icons from the traced mark |
 
@@ -46,6 +48,7 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `VITE_SHOW_DEMO_LOGINS` | `true` lists the seeded demo logins on the login screen. Leave empty in production |
 | `VITE_BACKEND` | `demo` forces the in-browser demo backend even when Supabase values are set |
 | `VITE_SITE_URL` | Public site URL (no trailing slash) for canonical and social preview tags |
+| `VITE_PUSH_ENABLED` | `true` turns on push registration in the apps (needs Firebase and APNs first) |
 
 Never commit `.env`.
 
@@ -98,6 +101,9 @@ src/pages/         Screens by area (auth, browse, bookings, hires, supplier, adm
 src/lib/           Pure logic (ABN, money, booking maths, cards, PDFs)
 e2e/               Playwright on the demo backend
 e2e-flows/         Playwright on Supabase
+e2e-audit/         Full-site audit: pages, features, visuals, native shell
+android/, ios/     Capacitor app projects (see MOBILE_BUILD.md)
+src/native/        Platform checks, device features, native bootstrap
 docs/checkpoints/  Checkpoint screenshots and board comparisons
 ```
 
