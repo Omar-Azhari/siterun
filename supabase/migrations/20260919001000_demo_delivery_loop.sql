@@ -10,6 +10,21 @@ begin
     return;
   end if;
   update public.bookings set status = 'in_transit' where id = demo;
+  -- Recreate the delivery if it was cleared (for example by the audit restore).
+  insert into public.deliveries (booking_id, stage, origin, destination, route, progress, picked_up_at, eta)
+  select b.id, 'in_transit',
+    jsonb_build_object('label', m.suburb || ', ' || m.state, 'lat', m.lat, 'lng', m.lng),
+    jsonb_build_object('label', coalesce(s.name || ', ' || s.suburb || ', ' || s.state, 'Site'), 'lat', coalesce(s.lat, m.lat), 'lng', coalesce(s.lng, m.lng)),
+    (select jsonb_agg(jsonb_build_array(
+        m.lat + (coalesce(s.lat, m.lat) - m.lat) * t / 8.0 + sin(pi() * t / 8.0) * 0.01,
+        m.lng + (coalesce(s.lng, m.lng) - m.lng) * t / 8.0 - sin(pi() * t / 8.0) * 0.01) order by t)
+      from generate_series(0, 8) t),
+    0.05, now(), now() + interval '90 minutes'
+  from public.bookings b
+  join public.machines m on m.id = b.machine_id
+  left join public.sites s on s.id = b.site_id
+  where b.id = demo
+  on conflict (booking_id) do nothing;
   update public.deliveries
     set stage = 'in_transit', progress = 0.05, delivered_at = null,
         picked_up_at = now(), eta = now() + interval '90 minutes'

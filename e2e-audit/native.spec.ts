@@ -41,5 +41,7 @@ test('signing in works in the app shell', async ({ page }) => {
 test('no service worker is registered inside the app', async ({ page }) => {
   await page.goto('/welcome')
   await page.waitForTimeout(1500)
-  expect(await page.evaluate(() => navigator.serviceWorker.getRegistrations().then((r) => r.length))).toBe(0)
+  expect(
+    await page.evaluate(() => navigator.serviceWorker.getRegistrations().then((r) => r.length)),
+  ).toBe(0)
 })
