@@ -36,7 +36,7 @@ restore the demo data in the Supabase SQL editor:
 ## Next steps
 
 1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README); turn on leaked-password protection and admin MFA (`SECURITY.md`).
-2. After the owner signs off Stage 1: Stage 2 (Capacitor apps), Phase 6 in the brief.
+2. Run the apps on a real Android emulator/phone and an iPhone (needs Android Studio, and a Mac for iOS), then take the Checkpoint 6 screenshots (`MOBILE_BUILD.md`).
 3. Before real launch: real payments (Stripe), real GPS, legal copy for Terms/Privacy, hide demo logins, Supabase Pro plan, error monitoring.
 
 ## Rules from the owner
