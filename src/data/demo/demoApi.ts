@@ -24,6 +24,7 @@ import {
   SWAP_OPTIONS,
 } from '@/lib/booking'
 import { geocodeLocal } from '@/lib/geo'
+import { hashPassword, verifyPassword } from '@/lib/passwordHash'
 import { ApiError, type Api, type MachineDraft, type TimeRange } from '../api'
 import { DEMO_OTP } from '../constants'
 import { buildSeed, DB_VERSION, type DemoDb } from '../seed'
@@ -236,7 +237,7 @@ export class DemoApi implements Api {
     await wait(300)
     const key = email.trim().toLowerCase()
     const p = this.db.profiles.find((x) => x.email.toLowerCase() === key)
-    if (!p || this.db.passwords[p.email] !== password) {
+    if (!p || !(await verifyPassword(this.db.passwords[p.email], password))) {
       throw new ApiError('Incorrect email or password.', 'invalid')
     }
     if (!p.emailVerified) throw new ApiError('Please verify your email first.', 'forbidden')
@@ -275,7 +276,7 @@ export class DemoApi implements Api {
       emailVerified: false,
     }
     this.db.profiles.push(profile)
-    this.db.passwords[email] = input.password
+    this.db.passwords[email] = await hashPassword(input.password)
     this.commit('profiles')
   }
 
@@ -301,7 +302,7 @@ export class DemoApi implements Api {
   async updatePassword(password: string) {
     await wait(200)
     const p = this.me()
-    this.db.passwords[p.email] = password
+    this.db.passwords[p.email] = await hashPassword(password)
     this.commit('profiles')
   }
 
