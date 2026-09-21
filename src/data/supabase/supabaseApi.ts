@@ -71,6 +71,7 @@ const CODES: Record<string, ApiError['code']> = {
   '23514': 'invalid',
   '23505': 'conflict',
   '23P01': 'conflict',
+  PT429: 'invalid', // rate limit; PostgREST returns it as HTTP 429
 }
 
 function toApiError(e: PostgrestError | { message: string; code?: string } | Error): ApiError {
