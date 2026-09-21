@@ -231,15 +231,36 @@ test.describe('contractor', () => {
 test('contractor: change password and log back in', async ({ page }) => {
   const errors = watch(page)
   await login(page, 'priya@buildco.test')
-  await page.goto('/account/privacy')
-  await page.getByLabel('New password').fill('SiteRun!2026x')
-  await page.getByLabel('Confirm password').fill('SiteRun!2026x')
-  await page.getByRole('button', { name: 'Update Password' }).click()
-  await toast(page, /password/i)
-  await page.getByLabel('New password').fill(PASSWORD)
-  await page.getByLabel('Confirm password').fill(PASSWORD)
-  await page.getByRole('button', { name: 'Update Password' }).click()
-  await page.waitForTimeout(1500)
+
+  // Each change is checked against the auth response, not a toast: a silently rejected
+  // change would leave this account locked out of every later test.
+  const setPassword = async (pw: string) => {
+    await page.goto('/account/privacy')
+    await page.getByLabel('New password').fill(pw)
+    await page.getByLabel('Confirm password').fill(pw)
+    const saved = page.waitForResponse(
+      (r) => r.url().includes('/auth/v1/user') && r.request().method() === 'PUT',
+      { timeout: 15_000 },
+    )
+    await page.getByRole('button', { name: 'Update Password' }).click()
+    const res = await saved
+    expect(res.ok(), `password change failed: ${res.status()} ${await res.text()}`).toBe(true)
+    await toast(page, /password/i)
+  }
+
+  try {
+    await setPassword('SiteRun!2026x')
+  } finally {
+    await setPassword(PASSWORD)
+  }
+
+  // Prove the seeded password is back: sign in again with no stored session.
+  await page.goto('/login')
+  await page.evaluate(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+  await login(page, 'priya@buildco.test')
   noErrors(errors)
 })
 
@@ -359,8 +380,12 @@ test.describe('platform admin', () => {
   test('reject a listing', async ({ page }) => {
     const errors = watch(page)
     await page.goto(`/admin/approvals/machines/${ID.pendingMachine}`)
-    await page.getByRole('button', { name: 'Reject' }).first().click()
-    await page.getByRole('dialog').getByRole('textbox').fill('Photos are too dark.')
+    // The pending documents each have their own Reject; the listing's is the last one,
+    // in the sticky footer after the page content.
+    await page.getByRole('button', { name: 'Reject', exact: true }).last().click()
+    const sheet = page.getByRole('dialog')
+    await expect(sheet.getByText('Reject listing')).toBeVisible()
+    await sheet.getByRole('textbox').fill('Photos are too dark.')
     await page.getByRole('button', { name: 'Send Rejection' }).click()
     await expect(page).toHaveURL(/\/admin\/approvals$/, { timeout: 15_000 })
     noErrors(errors)
