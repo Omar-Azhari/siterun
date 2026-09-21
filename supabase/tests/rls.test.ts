@@ -122,4 +122,87 @@ describe.runIf(URL && KEY)('row level security', () => {
     })
     expect(res.error).not.toBeNull()
   })
+
+  // ---- launch features (live location, error reports, push, Stripe) ----------------
+  const CONFIRMED_TURNER_BOOKING = 'ac255368-608d-4d75-a8f5-8ae32c5e41a1'
+
+  it('only the supplier or its operator can share a delivery’s location, and only in transit', async () => {
+    const contractor = await alex.rpc('report_location', {
+      p_booking: CONFIRMED_TURNER_BOOKING,
+      p_lat: -37.8,
+      p_lng: 144.9,
+    })
+    expect(contractor.error?.message).toMatch(/not found/i)
+    const notYet = await jordan.rpc('report_location', {
+      p_booking: CONFIRMED_TURNER_BOOKING,
+      p_lat: -37.8,
+      p_lng: 144.9,
+    })
+    expect(notYet.error?.message).toMatch(/on its way/i)
+    const signedOut = await anon.rpc('report_location', {
+      p_booking: CONFIRMED_TURNER_BOOKING,
+      p_lat: -37.8,
+      p_lng: 144.9,
+    })
+    expect(signedOut.error).not.toBeNull()
+  })
+
+  it('error reports can be sent by anyone but read only by platform admins', async () => {
+    const sent = await anon.rpc('log_client_error', {
+      p_message: 'rls test: anonymous report',
+      p_stack: '',
+      p_url: 'https://example.test/login?token=secret',
+      p_release: 'test',
+      p_platform: 'web',
+      p_user_agent: 'vitest',
+    })
+    expect(sent.error).toBeNull()
+    expect((await alex.from('client_errors').select('id')).data).toEqual([])
+    expect((await anon.from('client_errors').select('id')).data ?? []).toEqual([])
+    const seen = await admin
+      .from('client_errors')
+      .select('url')
+      .eq('message', 'rls test: anonymous report')
+    expect(seen.data?.[0]?.url).toBe('https://example.test/login')
+    const tamper = await alex.from('client_errors').insert({ fingerprint: 'x', message: 'x' })
+    expect(tamper.error).not.toBeNull()
+  })
+
+  it('push and Stripe functions are closed to the app', async () => {
+    for (const client of [anon, alex, admin]) {
+      expect((await client.rpc('push_hook_secret')).error).not.toBeNull()
+      expect(
+        (await client.rpc('push_payload', { p_notification: CONFIRMED_TURNER_BOOKING })).error,
+      ).not.toBeNull()
+      expect(
+        (
+          await client.rpc('stripe_record_card', {
+            p_org: ACME,
+            p_ref: 'pm_fake',
+            p_brand: 'visa',
+            p_last4: '4242',
+            p_exp_month: 1,
+            p_exp_year: 2030,
+          })
+        ).error,
+      ).not.toBeNull()
+      expect(
+        (
+          await client.rpc('stripe_apply_payment', {
+            p_org: ACME,
+            p_amount: 100,
+            p_card_ref: 'x',
+            p_intent: 'pi_x',
+          })
+        ).error,
+      ).not.toBeNull()
+    }
+  })
+
+  it('payment context describes only the caller’s own organisation', async () => {
+    const ctx = await alex.rpc('payment_context')
+    expect(ctx.error).toBeNull()
+    expect(ctx.data.org_id).toBe(ACME)
+    expect((await anon.rpc('payment_context')).error).not.toBeNull()
+  })
 })

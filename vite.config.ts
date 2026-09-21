@@ -30,7 +30,10 @@ const appShellInPreview: Plugin = {
   },
 }
 
+const APP_VERSION = (JSON.parse(readFileSync('package.json', 'utf8')) as { version: string }).version
+
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   plugins: [
     react(),
     tailwindcss(),
@@ -102,6 +105,6 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'supabase/functions/_shared/**/*.test.ts'],
   },
 })
