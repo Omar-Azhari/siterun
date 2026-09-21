@@ -49,13 +49,16 @@
     "react-hook-form": "^7.88.0",
     "react-is": "^18.3.1",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.30.6",
+    "react-router": "^7.18.4",
+    "react-router-dom": "^7.18.4",
     "recharts": "^3.10.1",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5"
   },
+  "overrides": {
+    "tar": "^7.5.22"
+  },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.2.2",
     "@eslint/js": "^10.0.0",
     "@fontsource/plus-jakarta-sans": "^5.3.0",

@@ -19,7 +19,7 @@ export function App() {
   return (
     <MotionProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <BrowserRouter>
           <ToastProvider>
             <OfflineNotice />
             <AuthSync />
