@@ -139,6 +139,8 @@ test('supplier lists a machine, uploads documents, admin approves, machine appea
   await jordan.getByRole('button', { name: 'Continue' }).click()
 
   await expect(jordan).toHaveURL(/edit\/specs/)
+  // The generator's spec fields render after the category loads; fill them once they're there.
+  await expect(jordan.getByLabel(/Prime power/)).toBeVisible()
   for (const input of await jordan
     .locator('main input[inputmode="decimal"], main input[type="text"]')
     .all()) {
@@ -194,4 +196,22 @@ test('a non-admin is kept out of the admin area', async ({ browser }) => {
   const alex = await as(browser, ALEX)
   await alex.goto('/admin')
   await expect(alex).not.toHaveURL(/\/admin/)
+})
+
+test('a crash on the site is reported to platform admins', async ({ browser }) => {
+  const message = `flows: deliberate crash ${Date.now()}`
+  const visitor = await (await browser.newContext()).newPage()
+  await visitor.goto('/login')
+  await visitor.evaluate((m) => {
+    setTimeout(() => {
+      throw new Error(m)
+    })
+  }, message)
+  // The report is sent in the background; give it a moment before the admin looks.
+  await visitor.waitForTimeout(2000)
+
+  const admin = await as(browser, ADMIN)
+  await admin.goto('/admin/errors')
+  await expect(admin.getByText(message, { exact: true })).toBeVisible()
+  await expect(admin.getByText(/signed out/).first()).toBeVisible()
 })
