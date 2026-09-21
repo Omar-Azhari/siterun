@@ -36,8 +36,9 @@ restore the demo data in the Supabase SQL editor:
 ## Next steps
 
 1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README); turn on leaked-password protection and admin MFA (`SECURITY.md`).
-2. Run the apps on a real Android emulator/phone and an iPhone (needs Android Studio, and a Mac for iOS), then take the Checkpoint 6 screenshots (`MOBILE_BUILD.md`).
-3. Before real launch: real payments (Stripe), real GPS, legal copy for Terms/Privacy, hide demo logins, Supabase Pro plan, error monitoring.
+2. Launch features are built and deployed but need the owner's accounts (`LAUNCH.md`): Stripe keys and webhook, then `payments_provider = 'stripe'`; Firebase (Android) and an Apple push key (iOS); company details in `src/lib/company.ts` and a lawyer's review of Terms and Privacy. Live GPS and error monitoring already work.
+3. Run the apps on a real Android emulator/phone and an iPhone (needs Android Studio, and a Mac for iOS), then take the Checkpoint 6 screenshots (`MOBILE_BUILD.md`).
+4. Before real launch: hide demo logins, Supabase Pro plan, supplier payouts through Stripe Connect (not built), and background GPS if drivers need it with the app closed.
 
 ## Rules from the owner
 

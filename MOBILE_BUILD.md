@@ -140,12 +140,10 @@ Apple also requires "Sign in with Apple" in an app that offers other social logi
 ## Push notifications (optional, off by default)
 
 Registering for push without the platform credentials crashes on Android, so it only runs
-when `VITE_PUSH_ENABLED=true`.
-
-1. **Android:** create a Firebase project, add an Android app with ID `au.com.siterun.app`, download `google-services.json` into `android/app/`.
-2. **iOS:** in the Apple Developer portal enable Push Notifications for the App ID, create an APNs key, and upload it to Firebase.
-3. Set `VITE_PUSH_ENABLED=true`, rebuild, and `npx cap sync`.
-4. Device tokens are stored in the `push_tokens` table. Sending still needs a server piece (a Supabase Edge Function calling FCM) — not built yet.
+when `VITE_PUSH_ENABLED=true`. Tokens are stored in `push_tokens`, and the `push` Edge
+Function sends every in-app notification to them: Android through Firebase, iPhones
+through Apple's push service. Setup, including the Firebase and Apple keys, is in
+`LAUNCH.md`.
 
 ## Store checklists
 
@@ -172,6 +170,7 @@ when `VITE_PUSH_ENABLED=true`.
 
 ## Known limits
 
-- Push sending isn't implemented; registration and token storage are.
+- Push needs the Firebase and Apple keys before anything is sent (`LAUNCH.md`).
+- Live location is shared only while SiteRun is open on the driver's phone; background tracking isn't included.
 - Payments are mocked, so the stores' in-app purchase rules don't apply. Real card payments through Stripe are outside the app stores' IAP rules because they pay for physical equipment hire.
 - The apps were built and verified here, but not run on an emulator or device: this machine has no Android SDK and iOS needs a Mac.

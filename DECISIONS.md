@@ -206,3 +206,49 @@ The mockup background is a deep navy-black rather than the neutral near-black in
   public search) and the INFO-level index suggestions (audit columns nothing filters on).
 - **Owner actions, dashboard only:** leaked-password protection, admin MFA, and leaving
   `VITE_SHOW_DEMO_LOGINS` unset in production.
+
+## Phase 8 (launch features)
+
+- **Stripe through Edge Functions, cards in Stripe's own fields.** The Add Card screen
+  mounts Stripe's card number, expiry and CVC fields (iframes) styled like the app's inputs,
+  so the card never passes through SiteRun's code or database. The `payments` function
+  creates SetupIntents and PaymentIntents; the database records only brand, last four,
+  expiry and Stripe's id. A webhook confirms payments too, idempotently, in case the browser
+  closes mid-payment.
+- **Mock until switched.** With no Stripe key the app keeps the mock card form (demo and
+  today's Supabase project). The database refuses the mock paths only after
+  `private.put_config('payments_provider', 'stripe')`, so switching is one deliberate step.
+- **Plans and SiteCredits are invoiced when Stripe is on**, and paid by card from the
+  account balance like hire invoices, rather than charged separately. One payment path is
+  easier to secure and reconcile. SiteCredits pack prices already include GST, so their
+  invoices split GST out instead of adding it.
+- **Card fields use the system font.** Loading Inter into Stripe's fields means Stripe.js
+  fetching a Google Fonts stylesheet from our page, which the CSP blocks and the privacy
+  policy doesn't cover. The difference is barely visible.
+- **Push goes to Apple directly for iPhones.** Capacitor's push plugin returns an APNs token
+  on iOS, not a Firebase one, so the `push` function signs its own Apple provider token
+  (ES256) and calls APNs, and uses Firebase HTTP v1 for Android. No native iOS changes or
+  Firebase iOS SDK needed.
+- **The database triggers pushes.** A trigger on `notifications` calls the function
+  through `pg_net` with a secret generated in the database and kept in Vault, so every
+  notification the app already creates reaches phones with no extra code, and nobody else
+  can trigger a push.
+- **GPS is foreground only.** The driver taps Share Live Location on the booking; the phone
+  sends a position every 6–20 s while SiteRun is open (screen kept awake where supported).
+  Background location needs a third-party plugin and "always" permission, which the stores
+  scrutinise; left out. The first real fix switches the delivery from the simulated route
+  to GPS, and the simulator leaves it alone after that. ETA uses the straight-line distance
+  × 1.3 at the phone's speed (or 45 km/h).
+- **Error monitoring in our own database, not a third-party service.** Reports go to
+  `client_errors` (deduplicated per day, capped, 90-day retention) and platform admins read
+  them at `/admin/errors`. No extra vendor, no extra privacy disclosure, works in the demo
+  too. A Sentry-style service can still be added later.
+- **A crash screen** replaces a blank page: an error boundary around the routes shows
+  "Something went wrong" with Reload and reports the error. It resets when the route changes.
+- **Legal pages rewritten** for what the app actually does (Stripe, live location,
+  overseas providers, retention, OAIC complaints). Company name, ABN and contact details
+  live in `src/lib/company.ts` and are left off the pages while empty. They still need a
+  lawyer's review.
+- **`?next=` paths are validated** (`safeNextPath`): the old check accepted `//host`.
+  `pushState` would have refused to leave the site, so it wasn't exploitable, but it's now
+  closed properly for sign-in, saving a card and tapped push notifications.

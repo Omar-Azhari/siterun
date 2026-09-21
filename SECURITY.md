@@ -5,30 +5,37 @@ only the project owner can turn on.
 
 ## The short version
 
-- There is no application server. The browser (or the app) talks to Supabase directly with
-  a **publishable key**, which is public by design. Every rule is enforced in Postgres:
-  Row Level Security on all 27 tables, `SECURITY DEFINER` functions that check the caller
-  before acting, guard triggers, and per-user rate limits.
-- Secrets never reach the repository or the bundle. `.env` has never been committed and
-  the service role key is not used anywhere in the project.
+- The browser (or the app) talks to Supabase directly with a **publishable key**, which is
+  public by design. Every rule is enforced in Postgres: Row Level Security on every table,
+  `SECURITY DEFINER` functions that check the caller before acting, guard triggers, and
+  per-user rate limits.
+- Three Edge Functions hold the only server-side secrets: `payments` and `stripe-webhook`
+  (Stripe) and `push` (Firebase and Apple). Each authenticates its caller itself; see
+  [Edge Functions](#edge-functions).
+- Secrets never reach the repository or the bundle. `.env` has never been committed, and
+  the service role key is used only inside the Edge Functions, where Supabase provides it.
 - Responses carry a strict Content-Security-Policy with no inline scripts.
 
 ## Keys and environment variables
 
-| Variable                 | Public? | Notes                                                     |
-| ------------------------ | ------- | --------------------------------------------------------- |
-| `VITE_SUPABASE_URL`      | Yes     | Project URL, visible in every request                     |
-| `VITE_SUPABASE_ANON_KEY` | Yes     | `sb_publishable_…`. RLS is the boundary, not this key     |
-| `VITE_SHOW_DEMO_LOGINS`  | Yes     | Leave empty in production or the seeded logins are listed |
-| `VITE_BACKEND`           | Yes     | `demo` forces the in-browser backend                      |
-| `VITE_SITE_URL`          | Yes     | Canonical and social tags                                 |
-| `VITE_PUSH_ENABLED`      | Yes     | Push registration in the apps                             |
+| Variable                      | Public? | Notes                                                     |
+| ----------------------------- | ------- | --------------------------------------------------------- |
+| `VITE_SUPABASE_URL`           | Yes     | Project URL, visible in every request                     |
+| `VITE_SUPABASE_ANON_KEY`      | Yes     | `sb_publishable_…`. RLS is the boundary, not this key     |
+| `VITE_SHOW_DEMO_LOGINS`       | Yes     | Leave empty in production or the seeded logins are listed |
+| `VITE_BACKEND`                | Yes     | `demo` forces the in-browser backend                      |
+| `VITE_SITE_URL`               | Yes     | Canonical and social tags                                 |
+| `VITE_PUSH_ENABLED`           | Yes     | Push registration in the apps                             |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Yes     | Stripe's publishable key, meant for browsers              |
 
 Anything prefixed `VITE_` is compiled into the JavaScript bundle, so only public values
-may use that prefix. The service role key has no `VITE_` name and is never read by the
-app; it belongs in the Supabase dashboard and, if a server piece is ever added, in that
-server's environment only. `.env` is git-ignored (`.env`, `.env.*`, except
-`.env.example`).
+may use that prefix. `.env` is git-ignored (`.env`, `.env.*`, except `.env.example`).
+
+Server secrets live only in **Supabase → Edge Functions → Secrets**: `STRIPE_SECRET_KEY`,
+`STRIPE_WEBHOOK_SECRET`, `FIREBASE_SERVICE_ACCOUNT`, `APNS_KEY` (with `APNS_KEY_ID`,
+`APNS_TEAM_ID`) and `ALLOWED_ORIGINS`. The shared secret that lets the database call the
+push function was generated inside the database and is kept in Supabase Vault; nobody needs
+to copy it anywhere.
 
 ## Authentication and authorisation
 
@@ -36,20 +43,21 @@ server's environment only. `.env` is git-ignored (`.env`, `.env.*`, except
   never sees, stores or logs a password.
 - The client only decides what to _show_. Every rule is also enforced in the database, so
   a crafted request gets the same answer as the UI:
-  - **RLS** on all 27 public tables (100% coverage, every table has at least one policy).
+  - **RLS** on all 29 public tables (100% coverage, every table has at least one policy).
   - Reads use tables and `security_invoker` views, so the caller's policies apply.
   - Writes with business rules go through `SECURITY DEFINER` functions that start with a
     caller check — `private.require_admin()`, `private.require_supplier()`,
     `private.require_contractor_writer()`, `private.my_booking_for_change()`,
-    `private.can_see_booking()`, `private.in_conversation()`, `private.my_org()`. All 27
-    functions were re-verified against this list.
+    `private.can_see_booking()`, `private.in_conversation()`, `private.my_org()`. Every
+    function the app can call was re-verified against this list; the ones for Stripe and
+    push can only be called by the service role inside the Edge Functions.
   - Triggers stop clients setting listing status, document review fields or profile flags
     directly.
 - **Platform admin** is `profiles.is_platform_admin`, set in the database only. Sign-up
   metadata can never set it, the sign-up screen has no such option, and `require_admin()`
   rejects everyone else with `42501`. `npm run test:rls` covers this.
-- `public.search_machines` is the one function anonymous visitors may call. It returns
-  live listings only, which is what the public search page shows.
+- Anonymous visitors may call two functions: `search_machines` (live listings only, what
+  the public search page shows) and `log_client_error` (crash reports).
 - The dev pages (`/dev/brand`, `/dev/components`, `/dev/screens`) are compiled out of
   production builds — the route only exists when `import.meta.env.DEV` is true, and no dev
   chunk appears in `dist/`.
@@ -60,8 +68,11 @@ server's environment only. `.env` is git-ignored (`.env`, `.env.*`, except
   no `innerHTML`, no `eval`, no `new Function` and no `document.write`.
 - Forms validate with zod schemas on the client and again in the database (checks,
   enums, length limits, `char(4)` for card last-four).
-- No page reads a URL, redirect or `next` parameter and navigates to it, so there is no
-  open-redirect surface.
+- Two screens follow a `?next=` path (after sign-in and after saving a card), and a tapped
+  push notification opens its `link`. All three go through `safeNextPath()`, which accepts
+  only a path on this site: a single leading `/`, not `//` or `/\` (which browsers treat
+  as another host), and no control characters. The push function applies the same rule
+  before sending.
 - The two links that open a new tab use `rel="noreferrer"`.
 - Uploads go to Supabase Storage. `compliance-docs` and `message-attachments` are private
   and read through short-lived signed URLs; `machine-photos` and `avatars` are public
@@ -78,20 +89,23 @@ function, so they apply to every path — an RPC, a direct PostgREST insert, or 
 request. Requests with no signed-in user (service role, `pg_cron`, seeding) are not
 limited.
 
-| Action               | Limit per user |
-| -------------------- | -------------- |
-| Messages             | 30 per minute  |
-| Bookings             | 20 per hour    |
-| Invitations          | 20 per hour    |
-| Support tickets      | 10 per hour    |
-| Payments             | 20 per hour    |
-| Saved cards          | 10 per hour    |
-| Payout requests      | 10 per hour    |
-| Machine listings     | 30 per hour    |
-| Machine photos       | 120 per hour   |
-| Compliance documents | 60 per hour    |
-| Reviews              | 20 per hour    |
-| Sites                | 30 per hour    |
+| Action                         | Limit per user                                    |
+| ------------------------------ | ------------------------------------------------- |
+| Messages                       | 30 per minute                                     |
+| Bookings                       | 20 per hour                                       |
+| Invitations                    | 20 per hour                                       |
+| Support tickets                | 10 per hour                                       |
+| Payments                       | 20 per hour                                       |
+| Saved cards                    | 10 per hour                                       |
+| Payout requests                | 10 per hour                                       |
+| Machine listings               | 30 per hour                                       |
+| Machine photos                 | 120 per hour                                      |
+| Compliance documents           | 60 per hour                                       |
+| Reviews                        | 20 per hour                                       |
+| Sites                          | 30 per hour                                       |
+| Live location updates          | 720 per hour (one every 5 s)                      |
+| Stripe card setups and charges | 30 per hour                                       |
+| Error reports                  | 60 per hour, and 300 per hour across all visitors |
 
 Sign-in, sign-up, OTP and email sending are rate limited by Supabase Auth itself
 (Authentication → Rate limits in the dashboard). The in-browser demo backend has no limits
@@ -107,9 +121,11 @@ OAuth uses the PKCE flow (supabase-js default).
   renderer compiles a module), `object-src 'none'`, `frame-ancestors 'none'`,
   `base-uri 'self'`, `form-action 'self'`, `frame-src 'self' blob: https://*.supabase.co`
   (the document review screen previews an uploaded file in an iframe), and an allow-list
-  for Supabase (REST, storage, realtime websocket), the ArcGIS map tiles and the Photon
-  geocoder. `style-src` keeps `'unsafe-inline'` because React sets inline styles for
-  layout.
+  for Supabase (REST, storage, realtime websocket, Edge Functions), the ArcGIS map tiles,
+  the Photon geocoder, and Stripe (`js.stripe.com` for its script and card fields,
+  `api.stripe.com`, `hooks.stripe.com` for 3-D Secure). Stripe's card fields use the
+  system font rather than a Google web font, so Google stays off the list. `style-src`
+  keeps `'unsafe-inline'` because React sets inline styles for layout.
 - `Strict-Transport-Security` (2 years, `includeSubDomains`, `preload`)
 - `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
   `Referrer-Policy: strict-origin-when-cross-origin`
@@ -131,11 +147,39 @@ things the first strict draft broke, both found by that run and fixed above: inv
 
 ## CORS
 
-There is no custom API to configure. Supabase's REST, Auth, Storage and Realtime
-endpoints handle their own CORS and require the `Authorization` header, which a
-cross-origin page cannot obtain. The site itself sets no `Access-Control-Allow-Origin`, so
-no other origin can read a response from it. `Cross-Origin-Resource-Policy: same-origin`
-stops other sites embedding its assets.
+- Supabase's REST, Auth, Storage and Realtime endpoints handle their own CORS and require
+  the `Authorization` header, which a cross-origin page cannot obtain.
+- The `payments` function echoes `Access-Control-Allow-Origin` only for the site's own
+  origins (`ALLOWED_ORIGINS`), the apps (`capacitor://localhost`, `https://localhost`) and
+  local development. Any other origin gets no CORS header, so a browser won't hand it the
+  response. CORS isn't what protects it, though: every call also needs a valid session.
+- `stripe-webhook` and `push` are server-to-server and send no CORS headers at all.
+- The site itself sets no `Access-Control-Allow-Origin`, and
+  `Cross-Origin-Resource-Policy: same-origin` stops other sites embedding its assets.
+
+## Edge Functions
+
+| Function         | Who may call it                              | How that is checked                                                                                                                                                                                  |
+| ---------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payments`       | A signed-in user, for their own organisation | The user's session token; the database then works out their organisation (`payment_context`), so a request can't name someone else's. Adding or removing cards needs the owner or a project manager. |
+| `stripe-webhook` | Stripe                                       | Stripe's signature (`STRIPE_WEBHOOK_SECRET`); unsigned or altered requests get 400. The customer must also match the organisation on record.                                                         |
+| `push`           | The database                                 | A 64-character secret from Vault, compared in constant time.                                                                                                                                         |
+
+All three are deployed with Supabase's gateway JWT check off because they authenticate in
+code (the webhook and the database can't send a user token, and the app's new-style
+publishable key isn't a JWT).
+
+Payments specifically:
+
+- Card numbers never touch SiteRun: they are typed into Stripe's own fields (iframes from
+  `js.stripe.com`) and sent straight to Stripe.
+- Amounts are checked against the balance the database reports, and a payment is recorded
+  only after Stripe says it succeeded. Recording is idempotent on Stripe's payment id, so
+  the app and the webhook can both confirm the same charge safely.
+- Each charge carries an idempotency key, so a double tap or a retried request charges once.
+- Once `payments_provider` is switched to `stripe`, the database refuses the old mock
+  paths: `make_payment` and inserting a card row by hand. Only the service-role functions
+  the Edge Functions call can record cards and payments.
 
 ## Debug output
 
@@ -175,9 +219,11 @@ added in any commit. The only `service_role` match is the phrase inside an RLS p
 
 `security`: the two remaining warnings are expected.
 
-1. _SECURITY DEFINER functions are callable by signed-in users (26) and by anonymous
-   visitors (1)._ That is the design: each function checks the caller first, and
-   `search_machines` is the public search. Re-verified function by function.
+1. _SECURITY DEFINER functions are callable by signed-in users (30) and by anonymous
+   visitors (2)._ That is the design: each function checks the caller first.
+   `search_machines` is the public search and `log_client_error` takes crash reports from
+   signed-out visitors too (capped and deduplicated). The service-only functions for
+   Stripe and push are not callable by either role. Re-verified function by function.
 2. _Leaked password protection disabled._ Owner action, below.
 
 `performance`: only INFO items — indexes on audit columns (`*_by` foreign keys) that no
@@ -191,14 +237,16 @@ query filters on, and indexes not yet used by the demo data volume.
 2. **Authentication → Multi-factor:** enable TOTP before real platform admins exist.
 3. **Vercel → Environment variables:** leave `VITE_SHOW_DEMO_LOGINS` unset in production,
    and set `VITE_SITE_URL` to the real domain so the CSP-friendly canonical tags match.
-4. Keep the service role key out of the app project entirely; if a server piece is added
-   later (for example push sending), give it its own environment.
+4. Keep the service role key and the Stripe, Firebase and Apple keys out of the app and
+   the repository: they belong only in Supabase's Edge Function secrets (`LAUNCH.md`).
 
 ## What is still mocked
 
-Payments. No real card number, CVV or bank detail is collected or stored anywhere — only
-the card brand, expiry and last four digits. Replacing this with Stripe means a server
-piece: the card must go straight to Stripe from the browser, never through this database.
+- Card payments stay mocked until the owner adds the Stripe keys and switches
+  `payments_provider` (`LAUNCH.md`). In either mode no card number, CVC or bank detail is
+  ever stored — only the card brand, expiry and last four digits.
+- Supplier payouts are recorded in the app but paid outside it (Stripe Connect isn't
+  built).
 
 ## Reporting a problem
 
