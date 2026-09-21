@@ -4,6 +4,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import {
   Building2,
+  Bug,
   CalendarDays,
   CircleAlert,
   CircleUserRound,
@@ -47,6 +48,7 @@ import {
   useAllBookings,
   useApiMutation,
   useCategories,
+  useClientErrors,
   useDocuments,
   useMachine,
   usePendingDocuments,
@@ -699,6 +701,12 @@ export function AdminMorePage() {
           subtitle="Submissions and alerts"
         />
         <ListRow
+          to="/admin/errors"
+          leading={<Bug className="size-7 text-primary" strokeWidth={1.5} />}
+          title="App errors"
+          subtitle="Crashes reported by the website and apps"
+        />
+        <ListRow
           to="/account"
           leading={<CircleUserRound className="size-7 text-primary" strokeWidth={1.5} />}
           title="Account"
@@ -723,6 +731,53 @@ export function AdminMorePage() {
         Log Out
       </Button>
       <p className="mt-6 text-center text-xs text-subtle">SiteRun platform admin</p>
+    </AppScreen>
+  )
+}
+
+/** Errors reported by the website and apps (lib/errorReporting.ts), newest first. */
+export function AdminErrorsPage() {
+  const q = useClientErrors()
+  return (
+    <AppScreen>
+      <ScreenTitle title="App errors" subtitle="Reported automatically. Kept for 90 days." />
+      {q.isPending ? (
+        <ListSkeleton rows={4} thumb={false} />
+      ) : q.isError ? (
+        <ErrorState onRetry={() => void q.refetch()} />
+      ) : !q.data?.length ? (
+        <EmptyState
+          icon={<Bug strokeWidth={1.75} />}
+          title="No errors reported"
+          description="Crashes on the website or in the apps will show up here."
+        />
+      ) : (
+        <div className="space-y-2">
+          {q.data.map((e) => (
+            <Card key={e.id} className="text-sm">
+              <p className="line-clamp-3 font-medium break-words">{e.message}</p>
+              <p className="mt-1 text-xs text-muted">
+                {e.count}× · {e.platform || 'web'}
+                {e.release && ` · v${e.release}`} · {e.signedIn ? 'signed in' : 'signed out'} · last{' '}
+                {timeAgo(e.lastSeen)}
+              </p>
+              {e.url && (
+                <p className="mt-1 truncate text-xs text-subtle">
+                  {new URL(e.url, window.location.origin).pathname}
+                </p>
+              )}
+              {e.stack && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-xs text-primary">Stack trace</summary>
+                  <pre className="mt-2 max-h-60 overflow-auto rounded-lg bg-black/30 p-2 text-[11px] leading-snug whitespace-pre-wrap text-muted">
+                    {e.stack}
+                  </pre>
+                </details>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
     </AppScreen>
   )
 }

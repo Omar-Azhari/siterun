@@ -1759,6 +1759,9 @@ export function buildSeed(now: Date = new Date()): DemoDb {
       pickedUpAt: at(0, 8, 15),
       eta: at(0, 11, 30),
       deliveredAt: null,
+      live: false,
+      position: null,
+      positionAt: null,
     },
   ]
 

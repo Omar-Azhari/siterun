@@ -232,6 +232,25 @@ export interface Delivery {
   pickedUpAt: string | null
   eta: string
   deliveredAt: string | null
+  /** True once the driver's phone is sharing GPS; until then the truck follows the route. */
+  live: boolean
+  /** Last GPS position, [lat, lng]. */
+  position: [number, number] | null
+  positionAt: string | null
+}
+
+/** An error report from the website or apps (platform admin view). */
+export interface ClientError {
+  id: number
+  message: string
+  stack: string
+  url: string
+  release: string
+  platform: string
+  count: number
+  firstSeen: string
+  lastSeen: string
+  signedIn: boolean
 }
 
 export interface Conversation {

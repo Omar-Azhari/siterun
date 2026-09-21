@@ -14,6 +14,7 @@ import {
 import { AppScreen } from '@/components/layout/AppScreen'
 import { dispatchPill } from '@/components/domain/bookingStatus'
 import { BaseMap } from '@/components/domain/maps/MapParts'
+import { LiveLocationCard } from '@/components/domain/LiveLocationCard'
 import { pinIcon } from '@/components/domain/maps/mapUtils'
 import {
   Button,
@@ -251,6 +252,7 @@ export function OperatorBookingDetailPage() {
           </a>
         </p>
       </Card>
+      {b.status === 'in_transit' && <LiveLocationCard bookingId={b.id} />}
       {s?.accessNotes && <InfoNote className="mt-3">{s.accessNotes}</InfoNote>}
       {b.customerMessage && (
         <InfoNote className="mt-2">Customer note: {b.customerMessage}</InfoNote>

@@ -25,7 +25,14 @@ import {
 } from '@/lib/booking'
 import { geocodeLocal } from '@/lib/geo'
 import { hashPassword, verifyPassword } from '@/lib/passwordHash'
-import { ApiError, type Api, type MachineDraft, type TimeRange } from '../api'
+import {
+  ApiError,
+  type Api,
+  type ErrorReport,
+  type LocationFix,
+  type MachineDraft,
+  type TimeRange,
+} from '../api'
 import { DEMO_OTP } from '../constants'
 import { buildSeed, DB_VERSION, type DemoDb } from '../seed'
 import type {
@@ -33,6 +40,7 @@ import type {
   Booking,
   BookingStatus,
   BookingView,
+  ClientError,
   ComplianceDocument,
   Delivery,
   Machine,
@@ -90,7 +98,10 @@ type Listener = () => void
 
 export class DemoApi implements Api {
   readonly mode = 'demo' as const
+  readonly payments = 'mock' as const
   private db: DemoDb
+  /** Error reports, kept in memory for the admin screen. */
+  private errors: ClientError[] = []
   private events = new EventTarget()
   private timers = new Map<string, number>()
 
@@ -312,6 +323,30 @@ export class DemoApi implements Api {
 
   async savePushToken() {
     // Push needs the Supabase backend.
+  }
+
+  async logClientError(r: ErrorReport) {
+    const frame = (stack: string) => stack.split('\n')[1] ?? ''
+    const same = this.errors.find(
+      (e) => e.message === r.message && frame(e.stack) === frame(r.stack),
+    )
+    if (same) {
+      same.count += 1
+      same.lastSeen = nowIso()
+      return
+    }
+    this.errors.push({
+      id: this.errors.length + 1,
+      message: r.message.slice(0, 500),
+      stack: r.stack.slice(0, 4000),
+      url: r.url.split(/[?#]/)[0] ?? '',
+      release: r.release,
+      platform: r.platform,
+      count: 1,
+      firstSeen: nowIso(),
+      lastSeen: nowIso(),
+      signedIn: !!this.session(),
+    })
   }
 
   async signOut() {
@@ -1014,9 +1049,51 @@ export class DemoApi implements Api {
     const b = this.db.bookings.find((x) => x.id === bookingId)
     if (!b || !this.canSee(b, p)) return null
     const d = this.db.deliveries.find((x) => x.bookingId === bookingId)
-    if (d) return { ...d }
+    // Deliveries saved before GPS existed lack the live fields.
+    if (d)
+      return {
+        ...d,
+        live: d.live ?? false,
+        position: d.position ?? null,
+        positionAt: d.positionAt ?? null,
+      }
     if (b.status === 'in_transit') return this.createDelivery(b)
     return null
+  }
+
+  async reportLocation(bookingId: string, fix: LocationFix) {
+    await wait(60)
+    const p = this.me()
+    const b = this.db.bookings.find((x) => x.id === bookingId)
+    if (!b || (b.supplierOrgId !== p.orgId && b.operatorProfileId !== p.id)) {
+      throw new ApiError('Booking not found.', 'not_found')
+    }
+    if (b.status !== 'in_transit') {
+      throw new ApiError('Live location is only shared while the machine is on its way.', 'invalid')
+    }
+    if (!this.db.deliveries.some((x) => x.bookingId === bookingId)) this.createDelivery(b)
+    const d = this.db.deliveries.find((x) => x.bookingId === bookingId)
+    if (!d) throw new ApiError('This booking has no delivery.', 'not_found')
+    // Same rules as the database: ignore poor fixes, never move backwards.
+    if (fix.accuracy == null || fix.accuracy <= 250) {
+      const total = Math.max(
+        0.2,
+        distanceKm(d.origin.lat, d.origin.lng, d.destination.lat, d.destination.lng),
+      )
+      const left = distanceKm(fix.lat, fix.lng, d.destination.lat, d.destination.lng)
+      const kmh =
+        fix.speed != null && fix.speed * 3.6 >= 20 && fix.speed * 3.6 <= 110 ? fix.speed * 3.6 : 45
+      d.live = true
+      d.position = [fix.lat, fix.lng]
+      d.positionAt = nowIso()
+      d.pickedUpAt ??= nowIso()
+      d.progress = Math.min(0.99, Math.max(d.progress, 1 - left / total))
+      d.stage = left < 1 ? 'arriving' : 'in_transit'
+      d.eta = new Date(Date.now() + Math.ceil(((left * 1.3) / kmh) * 60) * 60_000).toISOString()
+      this.persist()
+      this.events.dispatchEvent(new CustomEvent(`delivery:${bookingId}`, { detail: { ...d } }))
+    }
+    return { ...d }
   }
 
   private createDelivery(b: Booking): Delivery {
@@ -1047,6 +1124,9 @@ export class DemoApi implements Api {
       pickedUpAt: nowIso(),
       eta: new Date(Date.now() + 90 * 60_000).toISOString(),
       deliveredAt: null,
+      live: false,
+      position: null,
+      positionAt: null,
     }
     this.db.deliveries.push(d)
     this.persist()
@@ -1067,6 +1147,8 @@ export class DemoApi implements Api {
           this.timers.delete(topic)
           return
         }
+        // A phone is sharing real GPS for this delivery: don't move the truck.
+        if (d.live) return
         d.progress = Math.min(1, +(d.progress + 0.02).toFixed(3))
         const remainingMin = Math.round((1 - d.progress) * 150)
         d.eta = new Date(Date.now() + remainingMin * 60_000).toISOString()
@@ -1253,6 +1335,14 @@ export class DemoApi implements Api {
     this.db.paymentMethods.push(pm)
     this.commit('billing')
     return pm
+  }
+
+  async startCardSetup(): Promise<{ clientSecret: string }> {
+    throw new ApiError('Card payments need Stripe to be set up.', 'invalid')
+  }
+
+  async finishCardSetup(): Promise<import('../types').PaymentMethod> {
+    throw new ApiError('Card payments need Stripe to be set up.', 'invalid')
   }
 
   async removePaymentMethod(id: string) {
@@ -2073,6 +2163,12 @@ export class DemoApi implements Api {
       )
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .map((b) => this.view(b))
+  }
+
+  async listClientErrors() {
+    await wait()
+    this.requireAdmin()
+    return [...this.errors].sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
   }
 }
 

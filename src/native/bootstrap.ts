@@ -1,6 +1,7 @@
 // Runs once inside the Android/iOS app: status bar, splash screen, keyboard, the
 // Android back button, deep links (OAuth and email links) and push registration.
 import { getApi } from '@/data/client'
+import { safeNextPath } from '@/lib/safePath'
 import { APP_SCHEME, nativePlatform } from './platform'
 
 /** Client-side navigation that React Router picks up. */
@@ -68,8 +69,8 @@ async function registerPush() {
       .catch(() => {})
   })
   void PushNotifications.addListener('pushNotificationActionPerformed', ({ notification }) => {
-    const link = (notification.data as { link?: string } | undefined)?.link
-    if (link?.startsWith('/')) go(link)
+    const link = safeNextPath((notification.data as { link?: string } | undefined)?.link)
+    if (link) go(link)
   })
   await PushNotifications.register()
 }

@@ -82,6 +82,7 @@ export const usePendingDocuments = () =>
 export const useSupplierOrgs = () =>
   useQuery(q(['admin', 'suppliers'], (a) => a.listSupplierOrgs()))
 export const useAllBookings = () => useQuery(q(['admin', 'bookings'], (a) => a.listAllBookings()))
+export const useClientErrors = () => useQuery(q(['admin', 'errors'], (a) => a.listClientErrors()))
 
 // ---- mutations ---------------------------------------------------------------------
 /**

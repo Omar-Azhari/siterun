@@ -6,6 +6,7 @@ import type {
   AppNotification,
   BillingPeriod,
   BookingView,
+  ClientError,
   CollectionRequest,
   ComplianceDocument,
   ComplianceRequirement,
@@ -73,6 +74,24 @@ export interface CardInput {
   expYear: number
 }
 
+/** A position from the driver's phone. Accuracy in metres, heading in degrees, speed in m/s. */
+export interface LocationFix {
+  lat: number
+  lng: number
+  accuracy: number | null
+  heading: number | null
+  speed: number | null
+}
+
+export interface ErrorReport {
+  message: string
+  stack: string
+  url: string
+  release: string
+  platform: string
+  userAgent: string
+}
+
 export interface DocumentUploadInput {
   requirementId: string
   machineId: string | null
@@ -107,6 +126,8 @@ export interface Api {
   completeAuthRedirect(url: string): Promise<void>
   /** Native apps: remember this device for push notifications. */
   savePushToken(token: string, platform: string): Promise<void>
+  /** Sends an error report. Never throws. */
+  logClientError(report: ErrorReport): Promise<void>
 
   // Me / account
   getMe(): Promise<Me | null>
@@ -144,6 +165,8 @@ export interface Api {
   cancelBooking(id: string): Promise<BookingView>
   getDelivery(bookingId: string): Promise<Delivery | null>
   subscribeDelivery(bookingId: string, cb: (d: Delivery) => void): Unsubscribe
+  /** Driver's phone: share the truck's position while a delivery is on its way. */
+  reportLocation(bookingId: string, fix: LocationFix): Promise<Delivery>
 
   // Messaging
   listConversations(): Promise<Conversation[]>
@@ -155,9 +178,17 @@ export interface Api {
   openConversationForBooking(bookingId: string): Promise<string>
 
   // Payments
+  /**
+   * 'stripe' when card payments are real: cards are entered in Stripe's own fields
+   * (startCardSetup/finishCardSetup) and makePayment charges through Stripe.
+   * 'mock' in the demo and until Stripe is configured (addPaymentMethod).
+   */
+  readonly payments: 'mock' | 'stripe'
   getAccountBalance(): Promise<number>
   listPaymentMethods(): Promise<PaymentMethod[]>
   addPaymentMethod(card: CardInput): Promise<PaymentMethod>
+  startCardSetup(): Promise<{ clientSecret: string }>
+  finishCardSetup(setupIntentId: string): Promise<PaymentMethod>
   removePaymentMethod(id: string): Promise<void>
   makePayment(amountCents: number, methodId: string): Promise<void>
   listInvoices(): Promise<Invoice[]>
@@ -216,6 +247,7 @@ export interface Api {
   reviewDocument(id: string, approve: boolean, reason?: string): Promise<ComplianceDocument>
   listSupplierOrgs(): Promise<(Organisation & { machineCount: number; liveCount: number })[]>
   listAllBookings(): Promise<BookingView[]>
+  listClientErrors(): Promise<ClientError[]>
 }
 
 export class ApiError extends Error {

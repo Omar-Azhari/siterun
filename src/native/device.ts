@@ -42,6 +42,78 @@ export async function currentPosition(): Promise<[number, number]> {
   )
 }
 
+export interface PositionFix {
+  lat: number
+  lng: number
+  accuracy: number | null
+  heading: number | null
+  speed: number | null
+}
+
+/**
+ * Follows the device's position until the returned function is called. `onError` gets a
+ * message a driver can act on (for example, location permission is off).
+ */
+export async function watchPosition(
+  onFix: (fix: PositionFix) => void,
+  onError: (message: string) => void,
+): Promise<() => void> {
+  const toFix = (
+    c:
+      | GeolocationCoordinates
+      | {
+          latitude: number
+          longitude: number
+          accuracy: number
+          heading?: number | null
+          speed?: number | null
+        },
+  ): PositionFix => ({
+    lat: c.latitude,
+    lng: c.longitude,
+    accuracy: Number.isFinite(c.accuracy) ? c.accuracy : null,
+    heading: c.heading != null && Number.isFinite(c.heading) ? c.heading : null,
+    speed: c.speed != null && Number.isFinite(c.speed) ? c.speed : null,
+  })
+  const denied = 'Location access is off. Allow SiteRun to use your location to share it.'
+
+  if (isNative()) {
+    const { Geolocation } = await import('@capacitor/geolocation')
+    const perm = await Geolocation.checkPermissions()
+    if (perm.location !== 'granted') {
+      const asked = await Geolocation.requestPermissions({ permissions: ['location'] })
+      if (asked.location !== 'granted') {
+        onError(denied)
+        return () => {}
+      }
+    }
+    const id = await Geolocation.watchPosition(
+      { enableHighAccuracy: true, timeout: 20_000, maximumAge: 5_000 },
+      (p, err) => {
+        if (p) onFix(toFix(p.coords))
+        else if (err) onError('Can’t get your location right now. Check GPS is on.')
+      },
+    )
+    return () => void Geolocation.clearWatch({ id })
+  }
+
+  if (!navigator.geolocation) {
+    onError('This browser can’t share its location.')
+    return () => {}
+  }
+  const id = navigator.geolocation.watchPosition(
+    (p) => onFix(toFix(p.coords)),
+    (err) =>
+      onError(
+        err.code === err.PERMISSION_DENIED
+          ? denied
+          : 'Can’t get your location right now. Check GPS is on.',
+      ),
+    { enableHighAccuracy: true, timeout: 20_000, maximumAge: 5_000 },
+  )
+  return () => navigator.geolocation.clearWatch(id)
+}
+
 /** Saves a file: a download on the web, the Documents folder on native. */
 export async function saveFile(blob: Blob, filename: string): Promise<'downloaded' | 'documents'> {
   if (!isNative()) {

@@ -12,6 +12,7 @@ import {
   Truck,
   User,
 } from 'lucide-react'
+import { LiveLocationCard } from '@/components/domain/LiveLocationCard'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { dispatchPill } from '@/components/domain/bookingStatus'
 import {
@@ -572,6 +573,9 @@ export function SupplierBookingDetailPage() {
           </Line>
         )}
       </div>
+      {b.status === 'in_transit' && b.delivery === 'delivery' && (
+        <LiveLocationCard bookingId={b.id} />
+      )}
       {sheet}
     </AppScreen>
   )

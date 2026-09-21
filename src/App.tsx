@@ -8,6 +8,7 @@ import { FullPageSpinner } from '@/auth/guards'
 import { AppRoutes } from './routes'
 import { ScrollToTop } from './components/layout/ScrollToTop'
 import { OfflineNotice } from './components/layout/OfflineNotice'
+import { ErrorBoundary } from './components/layout/ErrorBoundary'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,9 +25,11 @@ export function App() {
             <OfflineNotice />
             <AuthSync />
             <ScrollToTop />
-            <Suspense fallback={<FullPageSpinner />}>
-              <AppRoutes />
-            </Suspense>
+            <ErrorBoundary>
+              <Suspense fallback={<FullPageSpinner />}>
+                <AppRoutes />
+              </Suspense>
+            </ErrorBoundary>
           </ToastProvider>
         </BrowserRouter>
       </QueryClientProvider>

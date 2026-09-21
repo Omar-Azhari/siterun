@@ -2,7 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { hasStoredSession } from './data/session'
 import { isNative } from './native/platform'
+import { initErrorReporting } from './lib/errorReporting'
 import './index.css'
+
+initErrorReporting()
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element missing')

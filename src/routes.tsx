@@ -189,6 +189,7 @@ const AdminDocumentReviewPage = page(
 const AdminSuppliersPage = page(() => import('@/pages/admin/AdminPages'), 'AdminSuppliersPage')
 const AdminBookingsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminBookingsPage')
 const AdminMorePage = page(() => import('@/pages/admin/AdminPages'), 'AdminMorePage')
+const AdminErrorsPage = page(() => import('@/pages/admin/AdminPages'), 'AdminErrorsPage')
 
 // Operator
 const OperatorHomePage = page(() => import('@/pages/operator/OperatorPages'), 'OperatorHomePage')
@@ -298,6 +299,7 @@ export function AppRoutes() {
           <Route path="/admin/suppliers" element={<AdminSuppliersPage />} />
           <Route path="/admin/bookings" element={<AdminBookingsPage />} />
           <Route path="/admin/more" element={<AdminMorePage />} />
+          <Route path="/admin/errors" element={<AdminErrorsPage />} />
         </Route>
 
         <Route element={<RequireArea area={['contractor']} />}>

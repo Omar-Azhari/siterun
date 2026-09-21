@@ -1,5 +1,6 @@
 import type { Api } from './api'
 import type { DemoApi } from './demo/demoApi'
+import { STRIPE_PUBLISHABLE_KEY } from './stripeConfig'
 
 /**
  * The app talks to one Api. With VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY set it
@@ -12,6 +13,7 @@ const useSupabase =
   !!import.meta.env.VITE_SUPABASE_URL &&
   !!import.meta.env.VITE_SUPABASE_ANON_KEY
 const MODE: Api['mode'] = useSupabase ? 'supabase' : 'demo'
+const PAYMENTS: Api['payments'] = useSupabase && STRIPE_PUBLISHABLE_KEY ? 'stripe' : 'mock'
 
 let current: Api | null = null
 let loading: Promise<Api> | null = null
@@ -50,6 +52,7 @@ const deferred = new Proxy({} as Api, {
   get(_, prop: string) {
     if (current) return Reflect.get(current, prop, current)
     if (prop === 'mode') return MODE
+    if (prop === 'payments') return PAYMENTS
     if (prop === 'then') return undefined
     if (SUBSCRIPTIONS.has(prop)) {
       return (...args: unknown[]) => {

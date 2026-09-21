@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { safeNextPath } from '@/lib/safePath'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { useMe } from '@/data/hooks'
@@ -74,9 +75,7 @@ export function PublicOnly() {
     const next = new URLSearchParams(location.search).get('next')
     const target = needsOnboarding(me.data)
       ? '/onboarding/business'
-      : next && next.startsWith('/')
-        ? next
-        : homePathFor(me.data)
+      : (safeNextPath(next) ?? homePathFor(me.data))
     return <Navigate to={target} replace />
   }
   return <Outlet />

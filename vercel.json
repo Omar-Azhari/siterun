@@ -51,7 +51,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://photon.komoot.io https://server.arcgisonline.com; frame-src 'self' blob: https://*.supabase.co; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; manifest-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://js.stripe.com https://*.js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://*.stripe.com; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://photon.komoot.io https://server.arcgisonline.com https://api.stripe.com; frame-src 'self' blob: https://*.supabase.co https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; manifest-src 'self'; upgrade-insecure-requests"
         },
         {
           "key": "Strict-Transport-Security",

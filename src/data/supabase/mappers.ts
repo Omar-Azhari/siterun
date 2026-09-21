@@ -4,6 +4,7 @@ import type {
   AppNotification,
   Booking,
   BookingView,
+  ClientError,
   ComplianceDocument,
   Conversation,
   Delivery,
@@ -307,6 +308,22 @@ export const toDelivery = (r: Row): Delivery => ({
   pickedUpAt: r.picked_up_at,
   eta: r.eta,
   deliveredAt: r.delivered_at,
+  live: r.source === 'gps',
+  position: r.position ? [Number(r.position.lat), Number(r.position.lng)] : null,
+  positionAt: r.position_at ?? null,
+})
+
+export const toClientError = (r: Row): ClientError => ({
+  id: Number(r.id),
+  message: r.message,
+  stack: r.stack,
+  url: r.url,
+  release: r.release,
+  platform: r.platform,
+  count: r.count,
+  firstSeen: r.first_seen,
+  lastSeen: r.last_seen,
+  signedIn: !!r.profile_id,
 })
 
 /** From conversation_list. */

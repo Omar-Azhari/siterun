@@ -4,14 +4,25 @@ import { CreditCard, Lock } from 'lucide-react'
 import { AppScreen } from '@/components/layout/AppScreen'
 import { Button, InfoNote, Input, ScreenTitle } from '@/components/ui'
 import { cardBrand, luhnValid, parseExpiry } from '@/lib/cards'
+import { safeNextPath } from '@/lib/safePath'
+import { getApi } from '@/data/client'
 import { useApiMutation } from '@/data/hooks'
 import { BrandMark } from '@/components/domain/BrandMark'
+import { StripeCardForm } from './StripeCardForm'
+
+/** Where to go after saving: back to the screen that sent the user here, or Payments. */
+const afterCardPath = (next: string | null) => safeNextPath(next) ?? '/payments'
+
+export function AddCardPage() {
+  return getApi().payments === 'stripe' ? <StripeCardForm /> : <MockAddCardPage />
+}
 
 /**
- * Mock card form. The full number and CVC exist only in this component's state and
- * are never sent anywhere: only brand, last 4 and expiry reach the Api.
+ * Mock card form (demo, and until Stripe is configured). The full number and CVC exist
+ * only in this component's state and are never sent anywhere: only brand, last 4 and
+ * expiry reach the Api.
  */
-export function AddCardPage() {
+function MockAddCardPage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [number, setNumber] = useState('')
@@ -57,8 +68,7 @@ export function AddCardPage() {
         onSuccess: () => {
           setNumber('')
           setCvc('')
-          const next = params.get('next')
-          navigate(next && next.startsWith('/') ? next : '/payments', { replace: true })
+          navigate(afterCardPath(params.get('next')), { replace: true })
         },
       },
     )

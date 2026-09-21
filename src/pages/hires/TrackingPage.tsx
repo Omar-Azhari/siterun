@@ -9,6 +9,7 @@ import { EmptyState, Skeleton, Timeline, type TimelineStep } from '@/components/
 import { getApi } from '@/data/client'
 import { useDelivery } from '@/data/hooks'
 import type { Delivery } from '@/data/types'
+import { timeAgo } from '@/lib/format'
 import { HireGate } from './HireGate'
 import { HireMachineCard } from './HireMachineCard'
 import { useHire } from './hireShared'
@@ -16,7 +17,10 @@ import { useHire } from './hireShared'
 const when = (iso: string) =>
   `${isToday(parseISO(iso)) ? 'Today' : format(parseISO(iso), 'EEE d MMM')}, ${format(parseISO(iso), 'h:mm a')}`
 
-/** Board 04 · Live Delivery Tracking (simulated GPS in demo, Realtime with Supabase). */
+/**
+ * Board 04 · Live Delivery Tracking. The truck follows the driver's phone once it shares
+ * GPS (report_location), otherwise the planned route. Updates arrive over Realtime.
+ */
 export function TrackingPage() {
   const { id } = useParams()
   const { q, b, state } = useHire(id)
@@ -29,7 +33,10 @@ export function TrackingPage() {
     return getApi().subscribeDelivery(id, setLive)
   }, [id])
 
-  const truck = useMemo(() => (d ? pointAlong(d.route, d.progress) : null), [d])
+  const truck = useMemo(
+    () => (d ? (d.live && d.position ? d.position : pointAlong(d.route, d.progress)) : null),
+    [d],
+  )
   if (!b) return <HireGate state={state} retry={() => void q.refetch()} />
 
   const steps: TimelineStep[] = d
@@ -45,7 +52,9 @@ export function TrackingPage() {
           details: [
             d.stage === 'in_transit' ? (
               <span key="l" className="text-primary">
-                Live location
+                {d.live && d.positionAt
+                  ? `Live GPS · updated ${timeAgo(d.positionAt)}`
+                  : 'Live location'}
               </span>
             ) : (
               'Completed'

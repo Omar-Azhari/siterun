@@ -13,6 +13,8 @@ import {
   type BusinessProfileInput,
   type CardInput,
   type DocumentUploadInput,
+  type ErrorReport,
+  type LocationFix,
   type MachineDraft,
   type SignUpInput,
   type SiteInput,
@@ -33,6 +35,7 @@ import type {
 } from '../types'
 import { authRedirect, isNative } from '@/native/platform'
 import * as map from './mappers'
+import { STRIPE_PUBLISHABLE_KEY } from '../stripeConfig'
 
 const REMEMBER_KEY = 'siterun-remember'
 const ACTIVE = ['in_transit', 'on_site', 'return_scheduled']
@@ -97,8 +100,19 @@ const newId = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2)
 
+/** This device's push token, so signing out can stop pushes to it. */
+const PUSH_TOKEN_KEY = 'siterun-push-token'
+
+type PaymentsReply = {
+  status?: string
+  clientSecret?: string
+  paymentIntentId?: string
+  card?: Record<string, unknown>
+}
+
 export class SupabaseApi implements Api {
   readonly mode = 'supabase' as const
+  readonly payments = STRIPE_PUBLISHABLE_KEY ? ('stripe' as const) : ('mock' as const)
   readonly client: SupabaseClient
 
   constructor(
@@ -140,6 +154,23 @@ export class SupabaseApi implements Api {
       await this.client.from('org_members').select('role').eq('profile_id', profileId).limit(1),
     )
     return rows[0]?.role ?? null
+  }
+
+  /** Calls the `payments` Edge Function, which is the only thing that talks to Stripe. */
+  private async payments_(action: string, body: Record<string, unknown> = {}) {
+    const { data, error } = await this.client.functions.invoke<PaymentsReply>('payments', {
+      body: { action, ...body },
+    })
+    if (error) {
+      let message = 'The payment service didn’t respond. Try again.'
+      const ctx = (error as { context?: Response }).context
+      if (ctx && typeof ctx.json === 'function') {
+        const payload = (await ctx.json().catch(() => null)) as { error?: string } | null
+        if (payload?.error) message = payload.error
+      }
+      throw new ApiError(message, 'invalid')
+    }
+    return data ?? {}
   }
 
   private async rpc<T = unknown>(fn: string, args?: Record<string, unknown>): Promise<T> {
@@ -234,6 +265,11 @@ export class SupabaseApi implements Api {
 
   async savePushToken(token: string, platform: string) {
     const id = await this.uid()
+    try {
+      localStorage.setItem(PUSH_TOKEN_KEY, token)
+    } catch {
+      // storage unavailable
+    }
     must(
       await this.client
         .from('push_tokens')
@@ -301,7 +337,32 @@ export class SupabaseApi implements Api {
 
   async signOut() {
     await this.client.removeAllChannels()
+    // Stop pushes to this device for the account that is leaving.
+    try {
+      const token = localStorage.getItem(PUSH_TOKEN_KEY)
+      if (token) {
+        await this.client.from('push_tokens').delete().eq('token', token)
+        localStorage.removeItem(PUSH_TOKEN_KEY)
+      }
+    } catch {
+      // storage unavailable, or already signed out
+    }
     await this.client.auth.signOut()
+  }
+
+  async logClientError(r: ErrorReport) {
+    try {
+      await this.client.rpc('log_client_error', {
+        p_message: r.message,
+        p_stack: r.stack,
+        p_url: r.url,
+        p_release: r.release,
+        p_platform: r.platform,
+        p_user_agent: r.userAgent,
+      })
+    } catch {
+      // Reporting must never cause another error.
+    }
   }
 
   // ---- me --------------------------------------------------------------------------
@@ -608,6 +669,18 @@ export class SupabaseApi implements Api {
     return row ? map.toDelivery(row) : null
   }
 
+  async reportLocation(bookingId: string, fix: LocationFix) {
+    const row = await this.rpc<Record<string, unknown>>('report_location', {
+      p_booking: bookingId,
+      p_lat: fix.lat,
+      p_lng: fix.lng,
+      p_accuracy: fix.accuracy,
+      p_heading: fix.heading,
+      p_speed: fix.speed,
+    })
+    return map.toDelivery(row)
+  }
+
   subscribeDelivery(bookingId: string, cb: (d: ReturnType<typeof map.toDelivery>) => void) {
     const channel = this.client
       .channel(`delivery:${bookingId}:${newId()}`)
@@ -721,7 +794,22 @@ export class SupabaseApi implements Api {
     ).map(map.toPaymentMethod)
   }
 
+  async startCardSetup() {
+    const r = await this.payments_('setup')
+    if (!r.clientSecret) throw new ApiError('Couldn’t start the card form. Try again.', 'invalid')
+    return { clientSecret: r.clientSecret }
+  }
+
+  async finishCardSetup(setupIntentId: string) {
+    const r = await this.payments_('save', { setupIntentId })
+    if (!r.card) throw new ApiError('The card wasn’t saved. Try again.', 'invalid')
+    return map.toPaymentMethod(r.card)
+  }
+
   async addPaymentMethod(card: CardInput) {
+    if (this.payments === 'stripe') {
+      throw new ApiError('Add cards through the secure card form.', 'invalid')
+    }
     const org = await this.orgId()
     if (!/^\d{4}$/.test(card.last4)) throw new ApiError('Invalid card.', 'invalid')
     if (new Date(card.expYear, card.expMonth, 0) < new Date())
@@ -748,11 +836,34 @@ export class SupabaseApi implements Api {
   }
 
   async removePaymentMethod(id: string) {
+    if (this.payments === 'stripe') {
+      await this.payments_('remove', { methodId: id })
+      return
+    }
     must(await this.client.from('payment_methods').delete().eq('id', id))
   }
 
   async makePayment(amountCents: number, methodId: string) {
-    await this.rpc('make_payment', { p_amount: amountCents, p_method: methodId })
+    if (this.payments === 'mock') {
+      await this.rpc('make_payment', { p_amount: amountCents, p_method: methodId })
+      return
+    }
+    // The key makes a double tap or a retry charge the card once.
+    const r = await this.payments_('pay', { amountCents, methodId, idempotencyKey: newId() })
+    if (r.status === 'requires_action' && r.clientSecret && r.paymentIntentId) {
+      // The bank wants the cardholder to confirm (3-D Secure): Stripe shows its own window.
+      const { getStripe } = await import('@/lib/stripe')
+      const stripe = await getStripe()
+      if (!stripe) throw new ApiError('Card payments aren’t available right now.', 'invalid')
+      const res = await stripe.handleNextAction({ clientSecret: r.clientSecret })
+      if (res.error)
+        throw new ApiError(res.error.message ?? 'The bank declined the payment.', 'invalid')
+      const done = await this.payments_('confirm', { paymentIntentId: r.paymentIntentId })
+      if (done.status !== 'succeeded')
+        throw new ApiError('The payment didn’t go through.', 'invalid')
+      return
+    }
+    if (r.status !== 'succeeded') throw new ApiError('The payment didn’t go through.', 'invalid')
   }
 
   async listInvoices() {
@@ -1069,6 +1180,17 @@ export class SupabaseApi implements Api {
   private async requireAdmin() {
     const p = await this.profile()
     if (!p.isPlatformAdmin) throw new ApiError('Platform admin access only.', 'forbidden')
+  }
+
+  async listClientErrors() {
+    await this.requireAdmin()
+    return must(
+      await this.client
+        .from('client_errors')
+        .select('*')
+        .order('last_seen', { ascending: false })
+        .limit(200),
+    ).map(map.toClientError)
   }
 
   async listAdminActivity() {
