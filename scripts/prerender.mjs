@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { Route, Routes } from 'react-router-dom'
-import { StaticRouter } from 'react-router-dom/server.js'
+import { StaticRouter } from 'react-router'
 import { createServer } from 'vite'
 
 const shell = readFileSync('dist/index.html', 'utf8')
@@ -32,8 +32,11 @@ const html = renderToString(
 )
 await vite.close()
 
-// Signed-in visitors go straight to the app: hide the baked landing until it's replaced.
-const guard = `<script>try{var k=Object.keys(localStorage).concat(Object.keys(sessionStorage));if(window.Capacitor||k.some(function(x){return /^sb-.+-auth-token$/.test(x)||x==='siterun-demo-session'}))document.documentElement.classList.add('app-boot')}catch(e){}</script><style>.app-boot #root>*{visibility:hidden}</style>`
+// Signed-in visitors and the native apps go straight to the app: hide the baked landing
+// until React replaces it. Kept in a file, not inline, so the CSP can ban inline scripts.
+const boot = `try{var k=Object.keys(localStorage).concat(Object.keys(sessionStorage));if(window.Capacitor||k.some(function(x){return /^sb-.+-auth-token$/.test(x)||x==='siterun-demo-session'}))document.documentElement.classList.add('app-boot')}catch(e){}`
+writeFileSync('dist/boot.js', boot)
+const guard = `<script src="/boot.js"></script><style>.app-boot #root>*{visibility:hidden}</style>`
 
 writeFileSync(
   'dist/index.html',

@@ -3,6 +3,12 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { FullPageSpinner, PublicOnly, RequireArea, RequireAuth } from '@/auth/guards'
 import { homePathFor, needsOnboarding } from '@/auth/roles'
 import { isNative } from '@/native/platform'
+
+// Dev-only pages: the conditional import is a build-time constant, so production
+// builds contain no /dev route and none of that code.
+const DevRoutes = import.meta.env.DEV
+  ? lazy(() => import('@/pages/dev/DevRoutes').then((m) => ({ default: m.DevRoutes })))
+  : null
 import { useMe } from '@/data/hooks'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
@@ -200,9 +206,6 @@ const OperatorDocumentsPage = page(
 )
 
 // Dev
-const BrandPage = page(() => import('@/pages/dev/BrandPage'), 'BrandPage')
-const ComponentsPage = page(() => import('@/pages/dev/ComponentsPage'), 'ComponentsPage')
-const DevScreensPage = page(() => import('@/pages/dev/DevScreensPage'), 'DevScreensPage')
 
 function RootRedirect() {
   const me = useMe()
@@ -327,13 +330,7 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      {import.meta.env.DEV && (
-        <>
-          <Route path="/dev/brand" element={<BrandPage />} />
-          <Route path="/dev/components" element={<ComponentsPage />} />
-          <Route path="/dev/screens" element={<DevScreensPage />} />
-        </>
-      )}
+      {DevRoutes && <Route path="/dev/*" element={<DevRoutes />} />}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
