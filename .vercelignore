@@ -1,0 +1,12 @@
+# Files the deployment does not need. `tsc -b` still type-checks e2e/ and
+# playwright.config.ts, so those stay.
+design
+docs
+android
+ios
+e2e-flows
+e2e-audit
+supabase
+playwright-report
+test-results
+*.zip

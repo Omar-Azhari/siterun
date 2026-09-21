@@ -166,3 +166,43 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **Native platform detection reads `window.Capacitor` once at startup**, because `@capacitor/core` replaces that global with its own instance when the first plugin loads, and on the web that instance reports "not native".
 - **The marketing page never shows in the apps**: they open at Welcome.
 - **Not run on a device here.** This machine has no Android SDK and iOS needs a Mac, so Checkpoint 6's emulator screenshots are outstanding. The native code paths were verified in a simulated Capacitor shell (`e2e-audit/native.spec.ts`).
+
+## Phase 7 (security hardening)
+
+- **The database is the security boundary**, not the client. The publishable key is public
+  by design, so every rule lives in Postgres: RLS on all 27 tables, `SECURITY DEFINER`
+  functions that check the caller first, guard triggers, and rate limits. `SECURITY.md`
+  is the full report.
+- **Rate limits are triggers on the tables, not code inside each function.** A limit in
+  `create_booking` would miss a direct PostgREST insert; a trigger catches both. They
+  raise `PT429`, which PostgREST turns into HTTP 429. Requests with no signed-in user
+  (service role, `pg_cron`, `seed.sql`) are skipped, otherwise seeding would trip them.
+- **Content-Security-Policy with no inline scripts.** Two things had to change for
+  `script-src 'self'` to hold: the landing page's boot guard moved from an inline
+  `<script>` to `/boot.js`, and Vite no longer inlines small fonts as `data:` URLs
+  (`build.assetsInlineLimit`), which keeps `font-src 'self'`. `style-src` still needs
+  `'unsafe-inline'` because React writes inline styles. Two directives had to be widened
+  after the audit run caught them: `script-src` needs `'wasm-unsafe-eval'` because
+  `@react-pdf/renderer` compiles a WebAssembly module (without it the invoice download
+  silently never starts), and `frame-src` needs `https://*.supabase.co` and `blob:` for the
+  document preview iframe on the admin review screen.
+- **Dev pages are compiled out of production.** `/dev/*` is a single lazy route that only
+  exists when `import.meta.env.DEV` is true, so no dev chunk ships.
+- **react-router-dom 6 → 7.18.4** to clear the open-redirect and `deserializeErrors`
+  advisories. The v6 `future` flags are v7 defaults, and `StaticRouter` moved to
+  `react-router` (the prerender script). No other code changed: 108 demo e2e, 5 flow and
+  101 page checks pass on v7.
+- **`@capacitor/assets` removed from devDependencies.** It pulled in an unpatched `sharp`,
+  `xcode` and `uuid` for a script that runs a few times a year; `npm run native:assets`
+  fetches it with `npx` instead. `tar` is pinned with `overrides` for the Capacitor CLI.
+  `npm audit` is now clean with and without dev dependencies.
+- **The demo backend hashes passwords** (PBKDF2-SHA256, 150k iterations, random salt) even
+  though it is a localStorage store, because people reuse real passwords when trying a
+  demo. The seeded accounts keep the published demo password as a plain value and
+  `verifyPassword` accepts both forms. Supabase Auth hashes with bcrypt; the app never
+  stores a password.
+- **Left alone on purpose:** the Supabase advisors' "SECURITY DEFINER function is callable"
+  warnings (that is the design — each one checks the caller, and `search_machines` is the
+  public search) and the INFO-level index suggestions (audit columns nothing filters on).
+- **Owner actions, dashboard only:** leaked-password protection, admin MFA, and leaving
+  `VITE_SHOW_DEMO_LOGINS` unset in production.

@@ -3,7 +3,7 @@
 Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
 _Machines. People. Progress._
 
-Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6.** Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps. See `DECISIONS.md` for design and technical decisions.
+Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6, plus a security hardening pass.** Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps, `SECURITY.md` for how it's protected, and `DECISIONS.md` for design and technical decisions.
 
 ## Stack
 
@@ -34,7 +34,7 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `npm run e2e`           | Playwright: component gallery, every screen against the design boards, and sign-up → verify → business profile → first site. Runs on the demo backend (port 5174)                                                                      |
 | `npm run e2e:flows`     | Playwright against Supabase (port 5175): search → book → supplier accepts → confirmation; extend hire; realtime messaging; supplier lists a machine → uploads documents → admin approves → machine appears in search; admin area guard |
 | `npm run og:image`      | Regenerate `public/og-image.png`                                                                                                                                                                                                       |
-| `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS                                                                                                                                                                            |
+| `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS (fetches `@capacitor/assets` with `npx`)                                                                                                                                   |
 | `npx cap sync`          | Copy the built web app into the Android and iOS projects                                                                                                                                                                               |
 | `npm run db:seed:sql`   | Regenerate `supabase/seed.sql` from the demo seed                                                                                                                                                                                      |
 | `npm run brand:assets`  | Regenerate logos, favicons and icons from the traced mark                                                                                                                                                                              |
@@ -50,11 +50,13 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `VITE_SITE_URL`          | Public site URL (no trailing slash) for canonical and social preview tags          |
 | `VITE_PUSH_ENABLED`      | `true` turns on push registration in the apps (needs Firebase and APNs first)      |
 
-Never commit `.env`.
+Every `VITE_` variable is compiled into the JavaScript bundle, so only public values may
+use that prefix. The service role key is never one of them — it belongs in the Supabase
+dashboard. Never commit `.env`.
 
 ## Supabase
 
-Migrations live in `supabase/migrations` (schema, RLS, business functions, storage/realtime/cron, hardening). Apply them in order with the Supabase CLI (`supabase db push`) or the SQL editor, then load the demo data:
+Migrations live in `supabase/migrations` (schema, RLS, business functions, storage/realtime/cron, hardening, rate limits). Apply them in order with the Supabase CLI (`supabase db push`) or the SQL editor, then load the demo data:
 
 ```bash
 npm run db:seed:sql     # writes supabase/seed.sql (dates relative to when it runs)
@@ -79,6 +81,14 @@ How it fits together:
 2. **SMTP.** The built-in sender only mails project members and is rate limited. Add your own SMTP provider before inviting real users.
 3. **URL configuration.** Set the Site URL to the deployed domain and add `http://localhost:5173/**` to the redirect URLs (used by email links, password reset and OAuth).
 4. **Google / Apple.** Authentication → Providers: add the client ID and secret for each. The buttons on the login screen work once a provider is enabled.
+
+## Security
+
+`SECURITY.md` has the full picture: RLS on every table, caller checks in every
+`SECURITY DEFINER` function, per-user rate limits, the response headers in `vercel.json`,
+and the two dashboard settings only the project owner can turn on. In short: the database
+is the boundary, the publishable key is public on purpose, and the app never stores a
+password or a card number.
 
 ## Deploy (Vercel)
 
@@ -108,6 +118,8 @@ docs/checkpoints/  Checkpoint screenshots and board comparisons
 ```
 
 ## Dev pages
+
+Only in `npm run dev`: the `/dev/*` route is compiled out of production builds.
 
 - `/dev/brand`: logos, colour tokens and type samples
 - `/dev/components`: every UI component in every state

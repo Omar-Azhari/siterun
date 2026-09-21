@@ -567,9 +567,7 @@
     "role": "admin",
     "path": "/admin/approvals/documents/0babcb8c-da14-4c2e-a123-cefe8ac84630",
     "finalUrl": "/admin/approvals/documents/0babcb8c-da14-4c2e-a123-cefe8ac84630",
-    "issues": [
-      "screen shows \"not available\""
-    ]
+    "issues": []
   },
   {
     "role": "admin",

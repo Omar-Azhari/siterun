@@ -27,13 +27,15 @@ Bugs found and fixed during the audit:
 6. Demo tracking trip ended after 90 minutes; a cron job restarts it every two hours (migration `20260919001000`, demo only).
 7. Leftover e2e test data removed from the database.
 
-After an audit run, restore the demo data in the Supabase SQL editor:
+The audit suite changes data on purpose (it books, rejects, pays and changes a password),
+so restore afterwards or the next run starts from the wrong state. After an audit run,
+restore the demo data in the Supabase SQL editor:
 `select private.audit_restore(); select private.audit_cleanup_new_rows();`
 (Baseline is in `private.audit_baseline`; refresh it only when the data is clean.)
 
 ## Next steps
 
-1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README).
+1. Owner actions: deploy to Vercel; Supabase auth email template with `{{ .Token }}`, SMTP, Site URL/redirects; Google/Apple keys (README); turn on leaked-password protection and admin MFA (`SECURITY.md`).
 2. After the owner signs off Stage 1: Stage 2 (Capacitor apps), Phase 6 in the brief.
 3. Before real launch: real payments (Stripe), real GPS, legal copy for Terms/Privacy, hide demo logins, Supabase Pro plan, error monitoring.
 

@@ -104,7 +104,9 @@ npm run native:assets
 ```
 
 This writes `assets/` (icon and splash sources) and then generates every Android and iOS
-size. The splash is the mark centred on navy `#0B1F44`.
+size. The splash is the mark centred on navy `#0B1F44`. `@capacitor/assets` is fetched by
+`npx` when the script runs rather than installed: it ships an old `sharp` and is only
+needed when the icons change.
 
 ## Device features
 
