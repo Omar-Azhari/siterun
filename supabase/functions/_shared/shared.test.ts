@@ -203,3 +203,66 @@ describe('Apple push', () => {
     expect(isDeadApnsToken(429, 'TooManyRequests')).toBe(false)
   })
 })
+
+describe('payout and refund requests', () => {
+  it('validates the new actions', () => {
+    expect(parseAction({ action: 'connect-start' })).toEqual({
+      action: 'connect-start',
+      returnPath: '/supplier/payouts',
+    })
+    expect(
+      parseAction({ action: 'connect-start', returnPath: '/supplier/payouts?done=1' }),
+    ).toEqual({
+      action: 'connect-start',
+      returnPath: '/supplier/payouts?done=1',
+    })
+    expect(parseAction({ action: 'connect-start', returnPath: '//evil.example' })).toEqual({
+      action: 'connect-start',
+      returnPath: '/supplier/payouts',
+    })
+    expect(parseAction({ action: 'payout', idempotencyKey: 'a1b2c3d4-e5f6' })).toHaveProperty(
+      'action',
+      'payout',
+    )
+    expect(parseAction({ action: 'payout' })).toHaveProperty('error')
+    const refund = {
+      action: 'refund',
+      paymentId: '0b2c8ece-4fea-4dff-ab03-61a4c574c6bf',
+      amountCents: 500,
+      reason: 'Overcharged',
+    }
+    expect(parseAction(refund)).toEqual(refund)
+    expect(parseAction({ ...refund, amountCents: 0 })).toHaveProperty('error')
+    expect(parseAction({ ...refund, reason: 'no' })).toHaveProperty('error')
+  })
+})
+
+describe('notification email', () => {
+  const payload = {
+    to: 'alex@acme.test',
+    name: 'Alex',
+    title: 'Booking Confirmed',
+    body: 'SR-2026-7815 · 5t Excavator',
+    link: '/bookings/1',
+    type: 'booking',
+  }
+
+  it('links back into the app and escapes what people typed', async () => {
+    const { htmlBody, subjectFor, textBody, actionUrl } = await import('./emailTemplate')
+    expect(actionUrl('https://siterun.com.au/', '/bookings/1')).toBe(
+      'https://siterun.com.au/bookings/1',
+    )
+    expect(actionUrl('https://siterun.com.au', '//evil.example')).toBeNull()
+    expect(subjectFor(payload)).toBe('Booking Confirmed — SR-2026-7815')
+    const html = htmlBody(
+      { ...payload, title: '<script>alert(1)</script>' },
+      'https://siterun.com.au',
+    )
+    expect(html).not.toContain('<script>alert(1)')
+    expect(html).toContain('&lt;script&gt;')
+    expect(html).toContain('https://siterun.com.au/bookings/1')
+    expect(textBody(payload, 'https://siterun.com.au')).toContain(
+      'Open SiteRun: https://siterun.com.au/bookings/1',
+    )
+  })
+})

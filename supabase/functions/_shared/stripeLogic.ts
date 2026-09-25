@@ -23,6 +23,17 @@ export type Action =
   | { action: 'pay'; amountCents: number; methodId: string; idempotencyKey: string }
   | { action: 'confirm'; paymentIntentId: string }
   | { action: 'remove'; methodId: string }
+  | { action: 'connect-start'; returnPath: string }
+  | { action: 'connect-status' }
+  | { action: 'payout'; idempotencyKey: string }
+  | { action: 'refund'; paymentId: string; amountCents: number; reason: string }
+
+/** A path back into the app, used for Stripe's onboarding return links. */
+export function safePath(value: unknown, fallback: string): string {
+  return typeof value === 'string' && /^\/(?![/\\])[\w\-/?=&.]*$/.test(value) && value.length <= 120
+    ? value
+    : fallback
+}
 
 /** Validates a request body. Returns the action, or a message for a 400 response. */
 export function parseAction(body: unknown): Action | { error: string } {
@@ -66,6 +77,29 @@ export function parseAction(body: unknown): Action | { error: string } {
       return typeof b.methodId === 'string' && UUID.test(b.methodId)
         ? { action: 'remove', methodId: b.methodId }
         : { error: 'Bad request.' }
+    case 'connect-start':
+      return { action: 'connect-start', returnPath: safePath(b.returnPath, '/supplier/payouts') }
+    case 'connect-status':
+      return { action: 'connect-status' }
+    case 'payout':
+      return typeof b.idempotencyKey === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(b.idempotencyKey)
+        ? { action: 'payout', idempotencyKey: b.idempotencyKey }
+        : { error: 'Bad request.' }
+    case 'refund': {
+      if (typeof b.paymentId !== 'string' || !UUID.test(b.paymentId))
+        return { error: 'Bad request.' }
+      if (
+        typeof b.amountCents !== 'number' ||
+        !Number.isInteger(b.amountCents) ||
+        b.amountCents < 1
+      ) {
+        return { error: 'Enter an amount above $0.' }
+      }
+      const reason = typeof b.reason === 'string' ? b.reason.trim() : ''
+      if (reason.length < 5 || reason.length > 200)
+        return { error: 'Say why the money is being refunded.' }
+      return { action: 'refund', paymentId: b.paymentId, amountCents: b.amountCents, reason }
+    }
     default:
       return { error: 'Bad request.' }
   }

@@ -205,4 +205,88 @@ describe.runIf(URL && KEY)('row level security', () => {
     expect(ctx.data.org_id).toBe(ACME)
     expect((await anon.rpc('payment_context')).error).not.toBeNull()
   })
+  it('usage events can be sent by anyone but read only by platform admins', async () => {
+    expect(
+      (await anon.rpc('track_event', { p_kind: 'search', p_query: 'rls test excavator' })).error,
+    ).toBeNull()
+    expect((await alex.rpc('track_event', { p_kind: 'machine_view' })).error).toBeNull()
+    expect((await alex.from('analytics_events').select('id')).data).toEqual([])
+    expect(((await admin.from('analytics_events').select('id')).data ?? []).length).toBeGreaterThan(
+      0,
+    )
+    expect((await alex.from('analytics_events').insert({ kind: 'booking' })).error).not.toBeNull()
+    expect((await alex.rpc('analytics_summary', { range_key: '30d' })).error).not.toBeNull()
+    expect((await admin.rpc('analytics_summary', { range_key: '30d' })).error).toBeNull()
+  })
+
+  it('only platform admins can cancel, adjust or refund on someone’s behalf', async () => {
+    const booking = 'c2778e0e-0d84-4cb0-a2d9-39ce464a5346'
+    for (const client of [alex, jordan, anon]) {
+      expect(
+        (await client.rpc('admin_cancel_booking', { p_booking: booking, p_reason: 'Trying it on' }))
+          .error,
+      ).not.toBeNull()
+      expect(
+        (
+          await client.rpc('admin_adjust_booking', {
+            p_booking: booking,
+            p_end_date: null,
+            p_total_cents: 1,
+            p_reason: 'Trying it on',
+          })
+        ).error,
+      ).not.toBeNull()
+      expect((await client.rpc('admin_payments', { p_booking: booking })).error).not.toBeNull()
+      expect(
+        (await client.rpc('admin_refund_context', { p_payment: booking })).error,
+      ).not.toBeNull()
+    }
+    // An admin gets in, but still has to give a reason.
+    expect(
+      (await admin.rpc('admin_cancel_booking', { p_booking: booking, p_reason: 'no' })).error
+        ?.message,
+    ).toMatch(/say why/i)
+    expect((await admin.rpc('admin_payments', { p_booking: booking })).error).toBeNull()
+  })
+
+  it('payout accounts and email preferences stay with their owner', async () => {
+    const jordanAccount = await jordan.rpc('payout_account')
+    expect(jordanAccount.error).toBeNull()
+    expect(jordanAccount.data).toMatchObject({ provider: 'mock', connected: false })
+    // A contractor is not a supplier, so there is no payout account to see.
+    expect((await alex.rpc('payout_account')).error).not.toBeNull()
+    expect((await anon.rpc('payout_context')).error).not.toBeNull()
+    expect((await anon.rpc('set_email_notifications', { p_on: false })).error).not.toBeNull()
+    expect((await alex.rpc('set_email_notifications', { p_on: true })).error).toBeNull()
+  })
+
+  it('the payout and refund plumbing is closed to the app', async () => {
+    for (const client of [anon, alex, jordan, admin]) {
+      expect(
+        (await client.rpc('stripe_set_account', { p_org: ACME, p_account: 'acct_fake' })).error,
+      ).not.toBeNull()
+      expect(
+        (
+          await client.rpc('stripe_record_payout', {
+            p_org: ACME,
+            p_amount: 100,
+            p_by: null,
+            p_transfer: 'tr_fake',
+          })
+        ).error,
+      ).not.toBeNull()
+      expect(
+        (
+          await client.rpc('stripe_record_refund', {
+            p_admin: null,
+            p_payment: ACME,
+            p_amount: 1,
+            p_reason: 'x',
+            p_ref: 're_fake',
+          })
+        ).error,
+      ).not.toBeNull()
+      expect((await client.rpc('email_payload', { p_notification: ACME })).error).not.toBeNull()
+    }
+  })
 })
