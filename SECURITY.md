@@ -43,7 +43,7 @@ to copy it anywhere.
   never sees, stores or logs a password.
 - The client only decides what to _show_. Every rule is also enforced in the database, so
   a crafted request gets the same answer as the UI:
-  - **RLS** on all 29 public tables (100% coverage, every table has at least one policy).
+  - **RLS** on all 30 public tables (100% coverage, every table has at least one policy).
   - Reads use tables and `security_invoker` views, so the caller's policies apply.
   - Writes with business rules go through `SECURITY DEFINER` functions that start with a
     caller check — `private.require_admin()`, `private.require_supplier()`,
@@ -56,8 +56,9 @@ to copy it anywhere.
 - **Platform admin** is `profiles.is_platform_admin`, set in the database only. Sign-up
   metadata can never set it, the sign-up screen has no such option, and `require_admin()`
   rejects everyone else with `42501`. `npm run test:rls` covers this.
-- Anonymous visitors may call two functions: `search_machines` (live listings only, what
-  the public search page shows) and `log_client_error` (crash reports).
+- Anonymous visitors may call three functions: `search_machines` (live listings only, what
+  the public search page shows), `log_client_error` (crash reports) and `track_event`
+  (usage counts). The last two are capped per hour, per person and overall.
 - The dev pages (`/dev/brand`, `/dev/components`, `/dev/screens`) are compiled out of
   production builds — the route only exists when `import.meta.env.DEV` is true, and no dev
   chunk appears in `dist/`.
@@ -89,23 +90,24 @@ function, so they apply to every path — an RPC, a direct PostgREST insert, or 
 request. Requests with no signed-in user (service role, `pg_cron`, seeding) are not
 limited.
 
-| Action                         | Limit per user                                    |
-| ------------------------------ | ------------------------------------------------- |
-| Messages                       | 30 per minute                                     |
-| Bookings                       | 20 per hour                                       |
-| Invitations                    | 20 per hour                                       |
-| Support tickets                | 10 per hour                                       |
-| Payments                       | 20 per hour                                       |
-| Saved cards                    | 10 per hour                                       |
-| Payout requests                | 10 per hour                                       |
-| Machine listings               | 30 per hour                                       |
-| Machine photos                 | 120 per hour                                      |
-| Compliance documents           | 60 per hour                                       |
-| Reviews                        | 20 per hour                                       |
-| Sites                          | 30 per hour                                       |
-| Live location updates          | 720 per hour (one every 5 s)                      |
-| Stripe card setups and charges | 30 per hour                                       |
-| Error reports                  | 60 per hour, and 300 per hour across all visitors |
+| Action                         | Limit per user                                        |
+| ------------------------------ | ----------------------------------------------------- |
+| Messages                       | 30 per minute                                         |
+| Bookings                       | 20 per hour                                           |
+| Invitations                    | 20 per hour                                           |
+| Support tickets                | 10 per hour                                           |
+| Payments                       | 20 per hour                                           |
+| Saved cards                    | 10 per hour                                           |
+| Payout requests                | 10 per hour                                           |
+| Machine listings               | 30 per hour                                           |
+| Machine photos                 | 120 per hour                                          |
+| Compliance documents           | 60 per hour                                           |
+| Reviews                        | 20 per hour                                           |
+| Sites                          | 30 per hour                                           |
+| Live location updates          | 720 per hour (one every 5 s)                          |
+| Stripe card setups and charges | 30 per hour                                           |
+| Error reports                  | 60 per hour, and 300 per hour across all visitors     |
+| Usage events (analytics)       | 600 per hour, and 20,000 per hour across all visitors |
 
 Sign-in, sign-up, OTP and email sending are rate limited by Supabase Auth itself
 (Authentication → Rate limits in the dashboard). The in-browser demo backend has no limits
@@ -190,16 +192,21 @@ changes what the app reveals.
 
 ## Dependencies
 
-`npm audit` reports **0 vulnerabilities** (with and without dev dependencies).
+`npm audit --omit=dev` reports **0 vulnerabilities**: nothing that ships to a browser or a
+phone has a known advisory.
 
 - `react-router-dom` 6 → 7.18.4, fixing the open-redirect and the
   `deserializeErrors` advisories. The v6 `future` flags are v7 defaults and were removed;
   `StaticRouter` now comes from `react-router`.
-- `tar` is pinned through `overrides` to `^7.5.22` for the Capacitor CLI (build tooling),
-  which closes the path-traversal advisory.
 - `@capacitor/assets` was removed from `devDependencies`. It pulled in an unpatched
   `sharp`, `xcode` and `uuid` and is only needed when regenerating app icons, which
   `npm run native:assets` does through `npx`.
+
+**One known dev-only advisory stands:** `tar`, pulled in by `@capacitor/cli` 6. Pinning it
+forward broke `npx cap sync` — the Capacitor 6 CLI uses tar v6's default export, which v7
+doesn't have — so the pin was removed. `tar` runs only on a developer's machine, when the
+CLI unpacks plugin templates, and never on the site or in the apps. It clears when
+Capacitor is upgraded to 8, which is a native-release job (`MOBILE_BUILD.md`).
 
 ## Exposed files
 
@@ -219,11 +226,12 @@ added in any commit. The only `service_role` match is the phrase inside an RLS p
 
 `security`: the two remaining warnings are expected.
 
-1. _SECURITY DEFINER functions are callable by signed-in users (30) and by anonymous
-   visitors (2)._ That is the design: each function checks the caller first.
-   `search_machines` is the public search and `log_client_error` takes crash reports from
-   signed-out visitors too (capped and deduplicated). The service-only functions for
-   Stripe and push are not callable by either role. Re-verified function by function.
+1. _SECURITY DEFINER functions are callable by signed-in users (40) and by anonymous
+   visitors (3)._ That is the design: each function checks the caller first.
+   `search_machines` is the public search, and `log_client_error` and `track_event` take
+   crash reports and usage counts from signed-out visitors too (both capped). The
+   service-only functions for Stripe, payouts, push and email are not callable by either
+   role. Re-verified function by function.
 2. _Leaked password protection disabled._ Owner action, below.
 
 `performance`: only INFO items — indexes on audit columns (`*_by` foreign keys) that no
@@ -240,13 +248,27 @@ query filters on, and indexes not yet used by the demo data volume.
 4. Keep the service role key and the Stripe, Firebase and Apple keys out of the app and
    the repository: they belong only in Supabase's Edge Function secrets (`LAUNCH.md`).
 
+## What admins can do, and what it leaves behind
+
+Platform admins can cancel a hire, change its dates or total, and refund a payment. Each
+one needs a written reason, messages both organisations, writes a booking event, and
+records the admin's id in `admin_actions`. There is no way to change a hire quietly.
+
+## What people are counted doing
+
+`analytics_events` holds four kinds of row — search, machine view, booking started,
+booking — with the search text, the category, the machine, and the organisation when the
+person is signed in. No IP addresses, no cookies, no third-party analytics and no tracking
+across other sites. Platform admins are the only readers, and rows are deleted after 180
+days.
+
 ## What is still mocked
 
 - Card payments stay mocked until the owner adds the Stripe keys and switches
   `payments_provider` (`LAUNCH.md`). In either mode no card number, CVC or bank detail is
   ever stored — only the card brand, expiry and last four digits.
-- Supplier payouts are recorded in the app but paid outside it (Stripe Connect isn't
-  built).
+- Supplier payouts move real money only once Stripe is switched on; until then they are
+  recorded as before.
 
 ## Reporting a problem
 

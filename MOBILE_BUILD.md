@@ -110,16 +110,17 @@ needed when the icons change.
 
 ## Device features
 
-| Feature                      | Where it's used                           | Permission           |
-| ---------------------------- | ----------------------------------------- | -------------------- |
-| Camera / photo library       | Machine photos, document scans            | Camera, Photos       |
-| Location                     | "Use my location" on the site map         | Location when in use |
-| Filesystem                   | Invoices and statements save to Documents | —                    |
-| Haptics                      | Success and error feedback                | —                    |
-| Status bar, splash, keyboard | App chrome                                | —                    |
-| Back button (Android)        | Closes sheets, then goes back, then exits | —                    |
-| Deep links                   | Sign-in and email links                   | —                    |
-| Push notifications           | Off unless `VITE_PUSH_ENABLED=true`       | Notifications        |
+| Feature                      | Where it's used                             | Permission                                     |
+| ---------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| Camera / photo library       | Machine photos, document scans              | Camera, Photos                                 |
+| Location                     | "Use my location" on the site map           | Location when in use                           |
+| Background location          | Sharing a delivery's location while driving | Location always (Android shows a notification) |
+| Filesystem                   | Invoices and statements save to Documents   | —                                              |
+| Haptics                      | Success and error feedback                  | —                                              |
+| Status bar, splash, keyboard | App chrome                                  | —                                              |
+| Back button (Android)        | Closes sheets, then goes back, then exits   | —                                              |
+| Deep links                   | Sign-in and email links                     | —                                              |
+| Push notifications           | Off unless `VITE_PUSH_ENABLED=true`         | Notifications                                  |
 
 ## Sign-in inside the apps
 
@@ -171,6 +172,7 @@ through Apple's push service. Setup, including the Firebase and Apple keys, is i
 ## Known limits
 
 - Push needs the Firebase and Apple keys before anything is sent (`LAUNCH.md`).
-- Live location is shared only while SiteRun is open on the driver's phone; background tracking isn't included.
+- Live location keeps sharing while the phone is locked, through `@capacitor-community/background-geolocation`. Both stores ask why at review; the wording is in `LAUNCH.md`.
+- That plugin ships native code that hasn't been built or run here (no Android SDK, no Mac).
 - Payments are mocked, so the stores' in-app purchase rules don't apply. Real card payments through Stripe are outside the app stores' IAP rules because they pay for physical equipment hire.
 - The apps were built and verified here, but not run on an emulator or device: this machine has no Android SDK and iOS needs a Mac.

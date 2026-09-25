@@ -3,13 +3,17 @@
 Five features are built and deployed but need accounts or secrets that only the owner can
 create. Each one is off, and harmless, until its steps are done. Do them in any order.
 
-| Feature                 | Works now?                      | Needs                                  |
-| ----------------------- | ------------------------------- | -------------------------------------- |
-| Live GPS for deliveries | Yes                             | Nothing                                |
-| Error monitoring        | Yes (Admin → More → App errors) | Nothing                                |
-| Terms and Privacy pages | Yes                             | Company details, then a lawyer's check |
-| Card payments (Stripe)  | Built, still mocked             | A Stripe account                       |
-| Push notifications      | Built, nothing is sent          | Firebase (Android), an Apple key (iOS) |
+| Feature                              | Works now?                      | Needs                                        |
+| ------------------------------------ | ------------------------------- | -------------------------------------------- |
+| Live GPS for deliveries              | Yes                             | Nothing                                      |
+| Error monitoring                     | Yes (Admin → More → App errors) | Nothing                                      |
+| Analytics                            | Yes (Admin → More → Analytics)  | Nothing                                      |
+| Admin tools (cancel, change, refund) | Yes (Admin → Bookings)          | Nothing (refunds need Stripe for real money) |
+| Terms and Privacy pages              | Yes                             | Company details, then a lawyer's check       |
+| Card payments (Stripe)               | Built, still mocked             | A Stripe account                             |
+| Supplier payouts (Stripe)            | Built, recorded only            | The same Stripe account, with Connect        |
+| Push notifications                   | Built, nothing is sent          | Firebase (Android), an Apple key (iOS)       |
+| Notification emails                  | Built, nothing is sent          | A Resend account and a verified domain       |
 
 Secrets go in **Supabase → Edge Functions → Secrets** (or `npx supabase secrets set NAME=value`).
 They never go in `.env`, the repository or Vercel.
@@ -46,6 +50,21 @@ Stripe. SiteRun stores only the brand, last four digits, expiry and Stripe's id 
    through Stripe; the mock "pay" and "save card" calls are rejected.
 8. Going live: swap both keys for the live ones (`pk_live_…`, `sk_live_…`), add a live-mode
    webhook with the same URL and events, and update `STRIPE_WEBHOOK_SECRET`.
+
+### Paying suppliers (Stripe Connect)
+
+Suppliers are paid from SiteRun's Stripe balance to their own Stripe account, which they
+set up themselves. SiteRun never sees or stores their bank details.
+
+1. In Stripe, open **Connect** and enable it (Express accounts). Set the branding — name,
+   colour and logo — under Connect → Settings, because suppliers see it during setup.
+2. Nothing else to configure: with `payments_provider` set to `stripe`, the Payouts screen
+   shows "Set Up Payouts", which sends the supplier's owner to Stripe and back.
+3. A payout moves money the moment the owner taps Request Payout, so SiteRun's Stripe
+   balance has to cover it. Card payments take a couple of days to settle, so a payout can
+   come back with "Payments from this week haven't settled yet" — that's Stripe, not a bug.
+4. Refunds: a platform admin opens **Admin → Bookings → the booking → Refund a Payment**.
+   With Stripe on, the money goes back to the card; in mock mode it's recorded only.
 
 To undo: `select private.put_config('payments_provider', 'mock');` and remove
 `VITE_STRIPE_PUBLISHABLE_KEY`.
@@ -91,7 +110,30 @@ The function is called only by the database, with a secret the database generate
 in Vault; nothing else can trigger a push. Tokens that Firebase or Apple report as dead are
 deleted, and signing out removes that phone's token.
 
-## 3. Live GPS
+## 3. Notification emails
+
+Every notification the app already shows (bookings, deliveries, invoices, documents,
+listings) is also emailed, unless the person turns email off under Account → Privacy &
+Security. Chat messages are never emailed.
+
+1. Create a [Resend](https://resend.com) account and verify the domain you'll send from
+   (it walks you through the DNS records). A verified domain is what keeps the mail out of
+   spam folders.
+2. **API keys → Create API key** (sending permission is enough).
+3. Supabase Edge Function secrets:
+   - `RESEND_API_KEY` = that key
+   - `EMAIL_FROM` = the sender, e.g. `SiteRun <notifications@siterun.com.au>`
+   - `SITE_URL` = the deployed site, e.g. `https://siterun.com.au` (used for the button in
+     the email)
+4. Tell the database where the function is (already done for the demo project):
+   ```sql
+   select private.put_config('email_function_url', 'https://<project-ref>.supabase.co/functions/v1/email');
+   ```
+
+To stop all emails again: `select private.put_config('email_function_url', '');` — or leave
+the secrets unset.
+
+## 4. Live GPS
 
 Nothing to set up. When a supplier marks a delivery **Dispatched**, the driver (the
 assigned operator, or anyone in the supplier's team) sees **Share Live Location** on the
@@ -100,12 +142,19 @@ with an arrival time from the real distance left.
 
 - Positions are sent about every 6–20 seconds, only while sharing is on, and only while
   the delivery is in transit. Each position is kept for two days.
-- The phone must keep SiteRun open during the drive (the screen is kept awake on phones
-  that allow it). Sharing in the background, with the app closed, needs an extra native
-  plugin and the "location always" permission, which the app stores review closely; it
-  isn't included.
+- In the apps, sharing keeps going when the phone is locked or the driver switches apps.
+  Android shows a notification for the whole trip (that's what makes background location
+  allowed), and it stops when the driver taps Stop Sharing or the delivery ends.
+- On the website, sharing only runs while the tab is open.
+- The app stores ask why an app needs background location. The answer for both: "Drivers
+  share their location with the customer while delivering hired equipment, and only while
+  a delivery is in progress." Android also needs the declaration form for
+  `ACCESS_BACKGROUND_LOCATION`, and iOS needs the "location" background mode, which is
+  already in `Info.plist`.
+- **Not tested on a device.** The plugin ships native code for both platforms, and this
+  machine can't build either app.
 
-## 4. Error monitoring
+## 5. Error monitoring
 
 Nothing to set up. Crashes and unhandled errors on the website and in the apps are reported
 automatically and listed under **Admin → More → App errors**, newest first, with a count,
@@ -114,7 +163,26 @@ contents, query strings or tokens. Reports are kept for 90 days.
 
 A crashing screen shows "Something went wrong" with a Reload button instead of a blank page.
 
-## 5. Terms and Privacy
+## 6. Analytics
+
+Nothing to set up. **Admin → More → Analytics** shows searches, machine views, started
+bookings and bookings for the last 7 days to a year, the funnel between them, the busiest
+searches and categories, and the most viewed machines with how many of those views became
+hires. Counts only, kept for 180 days, stored in SiteRun's own database — no third-party
+analytics service, no cookies, nothing shared.
+
+## 7. Admin tools
+
+Nothing to set up. **Admin → Bookings → a booking** can:
+
+- **Cancel the hire** on both parties' behalf, with a reason they both see.
+- **Change the dates or total** after a dispute, again with a reason.
+- **Refund a payment**, fully or partly.
+
+Each one messages both organisations, writes to the booking's history and shows up in the
+admin activity feed with the admin's name attached.
+
+## 8. Terms and Privacy
 
 The pages at `/terms` and `/privacy` now cover the real service: the marketplace model,
 bookings and GST, Stripe payments, supplier compliance, operators and live location, the

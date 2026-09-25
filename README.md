@@ -74,9 +74,11 @@ How it fits together:
 - Payments are mocked. Only card brand, last four digits and expiry are stored (`payment_methods.last4` is `char(4)`).
 - Storage buckets: `machine-photos` (public), `avatars` (public), `compliance-docs` and `message-attachments` (private, signed URLs).
 - Realtime: messages, notifications, deliveries and bookings.
-- Edge Functions (`supabase/functions`): `payments` (Stripe card setup, charges, removal), `stripe-webhook` (Stripe events, signature-checked) and `push` (Firebase and Apple push, called only by the database). Their secrets are set in Supabase, never in `.env`; see `LAUNCH.md`.
+- Edge Functions (`supabase/functions`): `payments` (Stripe cards, charges, supplier payouts through Connect, refunds), `stripe-webhook` (Stripe events, signature-checked), `push` (Firebase and Apple push) and `email` (Resend). The last two are called only by the database. Their secrets are set in Supabase, never in `.env`; see `LAUNCH.md`.
 - Live GPS: drivers share position through `report_location()` while a delivery is in transit; the simulator only moves deliveries without real GPS.
 - Error reports: `log_client_error()` from the website and apps, listed for admins at `/admin/errors`, kept 90 days.
+- Usage counts: `track_event()` records searches, machine views and bookings for the admin analytics screen at `/admin/analytics`, kept 180 days.
+- Platform admin tools: `admin_cancel_booking()`, `admin_adjust_booking()` and refunds, each with a written reason, a notification to both organisations and an entry in the activity feed.
 - pg_cron: `siterun-document-expiry` (daily 20:00 UTC, 06:00 AEST) warns at 30/14/7 days and pauses listings with expired required documents; `siterun-simulate-deliveries` moves in-transit trucks along their route every 20 seconds.
 
 ### Auth settings (Supabase dashboard)

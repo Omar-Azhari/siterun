@@ -252,3 +252,34 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **`?next=` paths are validated** (`safeNextPath`): the old check accepted `//host`.
   `pushState` would have refused to leave the site, so it wasn't exploitable, but it's now
   closed properly for sign-in, saving a card and tapped push notifications.
+
+## Phase 9 (running the business)
+
+- **Suppliers are paid through Stripe Connect Express.** They set up their own Stripe
+  account; SiteRun never sees bank details, only whether Stripe will pay that account yet.
+  A payout is a transfer from SiteRun's balance, recorded against the transfer id so a
+  retry can't pay twice. Payouts stay recorded-only until `payments_provider` is `stripe`.
+- **Refunds and hire fixes belong to platform admins, not suppliers.** A dispute usually
+  needs someone neutral to cancel a hire, change its dates or price, or hand money back.
+  Every action needs a written reason, messages both organisations, writes to the booking's
+  history and lands in the admin activity feed.
+- **Refunds are recorded on the payment**, not as a negative one: `payments.refunded_cents`
+  plus a `refund` row for the history. With Stripe on, the Edge Function refunds the charge
+  first and records it against the Stripe refund id.
+- **Notification emails reuse the notification table.** Anything already worth a bell in the
+  app is worth an email, so a second trigger on `notifications` posts to an `email` Edge
+  Function (Resend). Chat messages are the exception: they'd be a firehose, and push already
+  covers them. Turning email off is a real setting on the profile that the server checks,
+  not a browser preference.
+- **Analytics is four counters in our own database** (search, machine view, booking started,
+  booking) rather than a third-party service: no extra vendor in the privacy policy, no
+  cookie banner, and it works the same in the demo. Kept 180 days.
+- **Background GPS uses `@capacitor-community/background-geolocation`.** Capacitor's own
+  Geolocation stops when the app is backgrounded, which is useless for a driver whose phone
+  locks in the cab. Android shows a permanent notification while sharing, which is what
+  makes it allowed, and both stores need a written reason at review (`LAUNCH.md`).
+- **The `tar` override from the security pass had to go.** Pinning `tar` to v7 patched a
+  dev-only advisory but broke `npx cap sync`: the Capacitor 6 CLI imports tar's v6 default
+  export, so `cap sync` died with "Cannot read properties of undefined". The lock now
+  resolves the CLI's own `tar@6`, and the advisory is back to being a known, dev-only one
+  until Capacitor is upgraded to v8.
