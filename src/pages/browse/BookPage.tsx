@@ -21,6 +21,7 @@ import { cn } from '@/lib/cn'
 import { formatMoney } from '@/lib/format'
 import { bookingTotal, hireDays } from '@/lib/booking'
 import { useApiMutation, useMachine, useMe, useSites } from '@/data/hooks'
+import { track, useTrack } from '@/lib/track'
 import type { DeliveryMethod, HireType } from '@/data/types'
 
 /** Board 03 · Book Equipment */
@@ -50,6 +51,7 @@ export function BookPage() {
 
   const m = machine.data
   const hireType = (params.get('hire') as HireType | null) ?? 'dry'
+  useTrack('book_start', { machineId: m?.id })
   if (me?.role === 'viewer') return <Navigate to={`/machines/${id}`} replace />
   if (machine.isPending)
     return (
@@ -99,7 +101,12 @@ export function BookPage() {
         siteId: site.id,
         message,
       },
-      { onSuccess: (b) => navigate(`/bookings/${b.id}/confirmed`, { replace: true }) },
+      {
+        onSuccess: (b) => {
+          track('booking', { machineId: m.id })
+          navigate(`/bookings/${b.id}/confirmed`, { replace: true })
+        },
+      },
     )
   }
 

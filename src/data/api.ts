@@ -5,6 +5,7 @@ import type {
   AdminStats,
   AppNotification,
   BillingPeriod,
+  AnalyticsSummary,
   BookingView,
   ClientError,
   CollectionRequest,
@@ -24,16 +25,19 @@ import type {
   OrgMember,
   Organisation,
   PaymentMethod,
+  PayoutAccount,
   PerformanceSummary,
   Payout,
   PayoutSummary,
   PlanId,
   Profile,
+  RefundablePayment,
   SearchFilters,
   SearchResult,
   Site,
   Subscription,
   SupportTicket,
+  TrackedEvent,
 } from './types'
 
 export interface SignUpInput {
@@ -128,11 +132,18 @@ export interface Api {
   savePushToken(token: string, platform: string): Promise<void>
   /** Sends an error report. Never throws. */
   logClientError(report: ErrorReport): Promise<void>
+  /** Records how the app is used, for the admin analytics screen. Never throws. */
+  track(
+    event: TrackedEvent,
+    detail?: { machineId?: string; category?: string; query?: string },
+  ): Promise<void>
 
   // Me / account
   getMe(): Promise<Me | null>
   completeBusinessProfile(input: BusinessProfileInput): Promise<Organisation>
   updateProfile(patch: Partial<Pick<Profile, 'fullName' | 'phone'>>): Promise<Profile>
+  /** Turns the notification emails on or off for the signed-in person. */
+  setEmailNotifications(on: boolean): Promise<void>
   updateOrganisation(patch: Partial<Omit<Organisation, 'id' | 'kind'>>): Promise<Organisation>
 
   // Sites & team
@@ -221,6 +232,12 @@ export interface Api {
   /** Supplier lifecycle: confirmed → in_transit → on_site → completed (completion raises the invoice). */
   advanceBooking(id: string, to: 'in_transit' | 'on_site' | 'completed'): Promise<BookingView>
   getPayoutSummary(): Promise<PayoutSummary>
+  /** Whether this supplier can be paid through Stripe yet. */
+  getPayoutAccount(): Promise<PayoutAccount>
+  /** Starts (or resumes) Stripe's onboarding and returns the page to send the owner to. */
+  startPayoutSetup(returnPath: string): Promise<{ url: string }>
+  /** Asks Stripe whether onboarding is finished. */
+  refreshPayoutAccount(): Promise<PayoutAccount>
   listPayouts(): Promise<Payout[]>
   requestPayout(): Promise<Payout>
   getPerformance(range: '30d' | '90d' | '1y'): Promise<PerformanceSummary>
@@ -248,6 +265,16 @@ export interface Api {
   listSupplierOrgs(): Promise<(Organisation & { machineCount: number; liveCount: number })[]>
   listAllBookings(): Promise<BookingView[]>
   listClientErrors(): Promise<ClientError[]>
+  getAnalytics(range: TimeRange): Promise<AnalyticsSummary>
+  /** Payments on a booking's account that still have something left to refund. */
+  listRefundablePayments(bookingId: string): Promise<RefundablePayment[]>
+  adminCancelBooking(bookingId: string, reason: string): Promise<BookingView>
+  adminAdjustBooking(
+    bookingId: string,
+    change: { endDate?: string; totalCents?: number },
+    reason: string,
+  ): Promise<BookingView>
+  adminRefund(paymentId: string, amountCents: number, reason: string): Promise<void>
 }
 
 export class ApiError extends Error {

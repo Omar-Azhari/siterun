@@ -23,6 +23,7 @@ import {
   rangesOverlap,
   SWAP_OPTIONS,
 } from '@/lib/booking'
+import { formatDate, formatMoney } from '@/lib/format'
 import { geocodeLocal } from '@/lib/geo'
 import { hashPassword, verifyPassword } from '@/lib/passwordHash'
 import {
@@ -36,6 +37,7 @@ import {
 import { DEMO_OTP } from '../constants'
 import { buildSeed, DB_VERSION, type DemoDb } from '../seed'
 import type {
+  AdminActivity,
   AppNotification,
   Booking,
   BookingStatus,
@@ -325,6 +327,10 @@ export class DemoApi implements Api {
     // Push needs the Supabase backend.
   }
 
+  async track() {
+    // The demo store has no analytics; the admin screen shows the seeded numbers.
+  }
+
   async logClientError(r: ErrorReport) {
     const frame = (stack: string) => stack.split('\n')[1] ?? ''
     const same = this.errors.find(
@@ -419,6 +425,13 @@ export class DemoApi implements Api {
     }
     this.commit('profiles')
     return org
+  }
+
+  async setEmailNotifications(on: boolean) {
+    await wait()
+    const p = this.me()
+    p.emailNotifications = on
+    this.commit('profiles')
   }
 
   async updateProfile(patch: Partial<Pick<Profile, 'fullName' | 'phone'>>) {
@@ -743,6 +756,10 @@ export class DemoApi implements Api {
 
   private canSee(b: Booking, p: Profile) {
     return p.isPlatformAdmin || p.orgId === b.contractorOrgId || p.orgId === b.supplierOrgId
+  }
+
+  private addActivity(kind: AdminActivity['kind'], title: string, detail: string) {
+    this.db.activity.unshift({ id: uid('a'), kind, title, detail, createdAt: nowIso() })
   }
 
   private notifyOrg(
@@ -1778,6 +1795,26 @@ export class DemoApi implements Api {
       .reduce((s, b) => s + Math.round(b.totalCents * 0.9), 0)
   }
 
+  async getPayoutAccount() {
+    await wait()
+    const me = this.me()
+    return {
+      provider: 'mock' as const,
+      isOwner: this.myRoleOrNull(me.id) === 'owner',
+      connected: false,
+      detailsSubmitted: false,
+      payoutsEnabled: false,
+    }
+  }
+
+  async startPayoutSetup(): Promise<{ url: string }> {
+    throw new ApiError('Payouts need Stripe to be set up.', 'invalid')
+  }
+
+  async refreshPayoutAccount() {
+    return this.getPayoutAccount()
+  }
+
   async getPayoutSummary() {
     await wait()
     const org = this.requireSupplier()
@@ -2163,6 +2200,174 @@ export class DemoApi implements Api {
       )
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .map((b) => this.view(b))
+  }
+
+  async getAnalytics(range: TimeRange) {
+    await wait()
+    this.requireAdmin()
+    // Demo figures, shaped like the real ones so the screen looks the same.
+    const days = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 }[range]
+    const scale = days / 30
+    const round = (n: number) => Math.round(n * scale)
+    const machines = this.db.machines.filter((m) => m.status === 'live').slice(0, 6)
+    return {
+      searches: round(1840),
+      views: round(960),
+      bookStarts: round(210),
+      bookings: round(96),
+      organisations: round(64),
+      searchTrend: 12,
+      bookingTrend: 8,
+      viewToBooking: 10,
+      topSearches: [
+        { label: 'excavator', count: round(240) },
+        { label: '5t excavator', count: round(180) },
+        { label: 'scissor lift', count: round(120) },
+        { label: 'tipper', count: round(90) },
+      ],
+      topCategories: this.db.categories.slice(0, 4).map((c, i) => ({
+        label: c.name,
+        count: round(300 - i * 60),
+      })),
+      topMachines: machines.map((m, i) => ({
+        id: m.id,
+        label: m.title,
+        views: round(160 - i * 18),
+        bookings: round(18 - i * 2),
+      })),
+      daily: Array.from({ length: Math.min(days, 30) }, (_, i) => ({
+        date: format(subDays(new Date(), Math.min(days, 30) - 1 - i), 'yyyy-MM-dd'),
+        searches: 40 + ((i * 7) % 25),
+        bookings: 2 + (i % 4),
+      })),
+    }
+  }
+
+  async listRefundablePayments(bookingId: string) {
+    await wait()
+    this.requireAdmin()
+    const b = this.db.bookings.find((x) => x.id === bookingId)
+    if (!b) throw new ApiError('Booking not found.', 'not_found')
+    return this.db.payments
+      .filter(
+        (p) =>
+          p.orgId === b.contractorOrgId &&
+          p.kind !== 'refund' &&
+          p.amountCents > (p.refundedCents ?? 0),
+      )
+      .map((p) => ({
+        id: p.id,
+        amountCents: p.amountCents,
+        refundedCents: p.refundedCents ?? 0,
+        kind: p.kind,
+        description: p.description,
+        createdAt: p.createdAt,
+      }))
+      .sort((a, b2) => b2.createdAt.localeCompare(a.createdAt))
+  }
+
+  async adminCancelBooking(bookingId: string, reason: string) {
+    await wait(300)
+    this.requireAdmin()
+    if (reason.trim().length < 5)
+      throw new ApiError('Say why the hire is being cancelled.', 'invalid')
+    const b = this.db.bookings.find((x) => x.id === bookingId)
+    if (!b) throw new ApiError('Booking not found.', 'not_found')
+    if (['cancelled', 'completed', 'declined'].includes(b.status)) {
+      throw new ApiError('That hire is already finished.', 'invalid')
+    }
+    b.status = 'cancelled'
+    b.declineReason = reason
+    const m = this.db.machines.find((x) => x.id === b.machineId)
+    for (const org of [b.contractorOrgId, b.supplierOrgId]) {
+      this.notifyOrg(org, {
+        type: 'booking',
+        title: 'Hire Cancelled by SiteRun',
+        body: `${m?.title ?? 'Machine'} · ${b.ref}`,
+        detail: reason,
+        link: org === b.contractorOrgId ? `/bookings/${b.id}` : `/supplier/bookings/${b.id}`,
+      })
+    }
+    this.addActivity('booking_cancelled', 'Hire cancelled', `${b.ref} · ${reason}`)
+    this.commit('bookings')
+    return this.view(b)
+  }
+
+  async adminAdjustBooking(
+    bookingId: string,
+    change: { endDate?: string; totalCents?: number },
+    reason: string,
+  ) {
+    await wait(300)
+    this.requireAdmin()
+    if (reason.trim().length < 5)
+      throw new ApiError('Say why the hire is being changed.', 'invalid')
+    const b = this.db.bookings.find((x) => x.id === bookingId)
+    if (!b) throw new ApiError('Booking not found.', 'not_found')
+    if (['cancelled', 'declined'].includes(b.status)) {
+      throw new ApiError('That hire is no longer live.', 'invalid')
+    }
+    const changes: string[] = []
+    if (change.endDate) {
+      if (change.endDate < b.startDate)
+        throw new ApiError('The end date can’t be before the start.', 'invalid')
+      changes.push(`end date ${formatDate(b.endDate)} → ${formatDate(change.endDate)}`)
+      b.endDate = change.endDate
+    }
+    if (change.totalCents != null) {
+      if (change.totalCents < 0) throw new ApiError('Enter a total of $0 or more.', 'invalid')
+      changes.push(`total ${formatMoney(b.totalCents)} → ${formatMoney(change.totalCents)}`)
+      b.totalCents = change.totalCents
+    }
+    if (!changes.length) throw new ApiError('Change the end date or the total.', 'invalid')
+    for (const org of [b.contractorOrgId, b.supplierOrgId]) {
+      this.notifyOrg(org, {
+        type: 'booking',
+        title: 'Hire Updated by SiteRun',
+        body: b.ref,
+        detail: changes.join(', '),
+        link: org === b.contractorOrgId ? `/bookings/${b.id}` : `/supplier/bookings/${b.id}`,
+      })
+    }
+    this.addActivity('booking_adjusted', 'Hire adjusted', `${b.ref} · ${changes.join(', ')}`)
+    this.commit('bookings')
+    return this.view(b)
+  }
+
+  async adminRefund(paymentId: string, amountCents: number, reason: string) {
+    await wait(300)
+    this.requireAdmin()
+    if (reason.trim().length < 5)
+      throw new ApiError('Say why the money is being refunded.', 'invalid')
+    const pay = this.db.payments.find((p) => p.id === paymentId)
+    if (!pay) throw new ApiError('Payment not found.', 'not_found')
+    const left = pay.amountCents - (pay.refundedCents ?? 0)
+    if (amountCents <= 0 || amountCents > left) {
+      throw new ApiError(`Refund up to ${formatMoney(left, { cents: true })}.`, 'invalid')
+    }
+    pay.refundedCents = (pay.refundedCents ?? 0) + amountCents
+    this.db.payments.push({
+      ...pay,
+      id: uid('pay'),
+      amountCents,
+      refundedCents: 0,
+      kind: 'refund',
+      description: `Refund: ${reason}`,
+      createdAt: nowIso(),
+    })
+    this.notifyOrg(pay.orgId, {
+      type: 'invoice',
+      title: 'Refund Issued',
+      body: `${formatMoney(amountCents, { cents: true })} has been refunded to your card.`,
+      detail: reason,
+      link: '/payments',
+    })
+    this.addActivity(
+      'refund',
+      'Refund issued',
+      `${formatMoney(amountCents, { cents: true })} · ${reason}`,
+    )
+    this.commit('billing')
   }
 
   async listClientErrors() {

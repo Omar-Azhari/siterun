@@ -108,6 +108,11 @@ type PaymentsReply = {
   clientSecret?: string
   paymentIntentId?: string
   card?: Record<string, unknown>
+  payout?: Record<string, unknown>
+  url?: string
+  connected?: boolean
+  detailsSubmitted?: boolean
+  payoutsEnabled?: boolean
 }
 
 export class SupabaseApi implements Api {
@@ -350,6 +355,22 @@ export class SupabaseApi implements Api {
     await this.client.auth.signOut()
   }
 
+  async track(
+    event: string,
+    detail: { machineId?: string; category?: string; query?: string } = {},
+  ) {
+    try {
+      await this.client.rpc('track_event', {
+        p_kind: event,
+        p_machine: detail.machineId ?? null,
+        p_category: detail.category ?? null,
+        p_query: detail.query ?? null,
+      })
+    } catch {
+      // Analytics must never get in the way.
+    }
+  }
+
   async logClientError(r: ErrorReport) {
     try {
       await this.client.rpc('log_client_error', {
@@ -393,6 +414,10 @@ export class SupabaseApi implements Api {
       p_address: input.address,
     })
     return map.toOrg(row as Record<string, unknown>)
+  }
+
+  async setEmailNotifications(on: boolean) {
+    await this.rpc('set_email_notifications', { p_on: on })
   }
 
   async updateProfile(patch: Partial<Pick<Profile, 'fullName' | 'phone'>>) {
@@ -866,6 +891,27 @@ export class SupabaseApi implements Api {
     if (r.status !== 'succeeded') throw new ApiError('The payment didn’t go through.', 'invalid')
   }
 
+  async getPayoutAccount() {
+    return (await this.rpc('payout_account')) as import('../types').PayoutAccount
+  }
+
+  async startPayoutSetup(returnPath: string) {
+    const r = await this.payments_('connect-start', { returnPath })
+    if (!r.url) throw new ApiError('Couldn’t open Stripe. Try again.', 'invalid')
+    return { url: r.url }
+  }
+
+  async refreshPayoutAccount() {
+    const r = await this.payments_('connect-status')
+    return {
+      provider: 'stripe' as const,
+      isOwner: true,
+      connected: !!r.connected,
+      detailsSubmitted: !!r.detailsSubmitted,
+      payoutsEnabled: !!r.payoutsEnabled,
+    }
+  }
+
   async listInvoices() {
     const org = await this.orgId()
     return must(
@@ -1121,6 +1167,12 @@ export class SupabaseApi implements Api {
   }
 
   async requestPayout() {
+    if (this.payments === 'stripe') {
+      const r = await this.payments_('payout', { idempotencyKey: newId() })
+      const payout = (r as { payout?: Record<string, unknown> }).payout
+      if (!payout) throw new ApiError('The payout didn’t go through.', 'invalid')
+      return map.toPayout(payout)
+    }
     return map.toPayout(await this.rpc('request_payout'))
   }
 
@@ -1180,6 +1232,49 @@ export class SupabaseApi implements Api {
   private async requireAdmin() {
     const p = await this.profile()
     if (!p.isPlatformAdmin) throw new ApiError('Platform admin access only.', 'forbidden')
+  }
+
+  async getAnalytics(range: TimeRange) {
+    return (await this.rpc('analytics_summary', {
+      range_key: range,
+    })) as import('../types').AnalyticsSummary
+  }
+
+  async listRefundablePayments(bookingId: string) {
+    return (await this.rpc('admin_payments', {
+      p_booking: bookingId,
+    })) as import('../types').RefundablePayment[]
+  }
+
+  async adminCancelBooking(bookingId: string, reason: string) {
+    await this.rpc('admin_cancel_booking', { p_booking: bookingId, p_reason: reason })
+    return this.bookingView(bookingId)
+  }
+
+  async adminAdjustBooking(
+    bookingId: string,
+    change: { endDate?: string; totalCents?: number },
+    reason: string,
+  ) {
+    await this.rpc('admin_adjust_booking', {
+      p_booking: bookingId,
+      p_end_date: change.endDate ?? null,
+      p_total_cents: change.totalCents ?? null,
+      p_reason: reason,
+    })
+    return this.bookingView(bookingId)
+  }
+
+  async adminRefund(paymentId: string, amountCents: number, reason: string) {
+    if (this.payments === 'stripe') {
+      await this.payments_('refund', { paymentId, amountCents, reason })
+      return
+    }
+    await this.rpc('admin_refund_payment', {
+      p_payment: paymentId,
+      p_amount: amountCents,
+      p_reason: reason,
+    })
   }
 
   async listClientErrors() {

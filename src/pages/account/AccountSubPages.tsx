@@ -285,12 +285,18 @@ export function PrivacyPage() {
     defaultValues: { password: '', confirm: '' },
   })
   const password = useWatch({ control: form.control, name: 'password' })
+  const me = useMe()
   const [prefs, setPrefs] = useState<Record<string, boolean>>(() => ({
     email: true,
     sms: true,
     marketing: false,
     ...readPrefs(),
   }))
+  // Email updates are a real setting: the server checks it before sending anything.
+  const emailPref = useApiMutation((api, on: boolean) => api.setEmailNotifications(on), {
+    silent: true,
+  })
+  const emailOn = me.data?.profile.emailNotifications ?? prefs.email ?? true
   const update = useApiMutation((api, pw: string) => api.updatePassword(pw), {
     success: 'Password changed',
   })
@@ -346,8 +352,11 @@ export function PrivacyPage() {
         <ToggleRow
           title="Email updates"
           description="Bookings, invoices and documents"
-          checked={prefs.email ?? true}
-          onChange={(v) => setPref('email', v)}
+          checked={emailOn}
+          onChange={(v) => {
+            setPref('email', v)
+            emailPref.mutate(v)
+          }}
         />
         <ToggleRow
           title="SMS alerts"

@@ -1,5 +1,6 @@
 // Device features used by the app. Plugins load on demand and only inside the native
 // apps; on the web each helper falls back to the browser API.
+import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation'
 import { isNative } from './platform'
 
 /** Camera or photo library on native. Returns null if cancelled. */
@@ -78,23 +79,41 @@ export async function watchPosition(
   const denied = 'Location access is off. Allow SiteRun to use your location to share it.'
 
   if (isNative()) {
-    const { Geolocation } = await import('@capacitor/geolocation')
-    const perm = await Geolocation.checkPermissions()
-    if (perm.location !== 'granted') {
-      const asked = await Geolocation.requestPermissions({ permissions: ['location'] })
-      if (asked.location !== 'granted') {
-        onError(denied)
-        return () => {}
-      }
+    // Keeps sending while the driver locks the phone or switches apps. Android shows a
+    // notification the whole time, which is what makes that allowed.
+    const { registerPlugin } = await import('@capacitor/core')
+    const { BackgroundGeolocation } = {
+      BackgroundGeolocation: registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation'),
     }
-    const id = await Geolocation.watchPosition(
-      { enableHighAccuracy: true, timeout: 20_000, maximumAge: 5_000 },
-      (p, err) => {
-        if (p) onFix(toFix(p.coords))
-        else if (err) onError('Can’t get your location right now. Check GPS is on.')
+    const id = await BackgroundGeolocation.addWatcher(
+      {
+        backgroundTitle: 'Sharing your location with SiteRun',
+        backgroundMessage: 'The customer can see the truck on their tracking map.',
+        requestPermissions: true,
+        stale: false,
+        distanceFilter: 25,
+      },
+      (position, error) => {
+        if (error) {
+          onError(
+            error.code === 'NOT_AUTHORIZED'
+              ? denied
+              : 'Can’t get your location right now. Check GPS is on.',
+          )
+          return
+        }
+        if (position) {
+          onFix({
+            lat: position.latitude,
+            lng: position.longitude,
+            accuracy: Number.isFinite(position.accuracy) ? position.accuracy : null,
+            heading: position.bearing,
+            speed: position.speed,
+          })
+        }
       },
     )
-    return () => void Geolocation.clearWatch({ id })
+    return () => void BackgroundGeolocation.removeWatcher({ id })
   }
 
   if (!navigator.geolocation) {

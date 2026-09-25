@@ -6,6 +6,7 @@ import {
   Building2,
   Bug,
   CalendarDays,
+  ChartLine,
   CircleAlert,
   CircleUserRound,
   FileText,
@@ -23,12 +24,15 @@ import {
   Button,
   ButtonLink,
   Card,
+  DateField,
   EmptyState,
   ErrorState,
   ListRow,
   ListSkeleton,
+  Input,
   ScreenTitle,
   SearchInput,
+  Select,
   SectionLabel,
   SegmentedTabs,
   Skeleton,
@@ -45,6 +49,7 @@ import { getApi } from '@/data/client'
 import {
   useAdminActivity,
   useAdminStats,
+  useBooking,
   useAllBookings,
   useApiMutation,
   useCategories,
@@ -53,6 +58,7 @@ import {
   useMachine,
   usePendingDocuments,
   usePendingMachines,
+  useRefundablePayments,
   useRequirements,
   useSupplierOrgs,
 } from '@/data/hooks'
@@ -69,6 +75,9 @@ const DOT: Record<AdminActivity['kind'], string> = {
   payout: 'bg-success',
   document_verified: 'bg-primary',
   document_rejected: 'bg-warning',
+  booking_cancelled: 'bg-danger',
+  booking_adjusted: 'bg-warning',
+  refund: 'bg-warning',
 }
 
 /** Board 10 · Admin Dashboard */
@@ -635,6 +644,7 @@ export function AdminSuppliersPage() {
 }
 
 export function AdminBookingsPage() {
+  const navigate = useNavigate()
   const bookings = useAllBookings()
   const [q, setQ] = useState('')
   const list = (bookings.data ?? []).filter((b) =>
@@ -657,7 +667,14 @@ export function AdminBookingsPage() {
       {bookings.isPending && <ListSkeleton rows={4} />}
       <div className="space-y-2">
         {list.map((b) => (
-          <Card key={b.id} className="flex items-center gap-3 py-3">
+          <Card
+            key={b.id}
+            role="link"
+            tabIndex={0}
+            onClick={() => navigate(`/admin/bookings/${b.id}`)}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(`/admin/bookings/${b.id}`)}
+            className="flex cursor-pointer items-center gap-3 py-3 hover:border-primary/40"
+          >
             <Thumbnail src={thumb(b.machine.photos[0])} alt="" className="size-12" />
             <div className="min-w-0 flex-1 text-sm">
               <p className="font-semibold">
@@ -699,6 +716,12 @@ export function AdminMorePage() {
           leading={<CircleAlert className="size-7 text-primary" strokeWidth={1.5} />}
           title="Notifications"
           subtitle="Submissions and alerts"
+        />
+        <ListRow
+          to="/admin/analytics"
+          leading={<ChartLine className="size-7 text-primary" strokeWidth={1.5} />}
+          title="Analytics"
+          subtitle="Searches, views and bookings"
         />
         <ListRow
           to="/admin/errors"
@@ -778,6 +801,272 @@ export function AdminErrorsPage() {
           ))}
         </div>
       )}
+    </AppScreen>
+  )
+}
+
+/** Platform admin tools for one booking: cancel it, change it, or refund a payment. */
+export function AdminBookingDetailPage() {
+  const { id = '' } = useParams()
+  const q = useBooking(id)
+  const payments = useRefundablePayments(id)
+  const [sheet, setSheet] = useState<'cancel' | 'adjust' | 'refund' | null>(null)
+  const [reason, setReason] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [total, setTotal] = useState('')
+  const [paymentId, setPaymentId] = useState('')
+  const [amount, setAmount] = useState('')
+  const b = q.data
+
+  const close = () => {
+    setSheet(null)
+    setReason('')
+  }
+  const cancel = useApiMutation(
+    (api, v: { id: string; reason: string }) => api.adminCancelBooking(v.id, v.reason),
+    {
+      success: 'Hire cancelled and both parties told',
+    },
+  )
+  const adjust = useApiMutation(
+    (api, v: { id: string; change: { endDate?: string; totalCents?: number }; reason: string }) =>
+      api.adminAdjustBooking(v.id, v.change, v.reason),
+    { success: 'Hire updated' },
+  )
+  const refund = useApiMutation(
+    (api, v: { paymentId: string; amountCents: number; reason: string }) =>
+      api.adminRefund(v.paymentId, v.amountCents, v.reason),
+    { success: 'Refund issued' },
+  )
+
+  if (q.isPending) {
+    return (
+      <AppScreen>
+        <ListSkeleton rows={3} />
+      </AppScreen>
+    )
+  }
+  if (!b) {
+    return (
+      <AppScreen>
+        <EmptyState title="Booking not found" />
+      </AppScreen>
+    )
+  }
+
+  const live = !['cancelled', 'completed', 'declined'].includes(b.status)
+  const selected = (payments.data ?? []).find((p) => p.id === paymentId)
+  const maxRefund = selected ? (selected.amountCents - selected.refundedCents) / 100 : 0
+
+  return (
+    <AppScreen>
+      <ScreenTitle
+        title={`${b.ref}`}
+        subtitle={`${b.machine.title} · ${b.machine.make} ${b.machine.model}`}
+      />
+      <div className="mb-2 flex items-center justify-between">
+        <StatusPill
+          {...(b.status === 'requested'
+            ? { label: 'Requested', tone: 'warning' as const, mark: 'dot' as const }
+            : dispatchPill(b))}
+          size="md"
+        />
+        <span className="text-sm text-muted">{formatMoney(b.totalCents)} ex. GST</span>
+      </div>
+      <Card className="space-y-2 text-sm">
+        <p className="flex justify-between gap-3">
+          <span className="text-muted">Customer</span>
+          <span className="text-right font-medium">{b.contractor.name}</span>
+        </p>
+        <p className="flex justify-between gap-3">
+          <span className="text-muted">Supplier</span>
+          <span className="text-right font-medium">{b.supplier.name}</span>
+        </p>
+        <p className="flex justify-between gap-3">
+          <span className="text-muted">Dates</span>
+          <span className="text-right">
+            {formatDate(b.startDate)} – {formatDate(b.endDate)}
+          </span>
+        </p>
+        <p className="flex justify-between gap-3">
+          <span className="text-muted">Site</span>
+          <span className="text-right">{b.deliveryAddress}</span>
+        </p>
+        {b.declineReason && (
+          <p className="flex justify-between gap-3">
+            <span className="text-muted">Reason</span>
+            <span className="text-right">{b.declineReason}</span>
+          </p>
+        )}
+      </Card>
+
+      <SectionLabel>Platform actions</SectionLabel>
+      <div className="space-y-2">
+        <Button
+          variant="secondary"
+          size="md"
+          block
+          disabled={!live}
+          onClick={() => setSheet('adjust')}
+        >
+          Change Dates or Total
+        </Button>
+        <Button
+          variant="secondary"
+          size="md"
+          block
+          disabled={!payments.data?.length}
+          onClick={() => {
+            setPaymentId(payments.data?.[0]?.id ?? '')
+            setAmount('')
+            setSheet('refund')
+          }}
+        >
+          {payments.data?.length ? 'Refund a Payment' : 'Nothing to refund'}
+        </Button>
+        <Button
+          variant="danger"
+          size="md"
+          block
+          disabled={!live}
+          onClick={() => setSheet('cancel')}
+        >
+          Cancel Hire
+        </Button>
+      </div>
+      <p className="mt-3 text-xs text-subtle">
+        Every action here is recorded in the activity feed, and both organisations are told what
+        changed.
+      </p>
+
+      <BottomSheet
+        open={sheet === 'cancel'}
+        onClose={close}
+        title="Cancel this hire"
+        footer={
+          <Button
+            variant="danger"
+            disabled={reason.trim().length < 5}
+            loading={cancel.isPending}
+            onClick={() => cancel.mutate({ id: b.id, reason }, { onSuccess: close })}
+          >
+            Cancel Hire
+          </Button>
+        }
+      >
+        <Textarea
+          label="Why is it being cancelled?"
+          hint="Both the customer and the supplier see this."
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+      </BottomSheet>
+
+      <BottomSheet
+        open={sheet === 'adjust'}
+        onClose={close}
+        title="Change this hire"
+        footer={
+          <Button
+            disabled={reason.trim().length < 5 || (!endDate && !total)}
+            loading={adjust.isPending}
+            onClick={() =>
+              adjust.mutate(
+                {
+                  id: b.id,
+                  change: {
+                    ...(endDate ? { endDate } : {}),
+                    ...(total ? { totalCents: Math.round(Number(total) * 100) } : {}),
+                  },
+                  reason,
+                },
+                {
+                  onSuccess: () => {
+                    setEndDate('')
+                    setTotal('')
+                    close()
+                  },
+                },
+              )
+            }
+          >
+            Save Change
+          </Button>
+        }
+      >
+        <DateField
+          label="New end date"
+          hint={`Currently ${formatDate(b.endDate)}`}
+          value={endDate}
+          onChange={setEndDate}
+        />
+        <Input
+          label="New total (ex. GST)"
+          inputMode="decimal"
+          hint={`Currently ${formatMoney(b.totalCents)}`}
+          placeholder={(b.totalCents / 100).toFixed(2)}
+          value={total}
+          onChange={(e) => setTotal(e.target.value.replace(/[^\d.]/g, ''))}
+        />
+        <Textarea
+          label="Why is it being changed?"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+      </BottomSheet>
+
+      <BottomSheet
+        open={sheet === 'refund'}
+        onClose={close}
+        title="Refund a payment"
+        footer={
+          <Button
+            disabled={
+              !paymentId ||
+              !amount ||
+              Number(amount) <= 0 ||
+              Number(amount) > maxRefund ||
+              reason.trim().length < 5
+            }
+            loading={refund.isPending}
+            onClick={() =>
+              refund.mutate(
+                { paymentId, amountCents: Math.round(Number(amount) * 100), reason },
+                {
+                  onSuccess: () => {
+                    setAmount('')
+                    close()
+                  },
+                },
+              )
+            }
+          >
+            Refund {amount ? formatMoney(Math.round(Number(amount) * 100), { cents: true }) : ''}
+          </Button>
+        }
+      >
+        <Select
+          label="Payment"
+          value={paymentId}
+          onChange={(e) => setPaymentId(e.target.value)}
+          options={(payments.data ?? []).map((p) => ({
+            value: p.id,
+            label: `${formatMoney(p.amountCents, { cents: true })} · ${p.description || p.kind} · ${formatDate(p.createdAt)}`,
+          }))}
+        />
+        <Input
+          label="Amount to refund"
+          inputMode="decimal"
+          hint={`Up to ${formatMoney(Math.round(maxRefund * 100), { cents: true })}`}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))}
+        />
+        <Textarea
+          label="Why is it being refunded?"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+      </BottomSheet>
     </AppScreen>
   )
 }

@@ -32,6 +32,8 @@ export interface Profile {
   avatarUrl: string | null
   orgId: string | null
   emailVerified: boolean
+  /** Notification emails, off when the person turns them off. */
+  emailNotifications?: boolean
 }
 
 export interface Organisation {
@@ -239,6 +241,45 @@ export interface Delivery {
   positionAt: string | null
 }
 
+/** Where a supplier's payouts stand with Stripe. */
+export interface PayoutAccount {
+  /** 'stripe' once real payouts are switched on; 'mock' records them only. */
+  provider: 'mock' | 'stripe'
+  isOwner: boolean
+  connected: boolean
+  detailsSubmitted: boolean
+  payoutsEnabled: boolean
+}
+
+/** A payment an admin can refund. */
+export interface RefundablePayment {
+  id: string
+  amountCents: number
+  refundedCents: number
+  kind: string
+  description: string
+  createdAt: string
+}
+
+export interface AnalyticsSummary {
+  searches: number
+  views: number
+  bookStarts: number
+  bookings: number
+  organisations: number
+  searchTrend: number
+  bookingTrend: number
+  /** Percentage of machine views that became bookings. */
+  viewToBooking: number
+  topSearches: { label: string; count: number }[]
+  topCategories: { label: string; count: number }[]
+  topMachines: { id: string; label: string; views: number; bookings: number }[]
+  daily: { date: string; searches: number; bookings: number }[]
+}
+
+/** What the app records about how people use it (analytics_events). */
+export type TrackedEvent = 'search' | 'machine_view' | 'book_start' | 'booking'
+
 /** An error report from the website or apps (platform admin view). */
 export interface ClientError {
   id: number
@@ -306,9 +347,11 @@ export interface Payment {
   orgId: string
   amountCents: number
   methodId: string | null
-  kind: 'invoice' | 'subscription' | 'credits' | 'balance'
+  kind: 'invoice' | 'subscription' | 'credits' | 'balance' | 'refund'
   description: string
   status: 'succeeded' | 'failed'
+  /** How much of this payment has been refunded. */
+  refundedCents?: number
   createdAt: string
 }
 
@@ -375,6 +418,9 @@ export interface AdminActivity {
     | 'payout'
     | 'document_verified'
     | 'document_rejected'
+    | 'booking_cancelled'
+    | 'booking_adjusted'
+    | 'refund'
   title: string
   detail: string
   createdAt: string

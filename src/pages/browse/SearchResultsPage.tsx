@@ -12,6 +12,7 @@ import { Button, EmptyState, ErrorState, ListSkeleton, ScreenTitle } from '@/com
 import { cardClass } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 import { useCategories, useSearch } from '@/data/hooks'
+import { useTrack } from '@/lib/track'
 import type { SearchFilters } from '@/data/types'
 
 const SORTS: { value: NonNullable<SearchFilters['sort']>; label: string }[] = [
@@ -29,6 +30,8 @@ export function SearchResultsPage() {
   const categories = useCategories()
   const count = activeFilterCount(filters)
   const site = params.get('site')
+  const catName = categories.data?.find((c) => c.slug === filters.categorySlug)?.name
+  useTrack('search', { query: filters.q, category: catName })
 
   const patch = (p: SearchFilters) => {
     const next = paramsFromFilters({ ...filters, ...p })
@@ -37,7 +40,6 @@ export function SearchResultsPage() {
   }
 
   const place = filters.location ?? 'you'
-  const catName = categories.data?.find((c) => c.slug === filters.categorySlug)?.name
   const total = results.data?.total ?? 0
   const page = results.data?.page ?? 1
   const pageSize = results.data?.pageSize ?? 10

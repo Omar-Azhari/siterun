@@ -64,6 +64,13 @@
 	<string>Save invoices and documents to your device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Find equipment near your site and drop the site pin on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Share the truck's location with the customer while you are delivering, even when the screen is off.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

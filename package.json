@@ -21,6 +21,7 @@
     "native:assets": "node scripts/native-assets.mjs && npx @capacitor/assets generate --iconBackgroundColor '#0B1F44' --iconBackgroundColorDark '#0B1F44' --splashBackgroundColor '#0B1F44' --splashBackgroundColorDark '#011020'"
   },
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^1.2.26",
     "@capacitor/android": "^6.2.2",
     "@capacitor/app": "^6.0.3",
     "@capacitor/browser": "^6.0.6",
@@ -55,9 +56,6 @@
     "recharts": "^3.10.1",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5"
-  },
-  "overrides": {
-    "tar": "^7.5.22"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.2",

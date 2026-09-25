@@ -60,6 +60,8 @@ export const useSupplierBookings = () =>
 export const usePayoutSummary = (enabled = true) =>
   useQuery({ ...q(['payoutSummary'], (a) => a.getPayoutSummary()), enabled })
 export const usePayouts = () => useQuery(q(['payouts'], (a) => a.listPayouts()))
+export const usePayoutAccount = (enabled = true) =>
+  useQuery(q(['payoutAccount'], (a) => a.getPayoutAccount(), enabled))
 export const usePerformance = (range: '30d' | '90d' | '1y') =>
   useQuery({
     ...q(['performance', range], (a) => a.getPerformance(range)),
@@ -83,6 +85,19 @@ export const useSupplierOrgs = () =>
   useQuery(q(['admin', 'suppliers'], (a) => a.listSupplierOrgs()))
 export const useAllBookings = () => useQuery(q(['admin', 'bookings'], (a) => a.listAllBookings()))
 export const useClientErrors = () => useQuery(q(['admin', 'errors'], (a) => a.listClientErrors()))
+export const useAnalytics = (range: TimeRange) =>
+  useQuery({
+    ...q(['admin', 'analytics', range], (a) => a.getAnalytics(range)),
+    placeholderData: keepPreviousData,
+  })
+export const useRefundablePayments = (bookingId?: string) =>
+  useQuery(
+    q(
+      ['admin', 'payments', bookingId],
+      (a) => a.listRefundablePayments(bookingId ?? ''),
+      !!bookingId,
+    ),
+  )
 
 // ---- mutations ---------------------------------------------------------------------
 /**

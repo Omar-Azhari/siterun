@@ -15,7 +15,9 @@ import {
   StatusPill,
 } from '@/components/ui'
 import { formatMoney } from '@/lib/format'
-import { useApiMutation, useMe, usePayoutSummary, usePayouts } from '@/data/hooks'
+import { useApiMutation, useMe, usePayoutAccount, usePayoutSummary, usePayouts } from '@/data/hooks'
+import { getApi } from '@/data/client'
+import { PayoutSetupCard } from './PayoutSetupCard'
 
 /** Board 09 · Payouts */
 export function PayoutsPage() {
@@ -27,10 +29,14 @@ export function PayoutsPage() {
   const request = useApiMutation((api) => api.requestPayout(), {
     success: (p) => `Payout of ${formatMoney(p.amountCents, { cents: true })} requested`,
   })
+  const stripe = getApi().payments === 'stripe'
+  const account = usePayoutAccount(stripe)
   const s = summary.data
   const list = payouts.data ?? []
   const shown = all ? list : list.slice(0, 4)
-  const canRequest = me?.role === 'owner' && !!s?.availableCents
+  // With Stripe on, the money can only move once the supplier's account is ready.
+  const ready = !stripe || !!account.data?.payoutsEnabled
+  const canRequest = me?.role === 'owner' && !!s?.availableCents && ready
 
   return (
     <AppScreen root>
@@ -68,9 +74,14 @@ export function PayoutsPage() {
           loading={request.isPending}
           onClick={() => request.mutate(undefined)}
         >
-          {me?.role !== 'owner' ? 'Only the owner can request payouts' : 'Request Payout'}
+          {me?.role !== 'owner'
+            ? 'Only the owner can request payouts'
+            : !ready
+              ? 'Set up payouts first'
+              : 'Request Payout'}
         </Button>
       </Card>
+      <PayoutSetupCard />
       <div className="mt-2.5 grid grid-cols-2 gap-2.5">
         {s ? (
           <>

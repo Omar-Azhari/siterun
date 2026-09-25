@@ -49,7 +49,7 @@ const TERMS: Section[] = [
     h: 'Payments',
     p: [
       'Card payments are processed by Stripe. Your card number goes directly to Stripe and never passes through or is stored by SiteRun; we keep only the card brand, last four digits and expiry so you can recognise the card.',
-      'By saving a card you authorise SiteRun to charge it for payments you or your team confirm in the app: account balances, invoices, plans and SiteCredits. Suppliers are paid out to their nominated bank account.',
+      'By saving a card you authorise SiteRun to charge it for payments you or your team confirm in the app: account balances, invoices, plans and SiteCredits. Suppliers are paid through Stripe to the bank account they give Stripe, less SiteRun’s service fee. Refunds go back to the card that paid.',
     ],
   },
   {
@@ -70,6 +70,12 @@ const TERMS: Section[] = [
     p: [
       'Operators must hold the licences their work requires, including a high risk work licence where one applies, and follow work health and safety laws and each site’s rules.',
       'During a delivery an operator can share their live location so the contractor can follow the truck. Sharing runs only while it is switched on in the app, and stops when the delivery ends.',
+    ],
+  },
+  {
+    h: 'When SiteRun steps in',
+    p: [
+      'If a hire goes wrong and the two businesses can’t agree, SiteRun can cancel the hire, change its dates or total, or refund a payment. We do that only to settle a dispute or fix a mistake, we tell both businesses what changed and why, and we keep a record of it.',
     ],
   },
   {
@@ -125,8 +131,9 @@ const PRIVACY: Section[] = [
       'Hire activity: bookings, messages and attachments, reviews, invoices and support requests.',
       'Compliance documents suppliers and operators upload, such as insurance certificates, registrations and licences.',
       'Payment details: the card brand, last four digits and expiry. The full card number is held by Stripe, not by us. Suppliers’ payout bank details.',
-      'Location: an operator’s live location while they choose to share it during a delivery. When you tap “Use my location” on the site map, your position only places the pin; it is kept only if you save that spot as the site’s location.',
+      'Location: an operator’s live location while they choose to share it during a delivery. On the apps this keeps working while the phone is locked, and the phone shows that sharing is on until the driver stops it. When you tap “Use my location” on the site map, your position only places the pin; it is kept only if you save that spot as the site’s location.',
       'Device and app data: push notification tokens, and error reports when the app fails (the error message, the page, the browser or app version). Error reports do not include what you typed into forms.',
+      'Usage counts: that a search was made (and the words searched), that a machine was viewed, and that a booking was started or made, with your organisation when you are signed in. We use this to see where people are not finding what they need.',
     ],
   },
   {
@@ -146,27 +153,27 @@ const PRIVACY: Section[] = [
     h: 'Who we share it with',
     p: [
       'The other business on a booking sees the details that booking needs, such as site address, contact name and phone, and the delivery’s live location while it is shared. Your organisation’s members see what their role allows.',
-      'Service providers who run parts of SiteRun for us: Supabase (database, storage and sign-in, hosted in Sydney), Stripe (payments), Google Firebase and Apple (delivering push notifications), Vercel (website hosting), Esri (map images) and Photon by Komoot (address search, which receives the text you search for).',
+      'Service providers who run parts of SiteRun for us: Supabase (database, storage and sign-in, hosted in Sydney), Stripe (payments to us and payouts to suppliers), Google Firebase and Apple (delivering push notifications), Resend (sending our emails), Vercel (website hosting), Esri (map images) and Photon by Komoot (address search, which receives the text you search for).',
       'Government agencies or others where the law requires it.',
     ],
   },
   {
     h: 'Overseas disclosure',
     p: [
-      'Our database and files are stored in Australia. Some providers process information overseas: Stripe, Google Firebase, Apple, Vercel and Esri in the United States and other countries, and Photon in Germany. We use providers that protect information to a standard comparable to the Australian Privacy Principles.',
+      'Our database and files are stored in Australia. Some providers process information overseas: Stripe, Google Firebase, Apple, Resend, Vercel and Esri in the United States and other countries, and Photon in Germany. We use providers that protect information to a standard comparable to the Australian Privacy Principles.',
     ],
   },
   {
     h: 'Security and retention',
     p: [
       'Information is encrypted in transit and at rest. Every record is protected by access rules in the database, and compliance documents and message attachments are kept in private storage and opened through links that expire.',
-      'We keep information only as long as we need it: live location points for two days, error reports for 90 days, and account and hire records while your account is open. Invoices and payment records are kept for as long as tax and corporations law require, generally five to seven years.',
+      'We keep information only as long as we need it: live location points for two days, error reports for 90 days, usage counts for 180 days, and account and hire records while your account is open. Invoices and payment records are kept for as long as tax and corporations law require, generally five to seven years.',
     ],
   },
   {
     h: 'Access, correction and deletion',
     p: [
-      'You can see and update most of your details in Account & Settings, and ask us to delete your account from Account → Privacy & Security. To ask for a copy of your information or a correction we can’t make in the app, contact us. We respond within 30 days.',
+      'You can see and update most of your details in Account & Settings, turn our emails off under Account → Privacy & Security, and ask us to delete your account from the same screen. To ask for a copy of your information or a correction we can’t make in the app, contact us. We respond within 30 days.',
     ],
   },
   {

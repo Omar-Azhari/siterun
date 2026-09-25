@@ -14,6 +14,7 @@ import {
   StatusPill,
 } from '@/components/ui'
 import { useMachine, useMe } from '@/data/hooks'
+import { useTrack } from '@/lib/track'
 import type { HireType } from '@/data/types'
 import { areaFor } from '@/auth/roles'
 
@@ -90,6 +91,7 @@ export function MachineDetailPage() {
   const { data: me } = useMe()
   const m = machine.data
   const [hire, setHire] = useState<HireType>((params.get('hire') as HireType | null) ?? 'dry')
+  useTrack('machine_view', { machineId: m?.id })
 
   if (machine.isPending)
     return (
