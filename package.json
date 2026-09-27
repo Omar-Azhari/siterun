@@ -20,7 +20,8 @@
     "og:image": "node scripts/og-image.mjs",
     "native:assets": "node scripts/native-assets.mjs && npx @capacitor/assets generate --iconBackgroundColor '#0B1F44' --iconBackgroundColorDark '#0B1F44' --splashBackgroundColor '#0B1F44' --splashBackgroundColorDark '#011020'",
     "store:shots": "playwright test --config playwright.store.config.ts",
-    "store:assets": "node scripts/store-assets.mjs"
+    "store:assets": "node scripts/store-assets.mjs",
+    "plan:pdf": "node scripts/launch-plan.mjs"
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "^1.2.26",
