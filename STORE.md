@@ -164,6 +164,94 @@ advertising SDKs, and no cross-app tracking.
 
 ---
 
+## Play Console → App content → App access
+
+Choose **All or some functionality is restricted**, then add these three entries. Play
+keeps them for every future review, so they need to keep working: check both logins on the
+built app before each submission.
+
+| Field                | Entry 1                               | Entry 2                              |
+| -------------------- | ------------------------------------- | ------------------------------------ |
+| Name of instructions | Contractor account (hiring equipment) | Supplier account (listing equipment) |
+| Username             | `alex@acme.test`                      | `jordan@turnerplant.test`            |
+| Password             | `SiteRun!2026`                        | `SiteRun!2026`                       |
+| Any other details    | see below                             | see below                            |
+
+**Entry 1 — other details:**
+
+```
+Sign in on the Log In screen with the email and password above. This account is a
+contractor: it can search equipment, book it, follow a delivery on the tracking map, and
+see its invoices and documents. Nothing else is needed — no code, no verification email.
+```
+
+**Entry 2 — other details:**
+
+```
+Sign in on the Log In screen with the email and password above. This account is an
+equipment supplier: it can list machines, accept booking requests, dispatch a delivery and
+share the driver's live location, and see payouts. To see background location: open
+Bookings, open a confirmed booking, tap "Mark Dispatched", then tap "Share Live Location".
+```
+
+Add a third entry only if a reviewer asks about the platform admin screens; they are for
+SiteRun staff, not customers, and the flag is set in the database, never at sign-up.
+
+## Play Console → App content → Content rating
+
+The questionnaire is IARC's. Start it with your own email address and pick the category
+**Utility, Productivity, Communication, or Other** — SiteRun is a business tool, not a
+social app or a game.
+
+| Question                                                                         | Answer                                                                      |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Violence (realistic, fantasy, or against characters)                             | No                                                                          |
+| Sexuality or nudity                                                              | No                                                                          |
+| Language (profanity, crude humour)                                               | No                                                                          |
+| Controlled substances (drugs, alcohol, tobacco)                                  | No                                                                          |
+| Gambling, simulated gambling, or contests                                        | No                                                                          |
+| Horror, fear or disturbing content                                               | No                                                                          |
+| Does the app let users interact or exchange content?                             | **Yes** — messages between the two businesses on a booking                  |
+| Can users share their location with other users?                                 | **Yes** — a driver shares live location during a delivery                   |
+| Does the app share the user's personal information?                              | **Yes** — name and phone are shared with the other business on that booking |
+| Does the app contain user-generated content shown publicly?                      | No — listings are reviewed by SiteRun before they go live                   |
+| Does the app let users purchase digital goods?                                   | See the note below before answering                                         |
+| Is the app a news app? Does it provide COVID-19 tracing? Is it a government app? | No, no, no                                                                  |
+| Does the app provide financial features (loans, investing, crypto, banking)?     | No                                                                          |
+| Does the app contain ads?                                                        | No                                                                          |
+
+Expected outcome: **PEGI 3 / ESRB Everyone / USK 0 / ACB G**, with the interactive
+elements "Users Interact", "Shares Location" and "Shares Info".
+
+Elsewhere under App content, answer: target audience **18+ only** (it is a trade tool, and
+an ABN is required), no appeal to children, no ads, no government affiliation, no
+COVID-19 features, and no data shared with third parties for advertising.
+
+### Before you answer "digital goods": the plans screen is a policy risk
+
+The app currently sells two things by card, inside the app: **plan subscriptions**
+(Starter $99/month, Pro $249/month) and **SiteCredits** (prepaid hire credit).
+
+- Equipment hire itself is a **physical service** between two businesses. Both stores allow
+  that to be paid outside their billing, and the review note in this file says so.
+- A **subscription that unlocks features in the app** is a digital service. Google Play's
+  Payments policy and Apple's guideline 3.1.1 normally require their own billing for that,
+  taking 15–30%. Apple's enterprise carve-out (3.1.3(c)) and Play's B2B allowances are
+  narrower than they look, and "credits" reads to a reviewer like in-app currency.
+
+Two honest ways through, and this needs your decision before submitting:
+
+1. **Take plans and SiteCredits out of the phone apps** (recommended). The apps still show
+   which plan the organisation is on, but buying or upgrading happens on the website. This
+   is what most B2B marketplaces do, it's a small change here, and it removes the argument
+   entirely. Answer **No** to digital goods.
+2. **Keep selling them in the apps** and add Play Billing and Apple IAP for those two
+   items only. That is real work on both platforms, and both stores take their cut of every
+   plan and credit pack. Answer **Yes** to digital goods.
+
+Until that's decided, don't submit with plans purchasable in the app and "No" ticked: that
+mismatch is the kind of thing that gets an account warned, not just an app rejected.
+
 ## Permissions: what to say when they ask
 
 **Background location (the one both stores question).** Only drivers use it, only during a
@@ -268,9 +356,11 @@ npx cap open ios
 - **Background location with no explanation.** Use the wording above and the screen
   recording; this is the single most common reason a hire-and-delivery app gets bounced.
 - **Demo account that doesn't work.** Check both logins on the built app before submitting.
-- **Payments looking like in-app purchase.** It isn't: equipment hire is a physical service
-  between two businesses, which Apple's guideline 3.1.3(e) and Play's payments policy both
-  allow to use an outside processor. The review note says so.
+- **Payments looking like in-app purchase.** Equipment hire itself is a physical service
+  between two businesses, which both stores allow to be paid outside their billing, and the
+  review note says so. The plan subscriptions and SiteCredits on the Plans screen are a
+  different matter — decide that one before submitting (see "Before you answer 'digital
+  goods'").
 
 ## Still untested here
 
