@@ -3,7 +3,7 @@
 Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
 _Machines. People. Progress._
 
-Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6, a security hardening pass, and the launch features** (Stripe card payments, push sending, live GPS, error monitoring, full Terms and Privacy). Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps, `LAUNCH.md` for switching on payments and push, `SECURITY.md` for how it's protected, and `DECISIONS.md` for design and technical decisions.
+Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6, a security hardening pass, the launch features, and store submission prepared** (Stripe card payments, push sending, live GPS, error monitoring, full Terms and Privacy). Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps, `STORE.md` for submitting them to the App Store and Google Play, `LAUNCH.md` for switching on payments and push, `SECURITY.md` for how it's protected, and `DECISIONS.md` for design and technical decisions.
 
 ## Stack
 
@@ -36,6 +36,8 @@ Without Supabase values in `.env` the app runs on an in-browser demo store with 
 | `npm run og:image`      | Regenerate `public/og-image.png`                                                                                                                                                                                                       |
 | `npm run native:assets` | Regenerate app icons and splash screens for Android and iOS (fetches `@capacitor/assets` with `npx`)                                                                                                                                   |
 | `npx cap sync`          | Copy the built web app into the Android and iOS projects                                                                                                                                                                               |
+| `npm run store:shots`   | Regenerate the store screenshots into `docs/store/`                                                                                                                                                                                    |
+| `npm run store:assets`  | Regenerate the Play feature graphic and the store icons                                                                                                                                                                                |
 | `npm run db:seed:sql`   | Regenerate `supabase/seed.sql` from the demo seed                                                                                                                                                                                      |
 | `npm run brand:assets`  | Regenerate logos, favicons and icons from the traced mark                                                                                                                                                                              |
 

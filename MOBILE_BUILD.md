@@ -3,7 +3,8 @@
 The apps are the same web app inside Capacitor 6: one codebase, no second UI. This file
 covers running them, the device features they use, and what each store needs.
 
-- App ID: `au.com.siterun.app`
+- App ID: `au.com.siterun.app` · version 1.0.0
+- Submitting to the stores: `STORE.md` (listing text, screenshots, privacy answers, review notes)
 - App name: SiteRun
 - Web build copied into the apps: `dist/`
 - Deep link scheme: `au.com.siterun.app://` (sign-in and email links)
@@ -23,7 +24,7 @@ native plugins. Run `npx cap sync` after installing any Capacitor plugin.
 ### What you need
 
 - Android Studio (includes the Android SDK and an emulator)
-- JDK 17 (Android Studio ships one; Gradle here needs 17, not a newer JDK)
+- JDK 21 (Capacitor 8 needs 21; Android Studio ships one)
 
 ### Run on the emulator
 

@@ -283,3 +283,26 @@ The mockup background is a deep navy-black rather than the neutral near-black in
   export, so `cap sync` died with "Cannot read properties of undefined". The lock now
   resolves the CLI's own `tar@6`, and the advisory is back to being a known, dev-only one
   until Capacitor is upgraded to v8.
+
+## Phase 10 (store submission)
+
+- **Capacitor 6 → 8.** Google Play now requires new apps to target Android 16 (API 36);
+  Capacitor 6 tops out at 34. `npx cap migrate` moved the native projects: minSdk 24,
+  compile/target SDK 36, AGP 8.13, iOS deployment target 15, and the UIScene split
+  (`SceneDelegate.swift`) that Capacitor 8.5 adopts. The Gradle wrapper step failed for
+  want of a JDK, so `gradle-wrapper.properties` was set to 8.13 by hand. None of it has
+  been compiled here — no Android SDK, no Mac — so the first real build is the first test.
+- **Store screenshots come from the app, not a mockup tool.** `e2e-store/` drives the demo
+  backend at three exact pixel sizes (Play 1080×1920, iPhone 6.7" and 6.9") so the pictures
+  can never drift from what the app looks like. Re-run with `npm run store:shots`.
+- **A 360px layout bug turned up in the first screenshots**: on the narrowest common
+  Android phone, the hire card squeezed the machine name to "6t D…" and ran the arrival
+  time over the status pill. The card now wraps the arrival and chevron onto their own line
+  below 390px. The boards were drawn at 390, so nothing had caught it.
+- **`/account-deletion` is a public page** because Play requires a deletion route that
+  works without installing the app. It repeats what the in-app request does and what the
+  law makes us keep.
+- **Listing text, Data safety and App Privacy answers live in `STORE.md`**, written from
+  what the app actually collects rather than filled in at submission time. The background
+  location justification is there too: it is the most common reason an app like this is
+  rejected.
