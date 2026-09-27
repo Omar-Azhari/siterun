@@ -173,7 +173,7 @@ const PRIVACY: Section[] = [
   {
     h: 'Access, correction and deletion',
     p: [
-      'You can see and update most of your details in Account & Settings, turn our emails off under Account → Privacy & Security, and ask us to delete your account from the same screen. To ask for a copy of your information or a correction we can’t make in the app, contact us. We respond within 30 days.',
+      'You can see and update most of your details in Account & Settings, turn our emails off under Account → Privacy & Security, and ask us to delete your account from the same screen. What deletion covers is set out on our account deletion page at /account-deletion. To ask for a copy of your information or a correction we can’t make in the app, contact us. We respond within 30 days.',
     ],
   },
   {
@@ -184,9 +184,42 @@ const PRIVACY: Section[] = [
   },
 ]
 
+const DELETION: Section[] = [
+  {
+    h: 'Deleting your account in the app',
+    p: [
+      'Sign in and go to Account → Privacy & Security → Delete Account. That sends the request straight to us; you don’t need to email anyone.',
+    ],
+  },
+  {
+    h: 'If you can’t sign in',
+    p: [
+      `Ask us from the contact details below, from the email address on the account. Tell us the account’s email address and your business name so we can find it. Phone ${COMPANY.phone}.`,
+    ],
+  },
+  {
+    h: 'What gets deleted',
+    p: [
+      'Your profile, your contact details, your messages and attachments, your sites, your saved cards (the brand and last four digits — we never hold the card number), your device tokens for notifications, and your error reports. It is deleted within 30 days.',
+      'If you are the only owner of an organisation, its bookings, listings and documents go with it. If other people are still using that organisation, its records stay and only your own details go.',
+    ],
+  },
+  {
+    h: 'What we have to keep',
+    p: [
+      'Invoices and payment records, because tax and corporations law require them, generally for five to seven years. They are kept apart from your login and are not used to contact you.',
+    ],
+  },
+]
+
 const CONTENT = {
-  terms: { title: 'Terms of Service', updated: '21 September 2026', sections: TERMS },
-  privacy: { title: 'Privacy Policy', updated: '21 September 2026', sections: PRIVACY },
+  terms: { title: 'Terms of Service', updated: '27 September 2026', sections: TERMS },
+  privacy: { title: 'Privacy Policy', updated: '27 September 2026', sections: PRIVACY },
+  deletion: {
+    title: 'Deleting your account',
+    updated: '27 September 2026',
+    sections: DELETION,
+  },
 } as const
 
 export function LegalPage({ kind }: { kind: keyof typeof CONTENT }) {

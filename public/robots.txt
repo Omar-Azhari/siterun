@@ -2,4 +2,5 @@ User-agent: *
 Allow: /$
 Allow: /terms
 Allow: /privacy
+Allow: /account-deletion
 Disallow: /

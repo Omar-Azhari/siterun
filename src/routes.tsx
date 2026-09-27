@@ -36,6 +36,10 @@ const PrivacyPage = lazy(async () => {
   const { LegalPage } = await import('@/pages/LegalPage')
   return { default: () => <LegalPage kind="privacy" /> }
 })
+const AccountDeletionPage = lazy(async () => {
+  const { LegalPage } = await import('@/pages/LegalPage')
+  return { default: () => <LegalPage kind="deletion" /> }
+})
 
 // Board 02
 const CreateSiteLocationPage = page(
@@ -234,6 +238,7 @@ export function AppRoutes() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/account-deletion" element={<AccountDeletionPage />} />
       <Route path="/verify" element={<VerifyPage />} />
 
       <Route element={<PublicOnly />}>
