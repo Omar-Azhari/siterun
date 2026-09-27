@@ -215,7 +215,7 @@ social app or a game.
 | Can users share their location with other users?                                 | **Yes** — a driver shares live location during a delivery                   |
 | Does the app share the user's personal information?                              | **Yes** — name and phone are shared with the other business on that booking |
 | Does the app contain user-generated content shown publicly?                      | No — listings are reviewed by SiteRun before they go live                   |
-| Does the app let users purchase digital goods?                                   | See the note below before answering                                         |
+| Does the app let users purchase digital goods?                                   | **No** — the apps show the plan but don't sell it                           |
 | Is the app a news app? Does it provide COVID-19 tracing? Is it a government app? | No, no, no                                                                  |
 | Does the app provide financial features (loans, investing, crypto, banking)?     | No                                                                          |
 | Does the app contain ads?                                                        | No                                                                          |
@@ -227,30 +227,20 @@ Elsewhere under App content, answer: target audience **18+ only** (it is a trade
 an ABN is required), no appeal to children, no ads, no government affiliation, no
 COVID-19 features, and no data shared with third parties for advertising.
 
-### Before you answer "digital goods": the plans screen is a policy risk
+### Why "no digital goods" is the honest answer
 
-The app currently sells two things by card, inside the app: **plan subscriptions**
-(Starter $99/month, Pro $249/month) and **SiteCredits** (prepaid hire credit).
+Hiring a machine is a **physical service** between two businesses. Both stores allow that
+to be paid outside their billing, and the review note in this file says so.
 
-- Equipment hire itself is a **physical service** between two businesses. Both stores allow
-  that to be paid outside their billing, and the review note in this file says so.
-- A **subscription that unlocks features in the app** is a digital service. Google Play's
-  Payments policy and Apple's guideline 3.1.1 normally require their own billing for that,
-  taking 15–30%. Apple's enterprise carve-out (3.1.3(c)) and Play's B2B allowances are
-  narrower than they look, and "credits" reads to a reviewer like in-app currency.
+A **subscription that unlocks features**, and prepaid **SiteCredits**, are a different
+thing: Google Play's Payments policy and Apple's guideline 3.1.1 want their own billing for
+those, at 15–30%. So the apps no longer sell them. Inside the app the Plans screen shows
+which plan the organisation is on, when it renews and the SiteCredits balance, and says
+plan changes happen on the website. There is no buy button, no price list and no link out
+(the stores treat "buy it over there" as steering). Buying is unchanged on the website.
 
-Two honest ways through, and this needs your decision before submitting:
-
-1. **Take plans and SiteCredits out of the phone apps** (recommended). The apps still show
-   which plan the organisation is on, but buying or upgrading happens on the website. This
-   is what most B2B marketplaces do, it's a small change here, and it removes the argument
-   entirely. Answer **No** to digital goods.
-2. **Keep selling them in the apps** and add Play Billing and Apple IAP for those two
-   items only. That is real work on both platforms, and both stores take their cut of every
-   plan and credit pack. Answer **Yes** to digital goods.
-
-Until that's decided, don't submit with plans purchasable in the app and "No" ticked: that
-mismatch is the kind of thing that gets an account warned, not just an app rejected.
+If you ever want to sell plans in the apps, that means adding Play Billing and Apple IAP
+for those two items, and answering **Yes** to digital goods.
 
 ## Permissions: what to say when they ask
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isNative } from '@/native/platform'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Plus, X } from 'lucide-react'
 import { z } from 'zod'
@@ -76,7 +77,9 @@ export function InviteTeamPage() {
     })),
   ]
 
-  const finish = () => navigate(onboarding ? '/plans?onboarding=1' : '/team')
+  // The apps can't sell a plan, so onboarding there goes straight to the sites list.
+  const finish = () =>
+    navigate(onboarding ? (isNative() ? '/sites' : '/plans?onboarding=1') : '/team')
 
   return (
     <AppScreen

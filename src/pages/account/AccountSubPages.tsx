@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isNative } from '@/native/platform'
 import { Link, useNavigate } from 'react-router-dom'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -238,7 +239,10 @@ export function PaymentSettingsPage() {
         ))}
         <ListRow to="/payments/cards/new" title="Add Card" />
       </div>
-      <SectionLabel action={<Link to="/plans">Change</Link>}>Plan</SectionLabel>
+      {/* The apps show the plan but can't sell one, so "Change" is web only (STORE.md). */}
+      <SectionLabel action={isNative() ? undefined : <Link to="/plans">Change</Link>}>
+        Plan
+      </SectionLabel>
       <Card>
         {sub.data?.status === 'active' ? (
           <>
@@ -249,6 +253,8 @@ export function PaymentSettingsPage() {
               <p className="text-sm text-muted">Renews {formatDate(sub.data.renewsAt)}</p>
             )}
           </>
+        ) : isNative() ? (
+          <p className="text-sm text-muted">No plan yet. Plans are chosen on the website.</p>
         ) : (
           <Link to="/plans" className="flex items-center justify-between text-sm text-primary">
             Choose a plan <ChevronRight className="size-4" />

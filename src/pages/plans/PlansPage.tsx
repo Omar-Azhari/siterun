@@ -5,13 +5,17 @@ import { AppScreen } from '@/components/layout/AppScreen'
 import {
   Badge,
   Button,
+  Card,
+  InfoNote,
+  ListSkeleton,
   ScreenTitle,
   SegmentedTabs,
   SelectableCard,
   useToast,
 } from '@/components/ui'
 import { cn } from '@/lib/cn'
-import { formatMoney } from '@/lib/format'
+import { formatDate, formatMoney } from '@/lib/format'
+import { isNative } from '@/native/platform'
 import { useApiMutation, usePaymentMethods, useSubscription } from '@/data/hooks'
 import type { BillingPeriod, PlanId } from '@/data/types'
 
@@ -57,8 +61,59 @@ const PACKS = [
   { price: 250000, bonus: 350 },
 ]
 
+/**
+ * Inside the apps, plans and SiteCredits are shown but not sold. Buying a subscription
+ * inside an app is what Apple and Google require their own billing for; hiring a machine
+ * is a physical service, which they leave alone. See STORE.md.
+ */
+function PlanSummary() {
+  const sub = useSubscription()
+  const s = sub.data
+  return (
+    <AppScreen>
+      <ScreenTitle title="Your Plan" subtitle="Plans and SiteCredits for your organisation." />
+      {sub.isPending ? (
+        <ListSkeleton rows={2} thumb={false} />
+      ) : (
+        <Card className="space-y-2 text-sm">
+          <p className="flex justify-between gap-3">
+            <span className="text-muted">Plan</span>
+            <span className="font-semibold capitalize">{s?.plan ?? 'Starter'}</span>
+          </p>
+          <p className="flex justify-between gap-3">
+            <span className="text-muted">Billing</span>
+            <span className="capitalize">{s?.period ?? 'monthly'}</span>
+          </p>
+          {s?.renewsAt && (
+            <p className="flex justify-between gap-3">
+              <span className="text-muted">Renews</span>
+              <span>{formatDate(s.renewsAt)}</span>
+            </p>
+          )}
+          <p className="flex justify-between gap-3">
+            <span className="text-muted">SiteCredits</span>
+            <span className="font-semibold">
+              {(s?.creditsBalance ?? 0).toLocaleString('en-AU')}
+            </span>
+          </p>
+        </Card>
+      )}
+      <InfoNote className="mt-3">
+        Changing a plan or buying SiteCredits is done on the SiteRun website, not in the app.
+        Everything else — hiring, deliveries and invoices — works here as usual.
+      </InfoNote>
+    </AppScreen>
+  )
+}
+
 /** Board 02 · Choose Plan & SiteCredits */
 export function PlansPage() {
+  // The apps show the plan; they don't sell it.
+  if (isNative()) return <PlanSummary />
+  return <PlanPicker />
+}
+
+function PlanPicker() {
   const [params] = useSearchParams()
   const onboarding = params.get('onboarding') === '1'
   const navigate = useNavigate()

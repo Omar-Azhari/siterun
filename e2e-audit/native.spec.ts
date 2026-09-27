@@ -45,3 +45,24 @@ test('no service worker is registered inside the app', async ({ page }) => {
     await page.evaluate(() => navigator.serviceWorker.getRegistrations().then((r) => r.length)),
   ).toBe(0)
 })
+
+test('the app shows the plan but never sells one', async ({ page }) => {
+  await page.goto('/login')
+  await page.getByLabel('Email address').fill('alex@acme.test')
+  await page.getByLabel('Password', { exact: true }).fill('SiteRun!2026')
+  await page.getByRole('button', { name: 'Log In' }).click()
+  await expect(page).toHaveURL(/\/home/)
+
+  await page.goto('/plans')
+  await expect(page.getByRole('heading', { name: 'Your Plan' })).toBeVisible()
+  await expect(page.getByText(/done on the SiteRun website/)).toBeVisible()
+  // Nothing that buys: no plan picker, no credit packs, no continue button.
+  await expect(page.getByRole('radiogroup', { name: 'Plan' })).toHaveCount(0)
+  await expect(page.getByRole('radiogroup', { name: 'SiteCredits pack' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /Continue|Contact Sales/ })).toHaveCount(0)
+  // And no link out to a payment page, which both stores treat as steering.
+  await expect(page.locator('a[href^="http"]')).toHaveCount(0)
+
+  await page.goto('/account/payment-settings')
+  await expect(page.getByRole('link', { name: 'Change' })).toHaveCount(0)
+})

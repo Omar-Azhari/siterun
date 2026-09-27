@@ -302,6 +302,12 @@ The mockup background is a deep navy-black rather than the neutral near-black in
 - **`/account-deletion` is a public page** because Play requires a deletion route that
   works without installing the app. It repeats what the in-app request does and what the
   law makes us keep.
+- **The apps show plans but don't sell them.** Equipment hire is a physical service, which
+  both stores leave alone, but a subscription and prepaid credits are digital goods they
+  want their own billing for, at 15–30%. Rather than build Play Billing and Apple IAP for
+  two items nobody buys on a phone, `isNative()` swaps the Plans screen for a read-only
+  summary, onboarding skips it, and Account drops the "Change" link. No link out either:
+  the stores count that as steering. The website is untouched.
 - **Listing text, Data safety and App Privacy answers live in `STORE.md`**, written from
   what the app actually collects rather than filled in at submission time. The background
   location justification is there too: it is the most common reason an app like this is
