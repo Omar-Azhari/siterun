@@ -1,13 +1,47 @@
 # SiteRun
 
-Australian construction equipment hire marketplace. It connects contractors, suppliers and SiteRun platform admins.
+**A construction equipment hire marketplace for Australia, with a web app plus Android and iOS apps.** Contractors find and book machines, suppliers list and track them, and platform admins keep the marketplace safe.
 _Machines. People. Progress._
 
-Status: **Stage 1 (web) and Stage 2 (apps) built: Phases 0–6, a security hardening pass, the launch features, and store submission prepared** (Stripe card payments, push sending, live GPS, error monitoring, full Terms and Privacy). Design system, all screens, Supabase backend, wired flows with end-to-end tests, desktop layout, landing page, SEO, PWA offline support, and Android and iOS apps via Capacitor. See `MOBILE_BUILD.md` for the apps, `STORE.md` for submitting them to the App Store and Google Play, `LAUNCH.md` for switching on payments and push, `SECURITY.md` for how it's protected, and `DECISIONS.md` for design and technical decisions.
+Built by **Omar Al Azhari**. No public deployment yet; run it locally in a few minutes with the offline demo backend (see [Setup](#setup)).
+
+<p>
+<img src="docs/store/play/1080x1920/01-search.png" width="190" alt="Search for machines on a map">
+<img src="docs/store/play/1080x1920/02-machine.png" width="190" alt="Machine listing">
+<img src="docs/store/play/1080x1920/03-tracking.png" width="190" alt="Live delivery tracking">
+<img src="docs/store/play/1080x1920/07-compliance.png" width="190" alt="Supplier compliance documents">
+</p>
+
+## Key features
+
+- **Contractors:** map search and filters, booking, card payments, hire extensions, reviews, and real-time chat with the supplier.
+- **Suppliers:** machine listings with photos, compliance documents with expiry warnings, booking approvals, payouts, and live GPS tracking of deliveries.
+- **Platform admins:** approve suppliers and machines, review documents, cancel or adjust bookings with a written reason, and view error reports and usage analytics.
+- **Everywhere:** responsive web app, installable PWA with offline support, and native Android and iOS apps through Capacitor.
+
+## How it was built
+
+I designed the product, wrote the specification and made the technical decisions (recorded in `DECISIONS.md`). The code was written with an AI coding assistant (Claude Code), and every commit is co-authored to show that. I directed each phase, reviewed and tested every change, and set up the test suites that gate it: unit tests, database security tests and end-to-end flows.
+
+## Challenges solved
+
+- **The database is the security boundary.** Every table has Row Level Security, and every action with business rules (bookings, approvals, payouts) is a `SECURITY DEFINER` function that checks the caller first, so a modified client can't skip a rule. `npm run test:rls` signs in as each seeded role to prove it.
+- **One app, two backends.** The same API interface runs on Supabase or on an in-browser demo store with the same data and rules, so every screen works offline and the UI tests don't need a database.
+- **Payments without storing cards.** Stripe handles card entry, charges and supplier payouts through Connect; the database keeps only brand, last four digits and expiry.
+- **Testing whole journeys, not just functions.** Playwright walks the full loop (search, book, supplier accepts, confirmation, extend the hire, real-time messages) against a real Supabase project.
+
+## How it's tested
+
+| Command | What it checks |
+| --- | --- |
+| `npm test` | Vitest unit tests for the pure logic (booking maths, money, ABN checks, cards), offline |
+| `npm run test:rls` | Row Level Security against a Supabase project, signed in as each seeded role |
+| `npm run e2e` | Playwright on the demo backend: component gallery, every screen against the design boards, sign-up to first site |
+| `npm run e2e:flows` | Playwright against Supabase: booking, extensions, messaging, supplier onboarding and admin approval |
 
 ## Stack
 
-Vite + React 18 + TypeScript (strict), React Router 6, Tailwind CSS 4, lucide-react, framer-motion, react-hook-form + zod, TanStack Query, Supabase (Postgres, Auth, Storage, Realtime, pg_cron), Leaflet, Recharts, date-fns, @react-pdf/renderer. Tests use Vitest and Playwright. Hosting is on Vercel. Capacitor comes in Stage 2.
+Vite + React 18 + TypeScript (strict), React Router 6, Tailwind CSS 4, lucide-react, framer-motion, react-hook-form + zod, TanStack Query, Supabase (Postgres, Auth, Storage, Realtime, pg_cron), Leaflet, Recharts, date-fns, @react-pdf/renderer. Tests use Vitest and Playwright. Hosting is set up for Vercel. Capacitor builds the Android and iOS apps.
 
 ## Setup
 
@@ -135,7 +169,7 @@ Only in `npm run dev`: the `/dev/*` route is compiled out of production builds.
 
 ## Demo logins
 
-All accounts use the password `SiteRun!2026` (demo backend and the seeded Supabase project). In demo mode the verification code is `123456`.
+These accounts exist in the offline demo backend, and `supabase/seed.sql` creates them in a Supabase project. Only load the seed into a demo project, never one with real users. All accounts use the password `SiteRun!2026`; in demo mode the verification code is `123456`.
 
 | Role                               | Email                     | Organisation              |
 | ---------------------------------- | ------------------------- | ------------------------- |
