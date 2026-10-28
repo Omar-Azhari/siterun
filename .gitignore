@@ -12,3 +12,9 @@ node_modules/.tmp
 # design source archive (images live in design/)
 siterun.zip
 siterun/
+
+# Internal working notes and tool settings (kept locally, not published)
+HANDOFF.md
+LAUNCH-PLAN.pdf
+SITERUN_CLAUDE_CODE_PROMPT.md
+.claude/
