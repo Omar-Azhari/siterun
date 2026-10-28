@@ -3,7 +3,7 @@
 **A construction equipment hire marketplace for Australia, with a web app plus Android and iOS apps.** Contractors find and book machines, suppliers list and track them, and platform admins keep the marketplace safe.
 _Machines. People. Progress._
 
-Built by **Omar Al Azhari**. No public deployment yet; run it locally in a few minutes with the offline demo backend (see [Setup](#setup)).
+**Designed and built by Omar Al Azhari.** No public deployment yet; run it locally in a few minutes with the offline demo backend (see [Setup](#setup)).
 
 <p>
 <img src="docs/store/play/1080x1920/01-search.png" width="190" alt="Search for machines on a map">
@@ -21,7 +21,7 @@ Built by **Omar Al Azhari**. No public deployment yet; run it locally in a few m
 
 ## How it was built
 
-I designed the product, wrote the specification and made the technical decisions (recorded in `DECISIONS.md`). The code was written with an AI coding assistant (Claude Code), and every commit is co-authored to show that. I directed each phase, reviewed and tested every change, and set up the test suites that gate it: unit tests, database security tests and end-to-end flows.
+I built SiteRun end to end: the product idea, the specification, the design, the architecture and every technical decision (recorded in `DECISIONS.md`), through to the web app, the mobile apps and the test suites. I used an AI coding assistant (Claude Code) as a tool to write code faster, which is why commits are co-authored. I directed every phase and reviewed and tested every change before it was committed.
 
 ## Challenges solved
 
